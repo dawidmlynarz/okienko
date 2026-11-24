@@ -1,0 +1,7 @@
+/* Drop Tailwind's default palette: app code may only use Okienko tokens. */
+@theme {
+  --color-*: initial;
+  --color-white: #ffffff;
+  --color-transparent: transparent;
+  --color-current: currentColor;
+}

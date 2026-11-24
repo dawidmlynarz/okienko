@@ -1,0 +1,58 @@
+/* Smoczek, PoC draft. Each body part is its own layer; one class per pose drives it.
+   Dawid's final drawing replaces the shapes but keeps these layer names. */
+.smok { --body: #5ED19A; --belly: #D3F9E3; --spike: #91E7B9; --line: #1F4D3A; --horn: #F7DEAB; --cheek: #FFBAD4; --mouth: #7A2E3F; --tongue: #FE8FBC; overflow: visible; }
+.smok * { transform-box: view-box; }
+.smok .ln { stroke: var(--line); stroke-width: 4; stroke-linejoin: round; stroke-linecap: round; }
+.smok .whole { transform-origin: 120px 245px; }
+.smok .head { transform-origin: 120px 160px; }
+.smok .tail { transform-origin: 160px 212px; }
+.smok .wingL { transform-origin: 82px 160px; }
+.smok .wingR { transform-origin: 158px 160px; }
+.smok .armL { transform-origin: 72px 172px; }
+.smok .armR { transform-origin: 168px 172px; }
+.smok .eyes .lid { transform-origin: 120px 95px; }
+.smok .pupils { transition: transform 0.3s; }
+.smok .m, .smok .eyesHappy, .smok .dots, .smok .spark { display: none; }
+.smok.idle .m-idle, .smok.happy .m-happy, .smok.cheer .m-cheer, .smok.thinking .m-think { display: inline; }
+.smok.talking .m { display: none; }
+.smok.talking .m-happy { display: inline; transform-origin: 120px 136px; }
+.smok.cheer .eyes { display: none; }
+.smok.cheer .eyesHappy { display: inline; }
+.smok.thinking .dots, .smok.cheer .spark { display: inline; }
+.smok.thinking .pupils { transform: translate(5px, -7px); }
+.smok.cheer .armL { transform: translate(-12px, -4px) rotate(140deg); }
+.smok.cheer .armR { transform: translate(12px, -4px) rotate(-140deg); }
+.smok.thinking .armR { transform: rotate(-125deg); }
+
+@media (prefers-reduced-motion: no-preference) {
+  .smok.idle .body { animation: smok-breathe 2.8s ease-in-out infinite; transform-origin: 120px 240px; }
+  .smok .eyes .lid { animation: smok-blink 4.2s infinite; }
+  .smok.idle .tail { animation: smok-sway 3s ease-in-out infinite; }
+  .smok.happy .whole { animation: smok-bounce 0.7s cubic-bezier(0.3, 0.6, 0.4, 1) 2; }
+  .smok.happy .tail { animation: smok-wag 0.35s ease-in-out infinite alternate; }
+  .smok.cheer .whole { animation: smok-jump 1s cubic-bezier(0.3, 0.7, 0.4, 1) infinite; }
+  .smok.cheer .armL { animation: smok-waveL 0.5s ease-in-out infinite alternate; }
+  .smok.cheer .armR { animation: smok-waveR 0.5s ease-in-out infinite alternate; }
+  .smok.cheer .wingL { animation: smok-flapL 0.25s ease-in-out infinite alternate; }
+  .smok.cheer .wingR { animation: smok-flapR 0.25s ease-in-out infinite alternate; }
+  .smok.cheer .spark { animation: smok-twinkle 1s ease-in-out infinite; }
+  .smok.thinking .head { animation: smok-tilt 3s ease-in-out infinite; }
+  .smok.thinking .dots circle { animation: smok-dot 1.8s infinite; }
+  .smok.thinking .dots circle:nth-child(2) { animation-delay: 0.3s; }
+  .smok.thinking .dots circle:nth-child(3) { animation-delay: 0.6s; }
+  .smok.talking .m-happy { animation: smok-talk 0.22s ease-in-out infinite alternate; }
+}
+@keyframes smok-breathe { 50% { transform: scale(1.025, 0.975); } }
+@keyframes smok-blink { 0%, 92%, 100% { transform: scaleY(1); } 95% { transform: scaleY(0.08); } }
+@keyframes smok-sway { 50% { transform: rotate(-6deg); } }
+@keyframes smok-wag { from { transform: rotate(-10deg); } to { transform: rotate(8deg); } }
+@keyframes smok-bounce { 0%, 100% { transform: translateY(0); } 45% { transform: translateY(-10px); } }
+@keyframes smok-jump { 0%, 100% { transform: translateY(0) scale(1, 1); } 10% { transform: translateY(0) scale(1.06, 0.92); } 40% { transform: translateY(-22px) scale(0.97, 1.04); } 70% { transform: translateY(0) scale(1.04, 0.96); } }
+@keyframes smok-waveL { from { transform: translate(-12px, -4px) rotate(125deg); } to { transform: translate(-12px, -4px) rotate(155deg); } }
+@keyframes smok-waveR { from { transform: translate(12px, -4px) rotate(-125deg); } to { transform: translate(12px, -4px) rotate(-155deg); } }
+@keyframes smok-flapL { from { transform: rotate(0); } to { transform: rotate(-18deg); } }
+@keyframes smok-flapR { from { transform: rotate(0); } to { transform: rotate(18deg); } }
+@keyframes smok-twinkle { 0%, 100% { opacity: 0.2; transform: scale(0.8); } 50% { opacity: 1; transform: scale(1.1); } }
+@keyframes smok-tilt { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(-6deg); } }
+@keyframes smok-dot { 0%, 100% { opacity: 0.25; } 40% { opacity: 1; } }
+@keyframes smok-talk { from { transform: scaleY(0.35); } to { transform: scaleY(1); } }

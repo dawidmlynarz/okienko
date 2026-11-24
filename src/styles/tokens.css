@@ -1,0 +1,154 @@
+/* Okienko colour tokens (primitive + semantic). Generated in OKLCH, contrast-checked against WCAG 2.2 AA. */
+@theme {
+  --color-sky-50: #EFF8FF;
+  --color-sky-100: #DEF2FF;
+  --color-sky-200: #C3E7FE;
+  --color-sky-300: #9EDAFE;
+  --color-sky-400: #5DC4FB;
+  --color-sky-500: #37AAE3;
+  --color-sky-600: #0784B7;
+  --color-sky-700: #056B96;
+  --color-sky-800: #005476;
+  --color-sky-900: #04374F;
+  --color-mint-50: #E9FCF1;
+  --color-mint-100: #D3F9E3;
+  --color-mint-200: #B5F2D0;
+  --color-mint-300: #91E7B9;
+  --color-mint-400: #5ED19A;
+  --color-mint-500: #37B880;
+  --color-mint-600: #01915F;
+  --color-mint-700: #00764C;
+  --color-mint-800: #025C3B;
+  --color-mint-900: #033D26;
+  --color-pink-50: #FFF3F7;
+  --color-pink-100: #FEE8EF;
+  --color-pink-200: #FED4E3;
+  --color-pink-300: #FFBAD4;
+  --color-pink-400: #FE8FBC;
+  --color-pink-500: #E573A3;
+  --color-pink-600: #B9517F;
+  --color-pink-700: #993F67;
+  --color-pink-800: #773150;
+  --color-pink-900: #4F2035;
+  --color-lavender-50: #F6F6FE;
+  --color-lavender-100: #EEECFF;
+  --color-lavender-200: #E0DDFE;
+  --color-lavender-300: #D0CAFE;
+  --color-lavender-400: #B6AAFE;
+  --color-lavender-500: #9E8EEF;
+  --color-lavender-600: #7A6AC3;
+  --color-lavender-700: #6355A2;
+  --color-lavender-800: #4D427E;
+  --color-lavender-900: #332C54;
+  --color-butter-50: #FEF6E5;
+  --color-butter-100: #FDEDCD;
+  --color-butter-200: #F7DEAB;
+  --color-butter-300: #EECC85;
+  --color-butter-400: #DCB151;
+  --color-butter-500: #C3972A;
+  --color-butter-600: #9A7405;
+  --color-butter-700: #7E5E00;
+  --color-butter-800: #624902;
+  --color-butter-900: #423001;
+  --color-peach-50: #FFF4EF;
+  --color-peach-100: #FEEADF;
+  --color-peach-200: #FED8C4;
+  --color-peach-300: #FEC2A0;
+  --color-peach-400: #FB9D66;
+  --color-peach-500: #E28247;
+  --color-peach-600: #B75F25;
+  --color-peach-700: #974B18;
+  --color-peach-800: #763A12;
+  --color-peach-900: #4E270D;
+  --color-coral-50: #FEF4F3;
+  --color-coral-100: #FEE9E6;
+  --color-coral-200: #FFD6D2;
+  --color-coral-300: #FEBFB9;
+  --color-coral-400: #FF958E;
+  --color-coral-500: #F2716A;
+  --color-coral-600: #C44E4A;
+  --color-coral-700: #A33D3A;
+  --color-coral-800: #7F2F2C;
+  --color-coral-900: #551F1D;
+  --color-ink-50: #F5F7FC;
+  --color-ink-100: #EBEEF8;
+  --color-ink-200: #DBE1F1;
+  --color-ink-300: #C9D1E5;
+  --color-ink-400: #AEB7D1;
+  --color-ink-500: #949EB8;
+  --color-ink-600: #717A92;
+  --color-ink-700: #5B6377;
+  --color-ink-800: #474D5D;
+  --color-ink-900: #1B2240;
+}
+
+:root {
+  --bg: #FBF8F3;
+  --surface: #FFFFFF;
+  --text: var(--color-ink-900);
+  --text-muted: var(--color-ink-700);
+  --focus-ring: var(--color-sky-600);
+}
+
+[data-app="system"] {
+  --accent-soft: var(--color-sky-100);   /* window tint, backgrounds */
+  --accent-pastel: var(--color-sky-300); /* pastel buttons, tiles; label = --accent-deep */
+  --accent: var(--color-sky-500);        /* illustration only, never behind text */
+  --accent-edge: var(--color-sky-600);   /* button bottom edge, icons, borders (>=3:1) */
+  --accent-strong: var(--color-sky-700); /* coloured text on white; white text on it (>=4.5:1) */
+  --accent-deep: var(--color-sky-900);   /* text on any 50-300 pastel (>=8:1) */
+}
+
+[data-app="typing"] {
+  --accent-soft: var(--color-mint-100);   /* window tint, backgrounds */
+  --accent-pastel: var(--color-mint-300); /* pastel buttons, tiles; label = --accent-deep */
+  --accent: var(--color-mint-500);        /* illustration only, never behind text */
+  --accent-edge: var(--color-mint-600);   /* button bottom edge, icons, borders (>=3:1) */
+  --accent-strong: var(--color-mint-700); /* coloured text on white; white text on it (>=4.5:1) */
+  --accent-deep: var(--color-mint-900);   /* text on any 50-300 pastel (>=8:1) */
+}
+
+[data-app="english"] {
+  --accent-soft: var(--color-pink-100);   /* window tint, backgrounds */
+  --accent-pastel: var(--color-pink-300); /* pastel buttons, tiles; label = --accent-deep */
+  --accent: var(--color-pink-500);        /* illustration only, never behind text */
+  --accent-edge: var(--color-pink-600);   /* button bottom edge, icons, borders (>=3:1) */
+  --accent-strong: var(--color-pink-700); /* coloured text on white; white text on it (>=4.5:1) */
+  --accent-deep: var(--color-pink-900);   /* text on any 50-300 pastel (>=8:1) */
+}
+
+[data-app="maths"] {
+  --accent-soft: var(--color-lavender-100);   /* window tint, backgrounds */
+  --accent-pastel: var(--color-lavender-300); /* pastel buttons, tiles; label = --accent-deep */
+  --accent: var(--color-lavender-500);        /* illustration only, never behind text */
+  --accent-edge: var(--color-lavender-600);   /* button bottom edge, icons, borders (>=3:1) */
+  --accent-strong: var(--color-lavender-700); /* coloured text on white; white text on it (>=4.5:1) */
+  --accent-deep: var(--color-lavender-900);   /* text on any 50-300 pastel (>=8:1) */
+}
+
+[data-app="notes"] {
+  --accent-soft: var(--color-butter-100);   /* window tint, backgrounds */
+  --accent-pastel: var(--color-butter-300); /* pastel buttons, tiles; label = --accent-deep */
+  --accent: var(--color-butter-500);        /* illustration only, never behind text */
+  --accent-edge: var(--color-butter-600);   /* button bottom edge, icons, borders (>=3:1) */
+  --accent-strong: var(--color-butter-700); /* coloured text on white; white text on it (>=4.5:1) */
+  --accent-deep: var(--color-butter-900);   /* text on any 50-300 pastel (>=8:1) */
+}
+
+[data-app="web"] {
+  --accent-soft: var(--color-peach-100);   /* window tint, backgrounds */
+  --accent-pastel: var(--color-peach-300); /* pastel buttons, tiles; label = --accent-deep */
+  --accent: var(--color-peach-500);        /* illustration only, never behind text */
+  --accent-edge: var(--color-peach-600);   /* button bottom edge, icons, borders (>=3:1) */
+  --accent-strong: var(--color-peach-700); /* coloured text on white; white text on it (>=4.5:1) */
+  --accent-deep: var(--color-peach-900);   /* text on any 50-300 pastel (>=8:1) */
+}
+
+[data-app="error"] {
+  --accent-soft: var(--color-coral-100);   /* window tint, backgrounds */
+  --accent-pastel: var(--color-coral-300); /* pastel buttons, tiles; label = --accent-deep */
+  --accent: var(--color-coral-500);        /* illustration only, never behind text */
+  --accent-edge: var(--color-coral-600);   /* button bottom edge, icons, borders (>=3:1) */
+  --accent-strong: var(--color-coral-700); /* coloured text on white; white text on it (>=4.5:1) */
+  --accent-deep: var(--color-coral-900);   /* text on any 50-300 pastel (>=8:1) */
+}

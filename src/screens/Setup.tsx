@@ -1,0 +1,99 @@
+import { motion } from 'motion/react'
+import { useState } from 'react'
+import { COMPANION_COLORS, Smoczek } from '../components/Smoczek'
+import { Button } from '../components/Button'
+import { pl } from '../i18n/pl'
+import { unlockAudio } from '../lib/sound'
+import { requestPersistentStorage } from '../store/storage'
+import { useOkienko, type CompanionColor } from '../store/useOkienko'
+import { BackupButtons } from './Parent'
+
+export function ColorPicker({ value, onChange }: { value: CompanionColor; onChange: (c: CompanionColor) => void }) {
+  return (
+    <div role="radiogroup" aria-label={pl.setup.companionColor} className="flex gap-4">
+      {(Object.keys(COMPANION_COLORS) as CompanionColor[]).map((c) => (
+        <button
+          key={c}
+          type="button"
+          role="radio"
+          aria-checked={value === c}
+          aria-label={pl.setup.colors[c]}
+          title={pl.setup.colors[c]}
+          onClick={() => onChange(c)}
+          className={`size-14 rounded-full border-4 border-white transition-shadow ${value === c ? 'shadow-[0_0_0_4px_var(--color-ink-900)]' : 'shadow-[0_0_0_2px_var(--color-ink-300)]'}`}
+          style={{ background: COMPANION_COLORS[c][0] }}
+        />
+      ))}
+    </div>
+  )
+}
+
+export function Field({ label, hint, value, onChange, id }: { label: string; hint?: string; value: string; onChange: (v: string) => void; id: string }) {
+  return (
+    <label htmlFor={id} className="flex flex-col gap-2">
+      <span className="font-display text-xl font-semibold">{label}</span>
+      <input
+        id={id}
+        value={value}
+        maxLength={12}
+        onChange={(e) => onChange(e.target.value)}
+        className="h-16 rounded-md border-4 border-ink-200 bg-surface px-4 text-2xl outline-none focus:border-sky-600"
+        autoComplete="off"
+        spellCheck={false}
+      />
+      {hint && <span className="text-base text-muted">{hint}</span>}
+    </label>
+  )
+}
+
+export function Setup() {
+  const completeSetup = useOkienko((s) => s.completeSetup)
+  const [childName, setChildName] = useState('')
+  const [companionName, setCompanionName] = useState('Smoczek')
+  const [color, setColor] = useState<CompanionColor>('mint')
+  // Names are typed letter by letter on login, so keep letters only.
+  const clean = (s: string) => s.replace(/[^\p{L}]/gu, '')
+  const ok = clean(childName).length >= 2 && companionName.trim().length >= 2
+
+  return (
+    <div className="relative z-10 flex flex-1 items-center justify-center p-6">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="flex w-full max-w-4xl gap-10 rounded-xl bg-surface p-10 shadow-float"
+      >
+        <div className="flex w-64 flex-col items-center justify-center">
+          <Smoczek pose="happy" color={color} size={240} />
+        </div>
+        <form
+          className="flex flex-1 flex-col gap-6"
+          onSubmit={(e) => {
+            e.preventDefault()
+            if (!ok) return
+            unlockAudio()
+            void requestPersistentStorage()
+            const n = clean(childName)
+            completeSetup({ childName: n[0].toLocaleUpperCase('pl') + n.slice(1), companionName: companionName.trim(), companionColor: color })
+          }}
+        >
+          <div>
+            <h1 className="font-display text-4xl font-semibold">{pl.setup.title}</h1>
+            <p className="mt-2 text-xl text-muted">{pl.setup.lead}</p>
+          </div>
+          <Field id="child" label={pl.setup.childName} hint={pl.setup.childNameHint} value={childName} onChange={setChildName} />
+          <Field id="companion" label={pl.setup.companionName} value={companionName} onChange={setCompanionName} />
+          <div className="flex flex-col gap-3">
+            <span className="font-display text-xl font-semibold">{pl.setup.companionColor}</span>
+            <ColorPicker value={color} onChange={setColor} />
+          </div>
+          <div className="mt-2 flex items-center justify-between gap-4">
+            <BackupButtons importOnly />
+            <Button type="submit" variant="strong" size="lg" disabled={!ok}>
+              {pl.setup.start}
+            </Button>
+          </div>
+        </form>
+      </motion.div>
+    </div>
+  )
+}
