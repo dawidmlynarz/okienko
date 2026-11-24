@@ -87,7 +87,7 @@ export function UpgradeOverlay() {
                     </motion.g>
                   ))}
                 </svg>
-                <span className="font-display text-5xl font-semibold">{pl.os.version(NEXT)}</span>
+                <span className="font-display text-5xl font-bold">{pl.os.version(NEXT)}</span>
                 <span className="text-xl text-sky-100">{pl.upgrade.restarting}</span>
               </motion.div>
             ) : (
@@ -97,12 +97,12 @@ export function UpgradeOverlay() {
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: -12 }}
                 transition={{ type: 'spring', stiffness: 300, damping: 26 }}
-                className="flex w-full max-w-3xl flex-col items-center gap-6 rounded-xl bg-surface p-10 text-center shadow-float"
+                className="glass-strong flex w-full max-w-3xl flex-col items-center gap-6 rounded-[32px] p-10 text-center"
               >
                 {phase === 'offer' && (
                   <>
                     <Companion pose="cheer" say={pl.upgrade.readySay(NEXT)} size={200} />
-                    <h2 className="font-display text-4xl font-semibold">{pl.upgrade.ready}</h2>
+                    <h2 className="font-display text-4xl font-bold">{pl.upgrade.ready}</h2>
                     <p className="text-2xl text-muted">{pl.os.version('1.0')} → <strong className="text-sky-700">{pl.os.version(NEXT)}</strong></p>
                     <div className="flex gap-4">
                       <Button variant="plain" size="lg" onClick={() => setUpgradeOpen(false)}>
@@ -117,8 +117,8 @@ export function UpgradeOverlay() {
                 {phase === 'installing' && (
                   <>
                     <Companion pose="thinking" size={200} />
-                    <h2 className="font-display text-4xl font-semibold">{pl.upgrade.installing(NEXT)}</h2>
-                    <div className="h-8 w-full overflow-hidden rounded-full bg-sky-100" role="progressbar" aria-valuenow={Math.round(progress * 100)} aria-valuemin={0} aria-valuemax={100}>
+                    <h2 className="font-display text-4xl font-bold">{pl.upgrade.installing(NEXT)}</h2>
+                    <div className="h-4 w-full overflow-hidden rounded-full bg-sky-100" role="progressbar" aria-valuenow={Math.round(progress * 100)} aria-valuemin={0} aria-valuemax={100}>
                       <div className="h-full w-full origin-left rounded-full bg-sky-600" style={{ transform: `scaleX(${Math.max(0.04, progress)})` }} />
                     </div>
                     <div className="flex w-full justify-between text-xl">
@@ -134,7 +134,7 @@ export function UpgradeOverlay() {
                 {phase === 'new' && (
                   <>
                     <Companion pose="cheer" say={pl.upgrade.doneSay(NEXT)} size={180} />
-                    <h2 className="font-display text-4xl font-semibold">{pl.upgrade.whatsNew(NEXT)}</h2>
+                    <h2 className="font-display text-4xl font-bold">{pl.upgrade.whatsNew(NEXT)}</h2>
                     <ul className="flex w-full flex-col gap-4 text-left">
                       {pl.upgrade.features.map((f, i) => (
                         <motion.li
@@ -142,9 +142,9 @@ export function UpgradeOverlay() {
                           initial={{ opacity: 0, x: -20 }}
                           animate={{ opacity: 1, x: 0 }}
                           transition={{ delay: 0.4 + i * 0.25 }}
-                          className="flex items-start gap-4 rounded-lg bg-sky-50 p-5"
+                          className="flex items-start gap-4 rounded-[20px] bg-sky-50 p-5"
                         >
-                          <span className="grid size-14 shrink-0 place-items-center rounded-md bg-sky-200 text-sky-900">
+                          <span className="grid size-14 shrink-0 place-items-center rounded-[16px] bg-white text-sky-800 shadow-button">
                             {i === 0 ? <BookOpenText size={32} weight="bold" /> : <SunHorizon size={32} weight="bold" />}
                           </span>
                           <span>

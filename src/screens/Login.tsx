@@ -1,8 +1,9 @@
-import { Check, LockKey, UserCircle, Wrench } from '@phosphor-icons/react'
+import { Check, LockKey, SpeakerHigh, UserCircle, Wrench } from '@phosphor-icons/react'
 import { AnimatePresence, motion } from 'motion/react'
-import { useEffect, useState, type CSSProperties } from 'react'
+import { useEffect, useState } from 'react'
 import type { PictureId } from '../assets/pictures'
-import { Companion } from '../components/Companion'
+import { useTalk } from '../components/Companion'
+import { Smoczek } from '../components/Smoczek'
 import { OnScreenKeyboard } from '../components/OnScreenKeyboard'
 import { Picture } from '../components/Picture'
 import type { Pose } from '../components/Smoczek'
@@ -21,34 +22,57 @@ export function Login() {
   const profile = useOkienko((s) => s.profile)!
   const [step, setStep] = useState<Step>('name')
   const [line, setLine] = useState<{ text: string; say?: string; pose: Pose; key: number }>(() => ({
-    text: pl.login.typeName,
+    text: pl.login.hello(profile.companionName),
     say: `${pl.login.hello(profile.companionName)} ${pl.login.typeNameSay(profile.childName)}`,
     pose: 'happy',
     key: 0,
   }))
   const tell = (text: string, pose: Pose = 'idle', say?: string) => setLine((l) => ({ text, say, pose, key: l.key + 1 }))
+  const { talking, repeat } = useTalk(line.say ?? line.text, line.key)
 
   return (
-    <div className="relative z-10 flex flex-1 flex-col items-center justify-center gap-6 px-6 pb-6" onPointerDown={unlockAudio}>
-      <StepDots step={step} />
-      <div className="flex w-full max-w-6xl items-center justify-center gap-8">
-        <Companion text={line.text} say={line.say} sayKey={line.key} pose={line.pose} size={210} bubbleSide="top" className="w-80 shrink-0" />
-        <motion.div layout className="flex min-w-[680px] flex-col items-center gap-6 rounded-xl bg-surface p-8 shadow-float">
+    <div className="relative z-10 flex flex-1 flex-col items-center justify-center px-6 pb-4" onPointerDown={unlockAudio}>
+      <div className="relative flex flex-col items-center">
+        {/* Smoczek as the account picture, overlapping the card like a real login screen */}
+        <div className="relative z-10 -mb-20 grid size-44 place-items-center rounded-full bg-white shadow-float ring-8 ring-white/60">
+          <Smoczek pose={line.pose} talking={talking && line.pose !== 'thinking'} color={profile.companionColor} size={150} label={profile.companionName} className="translate-y-2" />
+        </div>
+        <motion.div layout className="glass-strong relative flex w-[860px] flex-col items-center gap-5 rounded-[32px] px-10 pt-24 pb-8">
+          <div className="flex items-center gap-2">
+            <AnimatePresence mode="popLayout">
+              <motion.p
+                key={line.key}
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+                className="text-center text-2xl text-muted"
+                role="status"
+              >
+                {line.text}
+              </motion.p>
+            </AnimatePresence>
+            <button type="button" aria-label="Powiedz jeszcze raz" title="Powiedz jeszcze raz" onClick={repeat} className="grid size-10 place-items-center rounded-full text-sky-700 hover:bg-sky-100">
+              <SpeakerHigh size={22} weight="bold" />
+            </button>
+          </div>
+          <div className="absolute top-5 left-5">
+            <StepDots step={step} />
+          </div>
           <AnimatePresence mode="wait">
             {step === 'name' ? (
-              <motion.div key="name" exit={{ opacity: 0, x: -40 }} className="flex flex-col items-center gap-6">
+              <motion.div key="name" exit={{ opacity: 0, x: -30 }} className="flex flex-col items-center gap-5">
                 <NameStep
                   name={profile.childName}
                   onTell={tell}
                   onDone={() => {
                     setStep('pin')
                     const has = !!profile.pin
-                    tell(has ? pl.login.pinEnter : pl.login.pinChoose, 'happy', `${pl.login.welcome(profile.childName)} ${has ? pl.login.pinEnterSay : pl.login.pinChooseSay}`)
+                    tell(pl.login.welcome(profile.childName), 'happy', `${pl.login.welcome(profile.childName)} ${has ? pl.login.pinEnterSay : pl.login.pinChooseSay}`)
                   }}
                 />
               </motion.div>
             ) : (
-              <motion.div key="pin" initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }} className="flex flex-col items-center gap-6">
+              <motion.div key="pin" initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} className="flex flex-col items-center gap-5">
                 <PinStep onTell={tell} />
               </motion.div>
             )}
@@ -61,21 +85,21 @@ export function Login() {
 
 function StepDots({ step }: { step: Step }) {
   const items = [
-    { id: 'name' as const, icon: <UserCircle size={26} weight="bold" />, label: 'Imię' },
-    { id: 'pin' as const, icon: <LockKey size={26} weight="bold" />, label: 'Tajne obrazki' },
+    { id: 'name' as const, icon: <UserCircle size={22} weight="bold" />, label: 'Imię' },
+    { id: 'pin' as const, icon: <LockKey size={22} weight="bold" />, label: 'Tajne obrazki' },
   ]
   const idx = items.findIndex((i) => i.id === step)
   return (
-    <ol className="flex items-center gap-3 rounded-full bg-surface/90 px-3 py-2 shadow-card" aria-label={pl.login.twoStepTitle}>
+    <ol className="flex items-center gap-2 rounded-full bg-ink-50 p-1.5" aria-label={pl.login.twoStepTitle}>
       {items.map((it, i) => (
         <li key={it.id} className="flex items-center gap-3">
-          {i > 0 && <span className={`h-1 w-10 rounded-full ${i <= idx ? 'bg-sky-600' : 'bg-ink-200'}`} />}
+          {i > 0 && <span className={`h-0.5 w-6 rounded-full ${i <= idx ? 'bg-sky-600' : 'bg-ink-300'}`} />}
           <span
-            className={`flex items-center gap-2 rounded-full px-4 py-1.5 font-display text-lg font-semibold ${
-              i === idx ? 'bg-sky-700 text-white' : i < idx ? 'bg-sky-100 text-sky-900' : 'text-muted'
+            className={`flex items-center gap-2 rounded-full px-4 py-1.5 font-display text-base font-semibold ${
+              i === idx ? 'bg-white text-sky-800 shadow-button' : i < idx ? 'text-sky-800' : 'text-muted'
             }`}
           >
-            {i < idx ? <Check size={24} weight="bold" /> : it.icon}
+            {i < idx ? <Check size={20} weight="bold" /> : it.icon}
             {it.label}
           </span>
         </li>
@@ -126,7 +150,7 @@ function NameStep({ name, onTell, onDone }: { name: string; onTell: (t: string, 
 
   return (
     <>
-      <h2 className="font-display text-3xl font-semibold">{pl.login.typeName}</h2>
+      <h2 className="font-display text-4xl font-bold">{pl.login.typeName}</h2>
       <motion.div key={shake} animate={shake ? { x: [0, -10, 10, -6, 6, 0] } : {}} transition={{ duration: 0.35 }} className="flex gap-3">
         {letters.map((c, i) => {
           const filled = i < pos
@@ -134,8 +158,12 @@ function NameStep({ name, onTell, onDone }: { name: string; onTell: (t: string, 
           return (
             <span
               key={i}
-              className={`grid h-24 w-20 place-items-center rounded-lg border-4 font-body text-6xl ${
-                filled ? 'border-mint-600 bg-mint-100 text-mint-900' : current ? 'border-sky-600 bg-sky-50 text-ink-400' : 'border-ink-200 bg-ink-50 text-ink-300'
+              className={`grid h-24 w-20 place-items-center rounded-[20px] font-body text-6xl transition-colors ${
+                filled
+                  ? 'bg-sky-50 text-ink shadow-[inset_0_0_0_2px_var(--color-sky-200)]'
+                  : current
+                    ? 'bg-white shadow-[inset_0_0_0_2px_var(--color-sky-600),0_0_0_5px_var(--color-sky-100)]'
+                    : 'bg-white/70 shadow-[inset_0_0_0_2px_var(--color-ink-200)]'
               }`}
             >
               {filled ? (
@@ -178,7 +206,7 @@ function PinStep({ onTell }: { onTell: (t: string, p?: Pose, say?: string) => vo
         setPicks([])
         setBusy(false)
         play('correct')
-        onTell(pl.login.pinRepeat, 'happy', pl.login.pinRepeatSay)
+        onTell(pl.login.pinRepeatSay, 'happy')
       } else if (picks.every((p, i) => p === first[i])) {
         setPin(picks)
         succeed()
@@ -211,10 +239,10 @@ function PinStep({ onTell }: { onTell: (t: string, p?: Pose, say?: string) => vo
 
   return (
     <>
-      <h2 className="font-display text-3xl font-semibold">{title}</h2>
+      <h2 className="font-display text-4xl font-bold">{title}</h2>
       <motion.div key={shake} animate={shake ? { x: [0, -10, 10, -6, 6, 0] } : {}} transition={{ duration: 0.35 }} className="flex gap-4">
         {[0, 1, 2].map((i) => (
-          <span key={i} className={`grid size-24 place-items-center rounded-lg border-4 ${picks[i] ? 'border-sky-600 bg-sky-50' : 'border-dashed border-ink-300 bg-ink-50'}`}>
+          <span key={i} className={`grid size-24 place-items-center rounded-[22px] ${picks[i] ? 'bg-sky-50 shadow-[inset_0_0_0_2px_var(--color-sky-600)]' : 'bg-white/70 shadow-[inset_0_0_0_2px_var(--color-ink-200)]'}`}>
             {picks[i] &&
               (mode === 'enter' ? (
                 <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }} className="size-8 rounded-full bg-sky-700" aria-label="ukryty obrazek" />
@@ -226,7 +254,7 @@ function PinStep({ onTell }: { onTell: (t: string, p?: Pose, say?: string) => vo
           </span>
         ))}
       </motion.div>
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-3 gap-3">
         {PIN_PICTURES.map((id) => (
           <button
             key={id}
@@ -238,8 +266,7 @@ function PinStep({ onTell }: { onTell: (t: string, p?: Pose, say?: string) => vo
               play('pop')
               setPicks((p) => [...p, id])
             }}
-            style={{ '--edge': 'var(--color-ink-300)' } as CSSProperties}
-            className="pressable grid size-28 place-items-center rounded-lg border-2 border-ink-200 bg-surface hover:bg-sky-50"
+            className="pressable grid size-28 place-items-center rounded-[24px] bg-white shadow-button hover:shadow-[0_0_0_3px_var(--color-sky-200),0_8px_20px_rgb(27_34_64/0.1)]"
           >
             <Picture id={id} size={72} />
           </button>
@@ -261,7 +288,7 @@ export function ParentButton() {
     <button
       type="button"
       onClick={() => setParentOpen(true)}
-      className="absolute right-5 bottom-5 z-20 flex items-center gap-2 rounded-full bg-surface/80 px-4 py-2 text-base text-muted shadow-card hover:bg-surface"
+      className="glass absolute right-6 bottom-6 z-20 flex items-center gap-2 rounded-full px-4 py-2 font-display text-base font-semibold text-muted hover:text-ink"
     >
       <Wrench size={20} weight="bold" /> {pl.login.parent}
     </button>

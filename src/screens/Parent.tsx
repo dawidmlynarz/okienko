@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from 'motion/react'
 import { useMemo, useRef, useState } from 'react'
 import { Button, IconButton } from '../components/Button'
 import { pl } from '../i18n/pl'
-import { polishVoices, speak } from '../lib/speak'
+import { polishVoices, speak, voiceQuality } from '../lib/speak'
 import { backupFile, useOkienko } from '../store/useOkienko'
 import { ColorPicker, Field } from './Setup'
 
@@ -71,7 +71,7 @@ function Gate({ onPass }: { onPass: () => void }) {
     >
       <p className="text-xl text-muted">{pl.setup.gateHint}</p>
       <label className="flex flex-col gap-2">
-        <span className="font-display text-2xl font-semibold">{pl.setup.gateQuestion(a, b)}</span>
+        <span className="font-display text-2xl font-bold">{pl.setup.gateQuestion(a, b)}</span>
         <input
           autoFocus
           inputMode="numeric"
@@ -80,7 +80,7 @@ function Gate({ onPass }: { onPass: () => void }) {
             setBad(false)
             setV(e.target.value.replace(/\D/g, ''))
           }}
-          className={`h-16 w-40 rounded-md border-4 bg-surface px-4 text-3xl outline-none ${bad ? 'border-coral-600' : 'border-ink-200 focus:border-sky-600'}`}
+          className={`h-16 w-40 rounded-md border-2 bg-surface px-4 text-3xl outline-none ${bad ? 'border-coral-600' : 'border-ink-200 focus:border-sky-600'}`}
         />
       </label>
       <Button type="submit" variant="strong" className="self-start">
@@ -103,22 +103,22 @@ function Panel() {
         <Field id="p-comp" label={pl.setup.companionName} value={profile.companionName} onChange={(v) => updateProfile({ companionName: v })} />
       </div>
       <div className="flex flex-col gap-3">
-        <span className="font-display text-xl font-semibold">{pl.setup.companionColor}</span>
+        <span className="font-display text-lg font-semibold">{pl.setup.companionColor}</span>
         <ColorPicker value={profile.companionColor} onChange={(c) => updateProfile({ companionColor: c })} />
       </div>
       <div className="flex flex-col gap-3">
-        <span className="font-display text-xl font-semibold">{pl.setup.voice}</span>
+        <span className="font-display text-lg font-semibold">{pl.setup.voice}</span>
         {voices.length ? (
           <div className="flex items-center gap-3">
             <select
               value={settings.voiceName ?? ''}
               onChange={(e) => setSettings({ voiceName: e.target.value || null })}
-              className="h-14 rounded-md border-4 border-ink-200 bg-surface px-3 text-xl"
+              className="h-14 rounded-md border-2 border-ink-200 bg-surface px-3 text-lg"
             >
               <option value="">Automatycznie</option>
               {voices.map((v) => (
                 <option key={v.name} value={v.name}>
-                  {v.name}
+                  {v.name} · {voiceQuality(v)}
                 </option>
               ))}
             </select>
@@ -133,9 +133,10 @@ function Panel() {
         ) : (
           <p className="text-lg text-muted">{pl.setup.voiceNone}</p>
         )}
+        <p className="max-w-2xl text-base text-muted">{pl.setup.voiceTip}</p>
       </div>
       <div className="flex flex-col gap-3">
-        <span className="font-display text-xl font-semibold">{pl.setup.backup}</span>
+        <span className="font-display text-lg font-semibold">{pl.setup.backup}</span>
         <BackupButtons />
       </div>
       <div className="flex flex-wrap items-center gap-3 border-t-2 border-ink-100 pt-6">
@@ -190,10 +191,10 @@ export function ParentDialog() {
             initial={{ scale: 0.95, y: 20 }}
             animate={{ scale: 1, y: 0 }}
             exit={{ scale: 0.95, y: 20 }}
-            className="max-h-full w-full max-w-3xl overflow-auto rounded-xl bg-surface p-8 shadow-float"
+            className="max-h-full w-full max-w-3xl overflow-auto rounded-[32px] bg-surface p-8 shadow-float"
           >
             <div className="mb-6 flex items-center justify-between">
-              <h2 className="font-display text-3xl font-semibold">{pl.setup.parentTitle}</h2>
+              <h2 className="font-display text-3xl font-bold">{pl.setup.parentTitle}</h2>
               <IconButton label={pl.setup.close} onClick={close}>
                 <X size={28} weight="bold" />
               </IconButton>

@@ -1,7 +1,7 @@
 import { House } from '@phosphor-icons/react'
 import { motion } from 'motion/react'
-import { Suspense, createContext, useCallback, useContext, useRef, type CSSProperties } from 'react'
-import { Picture } from '../components/Picture'
+import { Suspense, createContext, useCallback, useContext, useRef } from 'react'
+import { AppIcon } from '../components/Dock'
 import { pl } from '../i18n/pl'
 import { play } from '../lib/sound'
 import { stopSpeaking } from '../lib/speak'
@@ -43,22 +43,21 @@ export function AppFrame({ app }: { app: AppDef }) {
       initial={{ opacity: 0, scale: 0.96, y: 24 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
       transition={{ type: 'spring', stiffness: 260, damping: 26 }}
-      className="absolute inset-3 z-20 flex flex-col overflow-hidden rounded-lg bg-surface shadow-float"
+      className="absolute inset-4 z-20 flex flex-col overflow-hidden rounded-[28px] bg-surface shadow-float ring-1 ring-white/80"
       aria-label={app.name}
     >
-      <header className="flex shrink-0 items-center gap-4 bg-accent-soft px-4" style={{ height: 'var(--titlebar-height)' }}>
-        <Picture id={app.icon} size={36} />
-        <h1 className="flex-1 font-display text-2xl font-semibold text-accent-deep">{app.name}</h1>
+      <header className="flex shrink-0 items-center gap-3 border-b border-ink-100 bg-surface px-4" style={{ height: 'var(--titlebar-height)' }}>
+        <AppIcon icon={app.icon} size={44} />
+        <h1 className="flex-1 font-display text-2xl font-bold text-ink">{app.name}</h1>
         <button
           type="button"
           onClick={() => {
             play('click')
             close()
           }}
-          style={{ '--edge': 'var(--accent-edge)' } as CSSProperties}
-          className="pressable flex h-12 items-center gap-2 rounded-full bg-surface px-5 font-display text-xl font-semibold text-accent-deep"
+          className="pressable flex h-12 items-center gap-2 rounded-full bg-accent-soft px-5 font-display text-lg font-semibold text-accent-deep hover:bg-accent-pastel"
         >
-          <House size={26} weight="bold" /> {pl.os.home}
+          <House size={24} weight="bold" /> {pl.os.home}
         </button>
       </header>
       <div className="relative min-h-0 flex-1">

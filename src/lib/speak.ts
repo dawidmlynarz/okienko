@@ -16,24 +16,54 @@ if (typeof speechSynthesis !== 'undefined') {
   speechSynthesis.addEventListener?.('voiceschanged', loadVoices)
 }
 
-// Friendlier voices first: macOS "Zosia", Windows "Paulina", Chrome's "Google polski".
-const PREFERRED = [/zosia/i, /paulina/i, /google polski/i, /marek/i, /adam/i]
+/**
+ * Rank Polish voices by how natural they sound. Higher is better.
+ * macOS: downloadable "Ewa (Premium)" / "Zosia (Enhanced)" are far better than the default Zosia.
+ * Chrome everywhere: "Google polski" (online) beats Windows' built-in Paulina.
+ */
+export function voiceScore(v: Pick<SpeechSynthesisVoice, 'name' | 'localService'>): number {
+  const n = v.name.toLowerCase()
+  let score = 0
+  if (/natural|neural|online/.test(n)) score += 60
+  if (/premium/.test(n)) score += 50
+  if (/enhanced|ulepsz|rozszerz/.test(n)) score += 40
+  if (/google/.test(n)) score += 35
+  if (/ewa/.test(n)) score += 8
+  if (/zosia/.test(n)) score += 6
+  if (/paulina/.test(n)) score += 2
+  if (/compact|eloquence|grandma|grandpa|rocko|shelley|flo|reed|sandy/.test(n)) score -= 40
+  return score
+}
 
 export function polishVoices(): SpeechSynthesisVoice[] {
-  return voices.filter((v) => v.lang.toLowerCase().startsWith('pl'))
+  return voices.filter((v) => v.lang.toLowerCase().replace('_', '-').startsWith('pl')).sort((a, b) => voiceScore(b) - voiceScore(a))
+}
+
+/** A short quality label for the parent panel. */
+export function voiceQuality(v: SpeechSynthesisVoice): string {
+  const s = voiceScore(v)
+  return s >= 35 ? 'naturalny' : s >= 6 ? 'dobry' : 'podstawowy'
 }
 
 function pickVoice(): SpeechSynthesisVoice | null {
   const pl = polishVoices()
   if (!pl.length) return null
   const chosen = useOkienko.getState().settings.voiceName
-  const byName = chosen && pl.find((v) => v.name === chosen)
-  if (byName) return byName
-  for (const re of PREFERRED) {
-    const v = pl.find((x) => re.test(x.name))
-    if (v) return v
-  }
-  return pl[0]
+  return (chosen && pl.find((v) => v.name === chosen)) || pl[0]
+}
+
+/**
+ * Split into short phrases. Browser voices sound much less flat when each sentence
+ * is its own utterance (they reset intonation and pause naturally), and Chrome
+ * cuts off utterances longer than about 15 seconds.
+ */
+export function phrases(text: string): string[] {
+  return text
+    .replace(/…/g, '.')
+    .replace(/[„”"]/g, '')
+    .split(/(?<=[.!?])\s+|\n+/)
+    .map((p) => p.trim())
+    .filter(Boolean)
 }
 
 export interface SpeakOptions {
@@ -51,15 +81,26 @@ export function speak(text: string, opts: SpeakOptions = {}) {
     return
   }
   if (opts.interrupt !== false) speechSynthesis.cancel()
-  const u = new SpeechSynthesisUtterance(text)
-  u.lang = 'pl-PL'
+  const parts = phrases(text)
+  if (!parts.length) return opts.onEnd?.()
   const v = pickVoice()
-  if (v) u.voice = v
-  u.rate = 0.95
-  u.pitch = 1.15
-  u.onend = () => opts.onEnd?.()
-  u.onerror = () => opts.onEnd?.()
-  speechSynthesis.speak(u)
+  // Premium / natural voices sound best at their own pace; basic ones a touch slower and brighter.
+  const natural = v ? voiceScore(v) >= 35 : false
+  parts.forEach((part, i) => {
+    const u = new SpeechSynthesisUtterance(part)
+    u.lang = 'pl-PL'
+    if (v) u.voice = v
+    u.rate = natural ? 1 : 0.92
+    u.pitch = natural ? 1.05 : 1.1
+    u.volume = 1
+    // Questions and exclamations get a little lift.
+    if (/[!?]$/.test(part)) u.pitch += 0.05
+    if (i === parts.length - 1) {
+      u.onend = () => opts.onEnd?.()
+      u.onerror = () => opts.onEnd?.()
+    }
+    speechSynthesis.speak(u)
+  })
 }
 
 export function stopSpeaking() {

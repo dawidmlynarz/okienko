@@ -64,9 +64,9 @@ export default function Notatnik(_: AppProps) {
   }
 
   return (
-    <div className="absolute inset-0 flex bg-butter-50">
+    <div className="absolute inset-0 flex bg-surface">
       {/* Note list */}
-      <aside className="flex w-80 shrink-0 flex-col gap-3 overflow-y-auto border-r-2 border-butter-200 p-4">
+      <aside className="flex w-80 shrink-0 flex-col gap-2 overflow-y-auto border-r border-ink-100 bg-ink-50/60 p-4">
         <Button variant="pastel" icon={<Plus size={24} weight="bold" />} onClick={() => guarded(() => open(null))}>
           {pl.notes.newNote}
         </Button>
@@ -76,7 +76,7 @@ export default function Notatnik(_: AppProps) {
             key={n.id}
             type="button"
             onClick={() => n.id !== currentId && guarded(() => open(n))}
-            className={`rounded-md p-4 text-left transition-colors ${n.id === currentId ? 'bg-butter-200 text-butter-900' : 'bg-surface hover:bg-butter-100'}`}
+            className={`rounded-[16px] px-4 py-3 text-left transition-colors ${n.id === currentId ? 'bg-butter-100 text-butter-900 shadow-[inset_0_0_0_2px_var(--color-butter-300)]' : 'hover:bg-white'}`}
           >
             <span className="block truncate text-xl">{titleOf(n)}</span>
             <span className="text-base text-muted">{when(n.updatedAt)}</span>
@@ -86,14 +86,14 @@ export default function Notatnik(_: AppProps) {
 
       {/* Editor */}
       <div className="relative flex min-w-0 flex-1 flex-col">
-        <div className="flex items-center gap-3 border-b-2 border-butter-200 bg-surface px-5 py-3">
+        <div className="flex items-center gap-3 border-b border-ink-100 bg-surface px-5 py-3">
           <Button variant="strong" icon={<FloppyDisk size={24} weight="bold" />} onClick={save} disabled={!dirty}>
             {pl.notes.save}
           </Button>
           {canRead && (
             <Button variant="pastel" icon={<SpeakerHigh size={24} weight="bold" />} onClick={() => speak(draft || pl.notes.empty, { force: true })} disabled={!draft.trim()}>
               {pl.notes.readAloud}
-              <span className="ml-1 rounded-full bg-surface px-2 py-0.5 text-sm text-butter-900">{pl.notes.newFeature}</span>
+              <span className="ml-1 rounded-full bg-white px-2 py-0.5 text-sm text-butter-900">{pl.notes.newFeature}</span>
             </Button>
           )}
           <div className="flex-1" />
@@ -150,16 +150,16 @@ export default function Notatnik(_: AppProps) {
             }
           }}
           className="min-h-0 flex-1 resize-none bg-transparent p-8 focus-visible:outline-none font-body text-4xl leading-[1.5] text-ink outline-none placeholder:text-ink-600"
-          style={{ backgroundImage: 'repeating-linear-gradient(transparent 0 calc(1.5em - 2px), var(--color-butter-200) calc(1.5em - 2px) 1.5em)', backgroundPositionY: '2rem', backgroundAttachment: 'local' }}
+          style={{ backgroundImage: 'repeating-linear-gradient(transparent 0 calc(1.5em - 2px), var(--color-ink-100) calc(1.5em - 2px) 1.5em)', backgroundPositionY: '2rem', backgroundAttachment: 'local' }}
         />
 
         {/* Unsaved work dialog */}
         <AnimatePresence>
           {ask && (
             <motion.div className="absolute inset-0 z-20 grid place-items-center bg-ink-900/30" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-              <motion.div initial={{ scale: 0.9 }} animate={{ scale: 1 }} className="flex flex-col items-center gap-5 rounded-xl bg-surface p-8 shadow-float" role="alertdialog" aria-label={pl.notes.unsavedTitle}>
+              <motion.div initial={{ scale: 0.9 }} animate={{ scale: 1 }} className="flex flex-col items-center gap-5 rounded-[32px] bg-surface p-8 shadow-float" role="alertdialog" aria-label={pl.notes.unsavedTitle}>
                 <Companion say={pl.notes.unsavedSay} pose="thinking" size={150} />
-                <h2 className="font-display text-3xl font-semibold">{pl.notes.unsavedTitle}</h2>
+                <h2 className="font-display text-3xl font-bold">{pl.notes.unsavedTitle}</h2>
                 <div className="flex gap-4">
                   <Button
                     variant="plain"

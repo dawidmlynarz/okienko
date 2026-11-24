@@ -14,26 +14,32 @@ interface Props {
   pose?: Pose
   size?: number
   bubbleSide?: 'right' | 'left' | 'top'
+  /** 'plain' drops the bubble chrome, for use inside a card. */
+  variant?: 'bubble' | 'plain'
   className?: string
 }
 
-/** Smoczek with a speech bubble. Speaks each new line aloud and moves his mouth while talking. */
-export function Companion({ text, say, sayKey, pose = 'idle', size = 220, bubbleSide = 'right', className = '' }: Props) {
-  const profile = useOkienko((s) => s.profile)
+/** Speak a line whenever it (or its key) changes, and report whether Smoczek is talking. */
+export function useTalk(line: string | null | undefined, key?: string | number) {
   const [talking, setTalking] = useState(false)
-  const line = say ?? text
-
   const talk = (t: string) => {
     setTalking(true)
     speak(t, { onEnd: () => setTalking(false) })
     // Safety net: some voices never fire onend.
     window.setTimeout(() => setTalking(false), Math.min(12000, 600 + t.length * 70))
   }
-
   useEffect(() => {
     if (line) talk(line)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [line, sayKey])
+  }, [line, key])
+  return { talking, repeat: () => line && talk(line) }
+}
+
+/** Smoczek with a speech bubble. Speaks each new line aloud and moves his mouth while talking. */
+export function Companion({ text, say, sayKey, pose = 'idle', size = 220, bubbleSide = 'right', variant = 'bubble', className = '' }: Props) {
+  const profile = useOkienko((s) => s.profile)
+  const line = say ?? text
+  const { talking, repeat } = useTalk(line, sayKey)
 
   const bubble = (
     <AnimatePresence>
@@ -44,7 +50,7 @@ export function Companion({ text, say, sayKey, pose = 'idle', size = 220, bubble
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, transition: { duration: 0 } }}
           transition={{ type: 'spring', stiffness: 400, damping: 28 }}
-          className="relative flex max-w-md items-start gap-3 rounded-lg bg-surface px-6 py-4 text-2xl leading-snug shadow-card"
+          className={`relative flex max-w-md items-start gap-3 text-2xl leading-snug text-ink ${variant === 'bubble' ? 'rounded-[22px] bg-surface py-4 pr-4 pl-6 shadow-card' : ''}`}
           role="status"
         >
           <span className="flex-1">{text}</span>
@@ -52,10 +58,10 @@ export function Companion({ text, say, sayKey, pose = 'idle', size = 220, bubble
             type="button"
             aria-label="Powiedz jeszcze raz"
             title="Powiedz jeszcze raz"
-            className="mt-0.5 grid size-11 shrink-0 place-items-center rounded-full bg-sky-100 text-sky-800 hover:bg-sky-200"
-            onClick={() => line && talk(line)}
+            className="grid size-10 shrink-0 place-items-center rounded-full text-sky-700 transition-colors hover:bg-sky-100"
+            onClick={repeat}
           >
-            <SpeakerHigh size={24} weight="bold" />
+            <SpeakerHigh size={22} weight="bold" />
           </button>
         </motion.div>
       )}
@@ -66,7 +72,7 @@ export function Companion({ text, say, sayKey, pose = 'idle', size = 220, bubble
   return (
     <div className={`flex gap-4 ${dir} ${className}`}>
       <Smoczek pose={pose} talking={talking && pose !== 'thinking'} color={profile?.companionColor} size={size} label={profile?.companionName ?? 'Smoczek'} />
-      <div className={bubbleSide === 'top' ? '' : 'self-start pt-4'}>{bubble}</div>
+      <div className={bubbleSide === 'top' || variant === 'plain' ? 'self-center' : 'self-start pt-4'}>{bubble}</div>
     </div>
   )
 }

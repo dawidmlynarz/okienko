@@ -1,4 +1,12 @@
 /** Every word Okienko shows or says lives here. An English UI later is a second file of the same shape. */
+/** Polish plural: 1 gwiazdka, 2–4 gwiazdki, 5+ gwiazdek (and 12–14 gwiazdek). */
+export function plural(n: number, one: string, few: string, many: string) {
+  if (n === 1) return one
+  const d = n % 10, t = n % 100
+  return d >= 2 && d <= 4 && (t < 12 || t > 14) ? few : many
+}
+export const stars = (n: number) => `${n} ${plural(n, 'gwiazdka', 'gwiazdki', 'gwiazdek')}`
+
 export const pl = {
   os: {
     name: 'Okienko',
@@ -35,6 +43,8 @@ export const pl = {
     voice: 'Głos',
     voiceTest: 'Posłuchaj',
     voiceNone: 'Ta przeglądarka nie ma polskiego głosu. Napisy nadal działają.',
+    voiceTip:
+      'Najładniej brzmią głosy oznaczone jako „naturalny”. Na Macu: Ustawienia systemowe → Dostępność → Treść mówiona → Głos systemowy → Zarządzaj głosami → Polski → pobierz „Ewa (Premium)” lub „Zosia (rozszerzony)”, potem odśwież stronę. Na Windows w Chrome wybierz „Google polski”.',
     colors: { mint: 'Miętowy', sky: 'Niebieski', lavender: 'Lawendowy', peach: 'Brzoskwiniowy', pink: 'Różowy' },
   },
   login: {

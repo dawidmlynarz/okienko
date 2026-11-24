@@ -25,7 +25,7 @@ export function OnScreenKeyboard({ target, hint = true, wrongCode, platform = de
 
   return (
     <div
-      className="inline-flex flex-col rounded-xl bg-surface p-4 shadow-card"
+      className="glass-strong inline-flex flex-col rounded-[24px] p-3.5"
       style={{ gap }}
       aria-hidden
     >
@@ -37,21 +37,23 @@ export function OnScreenKeyboard({ target, hint = true, wrongCode, platform = de
             const isWrong = wrongCode === k.code
             const pl = PL_BY_CODE[k.code]
             const w = (k.width ?? 1) * unit + ((k.width ?? 1) - 1) * gap
+            // Glowing key: strong accent with a white letter (5.3:1+). Others: white caps with a hairline.
             const tone = isWrong
-              ? 'bg-coral-200 text-coral-900 [--edge:var(--color-coral-600)]'
+              ? 'bg-coral-100 text-coral-900 shadow-[inset_0_0_0_2px_var(--color-coral-600)]'
               : isGlow
-                ? 'bg-accent-pastel text-accent-deep [--edge:var(--accent-edge)] key-glow'
-                : 'bg-ink-50 text-ink [--edge:var(--color-ink-300)]'
+                ? 'bg-accent-strong text-white key-glow'
+                : isDown
+                  ? 'bg-ink-100 text-ink shadow-[inset_0_0_0_1px_var(--color-ink-200)]'
+                  : 'bg-surface text-ink shadow-[inset_0_0_0_1px_var(--color-ink-200),0_1px_2px_rgb(27_34_64/0.08)]'
             return (
               <div
                 key={k.code}
-                className={`pressable relative grid place-items-center rounded-md font-body ${tone}`}
-                data-pressed={isDown}
+                className={`relative grid place-items-center rounded-[12px] font-body transition-[transform,background-color] duration-100 ${isDown ? 'scale-95' : ''} ${tone}`}
                 style={{ width: w, height: unit, fontSize: k.label.length > 1 ? unit * 0.26 : unit * 0.46, cursor: 'default' }}
               >
                 <span className="leading-none">{k.label}</span>
                 {pl && altNeeded && (
-                  <span className={`absolute right-1.5 bottom-1 leading-none ${isGlow ? 'text-accent-deep' : 'text-muted'}`} style={{ fontSize: unit * 0.24 }}>
+                  <span className={`absolute right-1.5 bottom-1 leading-none ${isGlow ? 'text-white' : 'text-muted'}`} style={{ fontSize: unit * 0.24 }}>
                     {pl}
                   </span>
                 )}

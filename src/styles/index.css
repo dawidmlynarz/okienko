@@ -1,25 +1,25 @@
 @import 'tailwindcss';
 
 /* Self-hosted fonts. Each file declares unicode-range per subset, so the browser
-   downloads only Latin + Latin Extended (all Polish letters). */
+   downloads only Latin + Latin Extended (all Polish letters).
+   Andika: everything she reads and types. Figtree: titles, buttons, labels.
+   Both cover the full Polish alphabet (checked glyph by glyph). */
 @import '@fontsource/andika/400.css';
 @import '@fontsource/andika/700.css';
-@import '@fontsource/fredoka/500.css';
-@import '@fontsource/fredoka/600.css';
+@import '@fontsource-variable/figtree/wght.css';
 @import './reset-theme.css';
 @import './tokens.css';
 @import './smoczek.css';
 
-
 /* `inline` so utilities read the live semantic variables, which change per [data-app]. */
 @theme inline {
-  --font-body: 'Andika', ui-rounded, system-ui, sans-serif;
-  --font-display: 'Fredoka', ui-rounded, system-ui, sans-serif;
+  --font-body: 'Andika', system-ui, sans-serif;
+  --font-display: 'Figtree Variable', 'Figtree', system-ui, sans-serif;
 
-  --radius-sm: 12px;
-  --radius-md: 16px;
-  --radius-lg: 24px;
-  --radius-xl: 32px;
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
 
   /* Semantic tier, exposed to Tailwind (bg-surface, text-ink, bg-accent-soft…) */
   --color-bg: var(--bg);
@@ -34,25 +34,24 @@
   --color-accent-strong: var(--accent-strong);
   --color-accent-deep: var(--accent-deep);
 
-  --shadow-card: 0 12px 32px rgb(27 34 64 / 0.1);
-  --shadow-float: 0 20px 48px rgb(27 34 64 / 0.16);
-
-  --animate-shake: shake 0.38s cubic-bezier(0.36, 0.07, 0.19, 0.97);
-  @keyframes shake {
-    20%, 60% { transform: translateX(-8px); }
-    40%, 80% { transform: translateX(8px); }
-  }
+  /* Soft, layered shadows: a tight contact shadow plus a wide ambient one. */
+  --shadow-card: 0 1px 2px rgb(27 34 64 / 0.06), 0 8px 24px rgb(27 34 64 / 0.07);
+  --shadow-float: 0 2px 6px rgb(27 34 64 / 0.06), 0 24px 64px rgb(27 34 64 / 0.14);
+  --shadow-button: 0 1px 2px rgb(27 34 64 / 0.08), 0 4px 12px rgb(27 34 64 / 0.06);
 }
 
 /* Component tier: one number per component. */
 :root {
-  --topbar-height: 64px;
-  --titlebar-height: 64px;
-  --dock-icon: 80px;
-  --key-size: 64px;
-  --press-depth: 4px;
+  --topbar-height: 60px;
+  --titlebar-height: 68px;
+  --dock-icon: 72px;
+  --key-size: 60px;
+  --glass: rgb(255 255 255 / 0.72);
+  --glass-strong: rgb(255 255 255 / 0.86);
+  --glass-border: rgb(255 255 255 / 0.9);
 }
 
+@layer base {
 html, body, #root { height: 100%; }
 body {
   margin: 0;
@@ -60,63 +59,82 @@ body {
   color: var(--text);
   font-family: var(--font-body);
   font-size: 20px;
-  line-height: 1.4;
+  line-height: 1.45;
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
   overflow: hidden;
   user-select: none;
 }
 textarea, input { user-select: text; }
+h1, h2, h3 { text-wrap: balance; letter-spacing: -0.01em; }
 
 :focus-visible {
-  outline: 4px solid var(--focus-ring);
-  outline-offset: 4px;
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 3px;
 }
 
-/* Duolingo-style pressable surfaces: a darker bottom edge that collapses on press. */
+}
+
+@layer components {
+/* Frosted glass surface: the OS chrome (top bar, dock, windows, cards on the wallpaper). */
+.glass {
+  background: var(--glass);
+  -webkit-backdrop-filter: blur(24px) saturate(1.4);
+  backdrop-filter: blur(24px) saturate(1.4);
+  box-shadow: inset 0 0 0 1px var(--glass-border), var(--shadow-float);
+}
+.glass-strong {
+  background: var(--glass-strong);
+  -webkit-backdrop-filter: blur(28px) saturate(1.4);
+  backdrop-filter: blur(28px) saturate(1.4);
+  box-shadow: inset 0 0 0 1px var(--glass-border), var(--shadow-float);
+}
+
+/* Pressable: calm, flat controls that lift slightly on hover and sink on press. */
 .pressable {
   position: relative;
-  transition: transform 0.08s ease, box-shadow 0.08s ease, background-color 0.15s ease;
-  box-shadow: 0 var(--press-depth) 0 var(--edge, var(--accent-edge));
   cursor: pointer;
+  transition: transform 0.14s cubic-bezier(0.3, 0.7, 0.4, 1), box-shadow 0.14s ease, background-color 0.15s ease, color 0.15s ease;
 }
-.pressable:hover { filter: brightness(1.03); }
-.pressable:active, .pressable[data-pressed='true'] {
-  transform: translateY(var(--press-depth));
-  box-shadow: 0 0 0 var(--edge, var(--accent-edge));
-}
-.pressable:disabled { cursor: default; filter: saturate(0.4); opacity: 0.6; transform: none; }
+.pressable:hover { transform: translateY(-1px); }
+.pressable:active, .pressable[data-pressed='true'] { transform: translateY(0) scale(0.97); }
+.pressable:disabled { cursor: default; opacity: 0.45; transform: none; }
 
-/* The sky. The one gradient Okienko allows. */
-.sky-day { background: linear-gradient(180deg, var(--color-sky-200) 0%, var(--color-sky-100) 55%, var(--color-sky-50) 100%); }
-.sky-sunset { background: linear-gradient(180deg, var(--color-lavender-200) 0%, var(--color-pink-100) 50%, var(--color-peach-100) 100%); }
+/* The sky. Soft gradients plus large blurred colour fields, the one place gradients are allowed. */
+.sky-day {
+  background:
+    radial-gradient(60% 55% at 12% 18%, var(--color-sky-200) 0%, transparent 70%),
+    radial-gradient(50% 50% at 88% 12%, var(--color-lavender-100) 0%, transparent 70%),
+    radial-gradient(70% 60% at 80% 95%, var(--color-mint-100) 0%, transparent 70%),
+    radial-gradient(60% 60% at 10% 100%, var(--color-peach-50) 0%, transparent 70%),
+    linear-gradient(180deg, var(--color-sky-100) 0%, var(--color-sky-50) 100%);
+}
+.sky-sunset {
+  background:
+    radial-gradient(60% 55% at 15% 15%, var(--color-lavender-200) 0%, transparent 70%),
+    radial-gradient(55% 55% at 90% 20%, var(--color-pink-100) 0%, transparent 70%),
+    radial-gradient(70% 60% at 75% 100%, var(--color-peach-200) 0%, transparent 70%),
+    linear-gradient(180deg, var(--color-lavender-100) 0%, var(--color-peach-50) 100%);
+}
+
+}
+
+/* The next key to press breathes softly. */
+.key-glow { box-shadow: 0 0 0 0 color-mix(in oklab, var(--accent-strong) 45%, transparent), var(--shadow-button); }
+@media (prefers-reduced-motion: no-preference) {
+  .key-glow { animation: key-glow 1.4s ease-out infinite; }
+  .cursor-blink { animation: blink 1s steps(1) infinite; }
+  .balloon-bob { animation: bob 2.6s ease-in-out infinite; }
+  .float-slow { animation: float 9s ease-in-out infinite alternate; }
+}
+@keyframes key-glow {
+  0% { box-shadow: 0 0 0 0 color-mix(in oklab, var(--accent-strong) 45%, transparent), var(--shadow-button); }
+  100% { box-shadow: 0 0 0 12px color-mix(in oklab, var(--accent-strong) 0%, transparent), var(--shadow-button); }
+}
+@keyframes blink { 50% { opacity: 0; } }
+@keyframes bob { 0%, 100% { transform: translateY(0) rotate(-1.5deg); } 50% { transform: translateY(-10px) rotate(1.5deg); } }
+@keyframes float { from { transform: translate3d(-20px, 0, 0); } to { transform: translate3d(30px, -14px, 0); } }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
 }
-
-/* The next key to press breathes softly. */
-.key-glow { outline: 4px solid var(--accent-edge); outline-offset: 2px; }
-@media (prefers-reduced-motion: no-preference) {
-  .key-glow { animation: key-glow 1.1s ease-in-out infinite; }
-}
-@keyframes key-glow {
-  0%, 100% { outline-color: var(--accent-edge); outline-offset: 2px; }
-  50% { outline-color: color-mix(in oklab, var(--accent-edge) 35%, transparent); outline-offset: 6px; }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .cloud-a { animation: drift 38s ease-in-out infinite alternate; }
-  .cloud-b { animation: drift 46s ease-in-out infinite alternate-reverse; }
-  .cloud-c { animation: drift 30s ease-in-out infinite alternate; }
-}
-@keyframes drift { from { transform: translateX(-40px); } to { transform: translateX(60px); } }
-
-@media (prefers-reduced-motion: no-preference) {
-  .cursor-blink { animation: blink 1s steps(1) infinite; }
-}
-@keyframes blink { 50% { opacity: 0; } }
-
-@media (prefers-reduced-motion: no-preference) {
-  .balloon-bob { animation: bob 2.4s ease-in-out infinite; }
-}
-@keyframes bob { 0%, 100% { transform: translateY(0) rotate(-2deg); } 50% { transform: translateY(-10px) rotate(2deg); } }

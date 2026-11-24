@@ -31,13 +31,13 @@ export function ColorPicker({ value, onChange }: { value: CompanionColor; onChan
 export function Field({ label, hint, value, onChange, id }: { label: string; hint?: string; value: string; onChange: (v: string) => void; id: string }) {
   return (
     <label htmlFor={id} className="flex flex-col gap-2">
-      <span className="font-display text-xl font-semibold">{label}</span>
+      <span className="font-display text-lg font-semibold">{label}</span>
       <input
         id={id}
         value={value}
         maxLength={12}
         onChange={(e) => onChange(e.target.value)}
-        className="h-16 rounded-md border-4 border-ink-200 bg-surface px-4 text-2xl outline-none focus:border-sky-600"
+        className="h-14 rounded-[14px] border-2 border-ink-200 bg-surface px-4 text-2xl outline-none transition-shadow focus:border-sky-600 focus:shadow-[0_0_0_4px_var(--color-sky-100)]"
         autoComplete="off"
         spellCheck={false}
       />
@@ -60,13 +60,13 @@ export function Setup() {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="flex w-full max-w-4xl gap-10 rounded-xl bg-surface p-10 shadow-float"
+        className="glass-strong flex w-full max-w-4xl gap-10 rounded-[32px] p-10"
       >
         <div className="flex w-64 flex-col items-center justify-center">
           <Smoczek pose="happy" color={color} size={240} />
         </div>
         <form
-          className="flex flex-1 flex-col gap-6"
+          className="flex min-w-0 flex-1 flex-col gap-6"
           onSubmit={(e) => {
             e.preventDefault()
             if (!ok) return
@@ -77,13 +77,13 @@ export function Setup() {
           }}
         >
           <div>
-            <h1 className="font-display text-4xl font-semibold">{pl.setup.title}</h1>
+            <h1 className="font-display text-4xl font-bold">{pl.setup.title}</h1>
             <p className="mt-2 text-xl text-muted">{pl.setup.lead}</p>
           </div>
           <Field id="child" label={pl.setup.childName} hint={pl.setup.childNameHint} value={childName} onChange={setChildName} />
           <Field id="companion" label={pl.setup.companionName} value={companionName} onChange={setCompanionName} />
           <div className="flex flex-col gap-3">
-            <span className="font-display text-xl font-semibold">{pl.setup.companionColor}</span>
+            <span className="font-display text-lg font-semibold">{pl.setup.companionColor}</span>
             <ColorPicker value={color} onChange={setColor} />
           </div>
           <div className="mt-2 flex items-center justify-between gap-4">
