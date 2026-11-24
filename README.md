@@ -2,7 +2,7 @@
 
 A pretend computer in the browser where a 7-year-old learns to use a computer. This is the PoC:
 she logs in with two steps (types her name, then picks her picture-PIN) and lands in Smoczek's house.
-There she chats with Smoczek, plays five games and writes in **Notatnik**. Every finished round
+There she chats with Smoczek, plays six games and writes in **Notatnik**. Every finished round
 earns 1 to 3 stars. Stars are pocket money: in **Szafa Smoczka** (Smoczek's changing room) she spends them
 on gadgets for Smoczek, from a bow tie for 3 stars to a crown for 25. Gadgets live in `src/wardrobe/`.
 Every game and level is open from the start.
@@ -14,6 +14,7 @@ Every game and level is open from the start.
 | **Łap Biedronki** | Pointing and clicking with the mouse |
 | **Smocze Memory** | Clicking, memory, finding pairs |
 | **Liczymy Jabłka** | Counting and the number row |
+| **Konik wraca do stajni** | Arrow keys, left and right, and planning steps like a tiny program |
 
 Target: Chrome on a MacBook (Polish Pro layout) or a Windows PC (Polish programmer's layout), physical keyboard.
 

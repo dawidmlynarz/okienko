@@ -39,6 +39,8 @@ const pictures = {
   jez: 'hedgehog',
   mis: 'teddy-bear',
   kon: 'horse-face',
+  konik: 'horse',
+  marchewka: 'carrot',
   slon: 'elephant',
   lody: 'soft-ice-cream',
   tort: 'birthday-cake',

@@ -1,0 +1,38 @@
+{
+  "$comment": "Konik wraca do stajni. mode live: each arrow moves the horse at once. mode plan: lay arrow cards, then press Start. Map key: . grass, H horse, S stable, T tree, # fence, ~ pond, c carrot.",
+  "levels": [
+    {
+      "id": "konik-strzalki",
+      "title": "Strzałki",
+      "subtitle": "",
+      "mode": "live",
+      "maps": [
+        [".......", ".......", "H.....S", ".......", "......."],
+        [".......", "H......", "..T....", "...T..S", "......."],
+        ["S......", ".......", "...T...", ".T.....", "......H"]
+      ]
+    },
+    {
+      "id": "konik-plan",
+      "title": "Plan",
+      "subtitle": "",
+      "mode": "plan",
+      "maps": [
+        [".......", ".......", ".H..S..", ".......", "......."],
+        [".......", ".H.....", ".......", "....S..", "......."],
+        [".......", "..S....", "...T...", ".....H.", "......."]
+      ]
+    },
+    {
+      "id": "konik-przeszkody",
+      "title": "Przeszkody",
+      "subtitle": "",
+      "mode": "plan",
+      "maps": [
+        [".......", ".H.~...", "...~.S.", "...~...", "......."],
+        ["..c....", "H.###..", "......S", ".......", "......."],
+        [".......", ".~~~.c.", ".H.#...", "...#.S.", "......."]
+      ]
+    }
+  ]
+}
