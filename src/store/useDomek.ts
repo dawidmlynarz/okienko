@@ -1,10 +1,10 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import type { PictureId } from '../assets/pictures'
+import { buy, toggleWear, type BuyResult, type Wardrobe } from '../wardrobe/items'
 import { SCHEMA_VERSION, STORAGE_KEY, migrate, storage } from './storage'
 
 export type CompanionColor = 'mint' | 'sky' | 'lavender' | 'peach' | 'pink'
-export type OsVersion = '1.0' | '1.1'
 export type Wallpaper = 'day' | 'sunset'
 
 export interface Profile {
@@ -23,7 +23,10 @@ export interface Note {
 }
 
 export interface Progress {
+  /** Every star ever earned. Spending never lowers it. */
   stars: number
+  /** Stars spent in Smoczek's wardrobe. The wallet is stars - spent. */
+  spent?: number
   starsByDay: Record<string, number>
   /** Best stars per typing level id. */
   levels: Record<string, number>
@@ -44,7 +47,7 @@ export interface PersistedState {
   profile: Profile | null
   settings: Settings
   progress: Progress
-  os: { version: OsVersion; upgradeOffered: boolean }
+  wardrobe: Wardrobe
   notes: Note[]
 }
 
@@ -54,7 +57,6 @@ interface SessionState {
   screen: Screen
   openApp: string | null
   parentOpen: boolean
-  upgradeOpen: boolean
 }
 
 interface Actions {
@@ -66,11 +68,11 @@ interface Actions {
   launch: (appId: string) => void
   goHome: () => void
   setParentOpen: (open: boolean) => void
-  setUpgradeOpen: (open: boolean) => void
   toggleSound: () => void
   setSettings: (s: Partial<Settings>) => void
   addStars: (levelId: string, stars: number) => void
-  upgradeTo: (v: OsVersion) => void
+  buyGadget: (id: string) => BuyResult
+  toggleGadget: (id: string) => void
   saveNote: (id: string | null, body: string) => string
   deleteNote: (id: string) => void
   importData: (data: unknown) => boolean
@@ -83,16 +85,14 @@ export type DomekState = PersistedState & SessionState & Actions
 /** The companion's name. Not asked any more: everyone knows him as Smoczek. */
 export const COMPANION_NAME = 'Smoczek'
 
-/** Stars Smoczek needs to build the new room (the 1.0 to 1.1 update). About two good rounds. */
-export const UPGRADE_STARS = 5
 export const today = () => new Date().toISOString().slice(0, 10)
 
 const initialData = (): PersistedState => ({
   schemaVersion: SCHEMA_VERSION,
   profile: null,
   settings: { sound: true, voice: true, voiceName: null, wallpaper: 'day', keyboard: 'auto' },
-  progress: { stars: 0, starsByDay: {}, levels: {}, rounds: 0 },
-  os: { version: '1.0', upgradeOffered: false },
+  progress: { stars: 0, spent: 0, starsByDay: {}, levels: {}, rounds: 0 },
+  wardrobe: { owned: [], worn: {} },
   notes: [],
 })
 
@@ -105,7 +105,6 @@ export const useDomek = create<DomekState>()(
       screen: 'setup',
       openApp: null,
       parentOpen: false,
-      upgradeOpen: false,
 
       completeSetup: (p) => set({ profile: { ...p, pin: get().profile?.pin ?? null }, screen: 'login' }),
       updateProfile: (p) => set((s) => (s.profile ? { profile: { ...s.profile, ...p } } : {})),
@@ -115,7 +114,6 @@ export const useDomek = create<DomekState>()(
       launch: (appId) => set({ screen: 'app', openApp: appId }),
       goHome: () => set({ screen: 'home', openApp: null }),
       setParentOpen: (parentOpen) => set({ parentOpen }),
-      setUpgradeOpen: (upgradeOpen) => set({ upgradeOpen }),
       toggleSound: () => set((s) => ({ settings: { ...s.settings, sound: !s.settings.sound } })),
       setSettings: (p) => set((s) => ({ settings: { ...s.settings, ...p } })),
 
@@ -124,6 +122,7 @@ export const useDomek = create<DomekState>()(
           const d = today()
           return {
             progress: {
+              ...s.progress,
               stars: s.progress.stars + stars,
               starsByDay: { ...s.progress.starsByDay, [d]: (s.progress.starsByDay[d] ?? 0) + stars },
               levels: { ...s.progress.levels, [levelId]: Math.max(stars, s.progress.levels[levelId] ?? 0) },
@@ -132,7 +131,13 @@ export const useDomek = create<DomekState>()(
           }
         }),
 
-      upgradeTo: (version) => set((s) => ({ os: { ...s.os, version, upgradeOffered: true } })),
+      buyGadget: (id) => {
+        const { wardrobe, progress } = get()
+        const r = buy(wardrobe ?? { owned: [], worn: {} }, progress, id)
+        if (r.ok) set({ wardrobe: r.wardrobe, progress: { ...progress, spent: r.spent } })
+        return r
+      },
+      toggleGadget: (id) => set((s) => ({ wardrobe: toggleWear(s.wardrobe ?? { owned: [], worn: {} }, id) })),
 
       saveNote: (id, body) => {
         const now = Date.now()
@@ -147,8 +152,8 @@ export const useDomek = create<DomekState>()(
       deleteNote: (id) => set((s) => ({ notes: s.notes.filter((n) => n.id !== id) })),
 
       exportData: () => {
-        const { schemaVersion, profile, settings, progress, os, notes } = get()
-        return { schemaVersion, profile, settings, progress, os, notes }
+        const { schemaVersion, profile, settings, progress, wardrobe, notes } = get()
+        return { schemaVersion, profile, settings, progress, wardrobe, notes }
       },
       importData: (data) => {
         if (!data || typeof data !== 'object') return false
@@ -161,14 +166,14 @@ export const useDomek = create<DomekState>()(
           ...migrated,
           settings: { ...base.settings, ...migrated.settings },
           progress: { ...base.progress, ...migrated.progress },
-          os: { ...base.os, ...migrated.os },
+          wardrobe: { ...base.wardrobe, ...migrated.wardrobe },
           schemaVersion: SCHEMA_VERSION,
           screen: migrated.profile ? 'login' : 'setup',
           openApp: null,
         })
         return true
       },
-      resetAll: () => set({ ...initialData(), screen: 'setup', openApp: null, parentOpen: false, upgradeOpen: false }),
+      resetAll: () => set({ ...initialData(), screen: 'setup', openApp: null, parentOpen: false }),
     }),
     {
       name: STORAGE_KEY,
@@ -180,7 +185,7 @@ export const useDomek = create<DomekState>()(
         profile: s.profile,
         settings: s.settings,
         progress: s.progress,
-        os: s.os,
+        wardrobe: s.wardrobe,
         notes: s.notes,
       }),
     },

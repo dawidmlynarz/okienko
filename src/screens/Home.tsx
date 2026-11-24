@@ -1,11 +1,10 @@
 import { GameController, Lightbulb, Play, Smiley, Star } from '@phosphor-icons/react'
 import { AnimatePresence, motion } from 'motion/react'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { apps, type AppDef } from '../apps/registry'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { appById, apps, type AppDef } from '../apps/registry'
 import { Dock } from '../components/Dock'
 import { Picture } from '../components/Picture'
 import { ChatBubble } from '../components/ChatBubble'
-import { House } from '../components/House'
 import { ParentHint } from '../components/ParentHint'
 import { Smoczek, type Pose } from '../components/Smoczek'
 import { useTalk } from '../components/Companion'
@@ -13,7 +12,9 @@ import { useNow } from '../components/TopBar'
 import { pl } from '../i18n/pl'
 import { celebrate } from '../lib/confetti'
 import { play } from '../lib/sound'
-import { UPGRADE_STARS, starsToday, useDomek, type CompanionColor } from '../store/useDomek'
+import { starsToday, useDomek, type CompanionColor } from '../store/useDomek'
+import { GadgetPicture } from '../wardrobe/GadgetArt'
+import { GADGETS, balanceOf, nextGoal } from '../wardrobe/items'
 
 const rise = (delay: number) => ({
   initial: { opacity: 0, y: 18 },
@@ -54,10 +55,11 @@ const IDLE_MS = 30_000
 const MAX_IDLE = 3
 
 export function Home() {
-  const { profile, progress, os, screen, setUpgradeOpen, launch } = useDomek()
+  const { profile, progress, wardrobe, screen, launch } = useDomek()
   const name = profile?.childName ?? ''
-  const canUpgrade = os.version === '1.0' && progress.stars >= UPGRADE_STARS
-  const left = Math.max(0, UPGRADE_STARS - progress.stars)
+  const wallet = balanceOf(progress)
+  const canBuy = GADGETS.some((g) => !wardrobe.owned.includes(g.id) && g.price <= wallet)
+  const goal = nextGoal(wardrobe)
 
   const nextJoke = useBag(pl.smoczek.jokes)
   const nextFact = useBag(pl.smoczek.facts)
@@ -65,7 +67,7 @@ export function Home() {
   const nextApp = useBag(apps)
   const nextIdle = useBag(pl.smoczek.idle)
 
-  const [line, setLine] = useState<Line>(() => ({ text: canUpgrade ? pl.home.surprise(name) : greeting(name, new Date().getHours()), pose: canUpgrade ? 'cheer' : 'happy', key: 0 }))
+  const [line, setLine] = useState<Line>(() => ({ text: canBuy ? pl.smoczek.canBuy(wallet) : greeting(name, new Date().getHours()), pose: canBuy ? 'cheer' : 'happy', key: 0, app: canBuy ? appById('szafa') ?? undefined : undefined }))
   const say = useCallback((text: string, pose: Pose = 'happy', app?: AppDef) => setLine((l) => ({ text, pose, app, key: l.key + 1 })), [])
   const { talking, repeat } = useTalk(line.text, line.key)
   const lastPoke = useRef(Date.now())
@@ -75,14 +77,6 @@ export function Home() {
   const poked = () => {
     lastPoke.current = Date.now()
   }
-
-  // Offer the room when she is back home, never in the middle of an app.
-  useEffect(() => {
-    if (canUpgrade && screen === 'home') {
-      const t = window.setTimeout(() => setUpgradeOpen(true), 1600)
-      return () => window.clearTimeout(t)
-    }
-  }, [canUpgrade, screen, setUpgradeOpen])
 
   // When nobody has clicked for a while, Smoczek pipes up by himself. A few times, then he waits.
   useEffect(() => {
@@ -95,11 +89,12 @@ export function Home() {
       if (pick === 1) {
         const app = nextApp()
         say(pl.smoczek.play[app.id] ?? pl.smoczek.idle[0], 'happy', app)
-      } else if (pick === 2 && os.version === '1.0' && left > 0) say(pl.smoczek.stars(left), 'idle')
+      } else if (pick === 2 && canBuy) say(pl.smoczek.canBuy(wallet), 'happy', appById('szafa') ?? undefined)
+      else if (pick === 2 && goal) say(pl.smoczek.saving(goal.price - wallet, goal.name), 'idle')
       else say(nextIdle(), 'idle')
     }, 5000)
     return () => window.clearInterval(t)
-  }, [screen, say, nextApp, nextIdle, os.version, left])
+  }, [screen, say, nextApp, nextIdle, canBuy, wallet, goal])
 
   const pet = () => {
     poked()
@@ -198,7 +193,7 @@ export function Home() {
         {/* Right column */}
         <div className="flex min-h-0 flex-col gap-4">
           <TodayCard />
-          <RoomCard canUpgrade={canUpgrade} onBuild={() => setUpgradeOpen(true)} />
+          <WardrobeCard />
         </div>
       </div>
 
@@ -229,42 +224,48 @@ function TodayCard() {
   )
 }
 
-/** The update, in kid terms: stars buy bricks, bricks build Smoczek a new room. */
-function RoomCard({ canUpgrade, onBuild }: { canUpgrade: boolean; onBuild: () => void }) {
-  const { progress, os } = useDomek()
-  const have = Math.min(progress.stars, UPGRADE_STARS)
-  const built = os.version !== '1.0'
-  const room = useMemo(() => Array.from({ length: UPGRADE_STARS }, (_, i) => i < have), [have])
-
-  if (built) {
-    return (
-      <motion.section {...rise(0.1)} data-app="typing" className="tile relative flex flex-1 items-center gap-5 overflow-hidden rounded-[32px] p-6">
-        <ParentHint text={pl.parentHint.room} className="absolute top-4 right-4" />
-        <House progress={1} width="min(220px, 27vh)" />
-        <p className="font-display text-3xl leading-tight font-extrabold text-accent-deep">{pl.home.roomDone}</p>
-      </motion.section>
-    )
+/** Smoczek's wardrobe: what he wears now, and the next gadget she is saving up for. */
+function WardrobeCard() {
+  const { profile, progress, wardrobe, launch } = useDomek()
+  const wallet = balanceOf(progress)
+  const canBuy = GADGETS.some((g) => !wardrobe.owned.includes(g.id) && g.price <= wallet)
+  const goal = nextGoal(wardrobe)
+  const open = () => {
+    play('pop')
+    launch('szafa')
   }
-
   return (
-    <motion.section {...rise(0.1)} data-app="notes" className="tile relative flex flex-1 items-center gap-5 overflow-hidden rounded-[32px] p-6">
-      <ParentHint text={pl.parentHint.room} className="absolute top-4 right-4" />
-      <House progress={(have / UPGRADE_STARS) * 0.75} width="min(220px, 27vh)" smoke={false} />
+    <motion.section {...rise(0.1)} data-app="shop" className="tile relative flex flex-1 items-center gap-4 overflow-hidden rounded-[32px] p-5">
+      <ParentHint text={pl.parentHint.wardrobe} className="absolute top-4 right-4 z-10" />
+      <button type="button" onClick={open} aria-label={pl.apps.wardrobe} className="shrink-0 cursor-pointer rounded-full">
+        <Smoczek pose={canBuy ? 'happy' : 'idle'} color={profile?.companionColor} size="min(150px, 21vh)" followEyes={false} />
+      </button>
       <div className="flex min-w-0 flex-1 flex-col gap-3">
-        <p className="font-display text-3xl leading-tight font-extrabold text-accent-deep">{pl.home.roomTitle}</p>
-        {canUpgrade ? (
-          <button type="button" onClick={onBuild} className="pressable h-14 shrink-0 rounded-full bg-accent-strong font-display text-xl font-bold text-white shadow-button">
-            {pl.upgrade.install}
-          </button>
-        ) : (
-          <div className="flex gap-1" aria-label={`${have} z ${UPGRADE_STARS}`}>
-            {room.map((on, i) => (
-              <motion.span key={i} initial={false} animate={{ scale: on ? 1 : 0.9 }}>
-                <Star size={34} weight="fill" className={on ? 'text-butter-500 drop-shadow-[0_1px_0_var(--color-butter-700)]' : 'text-white'} />
-              </motion.span>
-            ))}
+        <p className="font-display text-[min(30px,3.8vh)] leading-tight font-extrabold text-accent-deep">{pl.apps.wardrobe}</p>
+        {canBuy ? (
+          <p className="flex items-center gap-2 font-display text-xl font-bold text-accent-deep">
+            <Star size={26} weight="fill" className="text-butter-500" />
+            {pl.wardrobe.canBuyNow}
+          </p>
+        ) : goal ? (
+          <div className="flex items-center gap-3" aria-label={`${pl.wardrobe.next}: ${goal.name}, ${pl.wardrobe.goal(wallet, goal.price)}`}>
+            <span className="grid size-14 shrink-0 place-items-center rounded-[18px] bg-white/80">
+              <GadgetPicture id={goal.id} size={40} />
+            </span>
+            <div className="flex min-w-0 flex-1 flex-col gap-1.5">
+              <div className="h-3.5 overflow-hidden rounded-full bg-white/80">
+                <motion.div className="h-full rounded-full bg-butter-500" initial={false} animate={{ width: `${Math.min(100, (wallet / goal.price) * 100)}%` }} />
+              </div>
+              <span className="flex items-center gap-1 font-display text-lg font-bold text-accent-deep tabular-nums">
+                <Star size={18} weight="fill" className="text-butter-500" />
+                {pl.wardrobe.goal(wallet, goal.price)}
+              </span>
+            </div>
           </div>
-        )}
+        ) : null}
+        <button type="button" onClick={open} className="pressable h-14 shrink-0 rounded-full bg-accent-strong px-6 font-display text-xl font-bold text-white shadow-button">
+          {pl.wardrobe.open}
+        </button>
       </div>
     </motion.section>
   )

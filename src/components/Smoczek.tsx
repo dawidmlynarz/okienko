@@ -1,5 +1,7 @@
 import { useEffect, useRef, type CSSProperties } from 'react'
-import type { CompanionColor } from '../store/useDomek'
+import { useDomek, type CompanionColor } from '../store/useDomek'
+import { OutfitLayer } from '../wardrobe/GadgetArt'
+import type { Outfit } from '../wardrobe/items'
 
 /* Eyes that follow the pointer. One window listener feeds every Smoczek on screen. */
 const watchers = new Set<() => void>()
@@ -87,9 +89,13 @@ interface Props {
   beat?: number
   /** Eyes follow the mouse pointer (on by default). */
   followEyes?: boolean
+  /** Gadgets to wear. Defaults to what he has on in the wardrobe; pass {} for none. */
+  outfit?: Outfit
 }
 
-export function Smoczek({ pose = 'idle', color = 'mint', talking = false, size = 240, className = '', label = 'Smoczek', beat, followEyes = true }: Props) {
+export function Smoczek({ pose = 'idle', color = 'mint', talking = false, size = 240, className = '', label = 'Smoczek', beat, followEyes = true, outfit }: Props) {
+  const worn = useDomek((s) => s.wardrobe?.worn)
+  const wearing = outfit ?? worn
   const ref = useRef<SVGSVGElement>(null)
   // Thinking looks up and away on purpose, so the eyes stop following then.
   useFollowEyes(ref, followEyes && pose !== 'thinking' && pose !== 'cheer', beat)
@@ -99,6 +105,7 @@ export function Smoczek({ pose = 'idle', color = 'mint', talking = false, size =
     <svg ref={ref} key={beat} className={`smok ${pose} ${talking ? 'talking' : ''} ${className}`} viewBox="0 0 240 260" role="img" aria-label={label} style={style}>
       <ellipse cx="120" cy="248" rx="70" ry="8" fill="#1B2240" opacity=".08" />
       <g className="whole">
+        <OutfitLayer outfit={wearing} layer="back" />
         <g className="spark" fill="#F7DEAB" stroke="#AC6B22" strokeWidth="2.5" strokeLinejoin="round">
           <path d="M30 70l5 11 11 5-11 5-5 11-5-11-11-5 11-5z" />
           <path d="M206 92l4 8 8 4-8 4-4 8-4-8-8-4 8-4z" />
@@ -113,6 +120,7 @@ export function Smoczek({ pose = 'idle', color = 'mint', talking = false, size =
           <path d="M160 214C192 230 216 214 214 184" fill="none" stroke="var(--line)" strokeWidth="22" strokeLinecap="round" />
           <path d="M160 214C192 230 216 214 214 184" fill="none" stroke="var(--body)" strokeWidth="14" strokeLinecap="round" />
           <path className="ln" d="M214 160l12 16-12 14-12-14z" fill="var(--spike)" />
+          <OutfitLayer outfit={wearing} layer="tail" />
         </g>
         <path className="wingL ln" d="M84 158C60 122 34 128 36 156c10-4 18 2 20 10 8-4 18 0 24 8z" fill="var(--spike)" />
         <path className="wingR ln" d="M156 158c24-36 50-30 48-2-10-4-18 2-20 10-8-4-18 0-24 8z" fill="var(--spike)" />
@@ -160,7 +168,9 @@ export function Smoczek({ pose = 'idle', color = 'mint', talking = false, size =
             <path d="M110 145q10-7 20 0q-10 9-20 0z" fill="var(--tongue)" />
           </g>
           <path className="m m-think" d="M108 139q6-4 12 0t12-1" fill="none" stroke="var(--line)" strokeWidth="4" strokeLinecap="round" />
+          <OutfitLayer outfit={wearing} layer="head" />
         </g>
+        <OutfitLayer outfit={wearing} layer="front" />
       </g>
     </svg>
   )

@@ -15,7 +15,7 @@ const titleOf = (n: Pick<Note, 'body'>) => n.body.split('\n').find((l) => l.trim
 const when = (t: number) => new Date(t).toLocaleDateString('pl-PL', { day: 'numeric', month: 'long' })
 
 export default function Notatnik(_: AppProps) {
-  const { notes, saveNote, deleteNote, os } = useDomek()
+  const { notes, saveNote, deleteNote } = useDomek()
   const [currentId, setCurrentId] = useState<string | null>(notes[0]?.id ?? null)
   const current = notes.find((n) => n.id === currentId) ?? null
   const [draft, setDraft] = useState(current?.body ?? '')
@@ -24,7 +24,7 @@ export default function Notatnik(_: AppProps) {
   const [confirmDelete, setConfirmDelete] = useState(false)
   const area = useRef<HTMLTextAreaElement>(null)
   const dirty = draft !== (current?.body ?? '') && draft.trim() !== ''
-  const canRead = os.version !== '1.0'
+  const canRead = true
 
   const setGuard = useCloseGuard()
   useEffect(() => {

@@ -2,8 +2,10 @@
 
 A pretend computer in the browser where a 7-year-old learns to use a computer. This is the PoC:
 she logs in with two steps (types her name, then picks her picture-PIN) and lands in Smoczek's house.
-There she chats with Smoczek, plays five games and writes in **Notatnik**. Her stars pay for a new room
-in the house, which is the computer's first update (1.0 to 1.1), told so a child understands it.
+There she chats with Smoczek, plays five games and writes in **Notatnik**. Every finished round
+earns 1 to 3 stars. Stars are pocket money: in **Szafa Smoczka** (Smoczek's changing room) she spends them
+on gadgets for Smoczek, from a bow tie for 3 stars to a crown for 25. Gadgets live in `src/wardrobe/`.
+Every game and level is open from the start.
 
 | Game | Teaches |
 | --- | --- |

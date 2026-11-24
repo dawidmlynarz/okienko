@@ -1,9 +1,10 @@
+import { balanceOf } from '../wardrobe/items'
 import { SignOut, SpeakerHigh, SpeakerSlash, Star, Sun, SunHorizon } from '@phosphor-icons/react'
 import { useEffect, useState } from 'react'
 import { pl } from '../i18n/pl'
 import { play } from '../lib/sound'
 import { stopSpeaking } from '../lib/speak'
-import { starsToday, useDomek } from '../store/useDomek'
+import { useDomek } from '../store/useDomek'
 import { IconButton } from './Button'
 import { COMPANION_COLORS } from './Smoczek'
 
@@ -19,8 +20,7 @@ export const timeText = (d: Date) => d.toLocaleTimeString('pl-PL', { hour: '2-di
 
 export function TopBar() {
   const clock = timeText(useNow())
-  const { profile, progress, os, settings, toggleSound, logout, setSettings } = useDomek()
-  const today = starsToday(progress)
+  const { profile, progress, settings, toggleSound, logout, setSettings } = useDomek()
 
   return (
     <header className="glass relative z-10 mx-4 mt-4 flex items-center gap-2 rounded-full pr-2 pl-3" style={{ height: 'var(--topbar-height)' }}>
@@ -31,9 +31,9 @@ export function TopBar() {
 
       <div className="flex-1" />
 
-      <div className="flex items-center gap-1.5 rounded-full bg-butter-100 py-1 pr-3.5 pl-2 font-display text-lg font-bold text-butter-900 tabular-nums" title={pl.os.starsToday(today)}>
+      <div className="flex items-center gap-1.5 rounded-full bg-butter-100 py-1 pr-3.5 pl-2 font-display text-lg font-bold text-butter-900 tabular-nums" title={pl.os.wallet(balanceOf(progress))} aria-label={pl.os.wallet(balanceOf(progress))}>
         <Star size={22} weight="fill" className="text-butter-600" />
-        {progress.stars}
+        {balanceOf(progress)}
       </div>
 
       {profile && (
@@ -48,7 +48,7 @@ export function TopBar() {
       <span className="px-2 font-display text-lg font-semibold tabular-nums">{clock}</span>
 
       <div className="flex items-center">
-        {os.version !== '1.0' && (
+        {(
           <IconButton label={settings.wallpaper === 'day' ? 'Zachód słońca' : 'Dzień'} onClick={() => setSettings({ wallpaper: settings.wallpaper === 'day' ? 'sunset' : 'day' })}>
             {settings.wallpaper === 'day' ? <SunHorizon size={26} weight="bold" /> : <Sun size={26} weight="bold" />}
           </IconButton>

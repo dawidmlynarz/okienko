@@ -9,6 +9,7 @@ const set = JSON.parse(readFileSync(require.resolve('@iconify-json/fluent-emoji-
 
 const pictures = {
   kot: 'cat-face',
+  korona: 'crown',
   pies: 'dog-face',
   slonce: 'sun',
   gwiazda: 'star',

@@ -1,4 +1,4 @@
-import { ArrowLeft, LockSimple, Star } from '@phosphor-icons/react'
+import { ArrowLeft, Star } from '@phosphor-icons/react'
 import { AnimatePresence, motion } from 'motion/react'
 import { useEffect, useState, type ReactNode } from 'react'
 import { Button } from '../../components/Button'
@@ -97,43 +97,37 @@ export function LevelPicker<L extends LevelBase>({ levels, heading, lead, hint, 
       <h2 className="font-display text-5xl font-extrabold tracking-tight text-ink">{heading}</h2>
       <div className="flex flex-wrap justify-center gap-5">
         {levels.map((l, i) => {
-          const locked = progress.stars < l.unlockStars
           const best = progress.levels[l.id] ?? 0
           const tint = LEVEL_TINTS[i % LEVEL_TINTS.length]
           return (
             <motion.button
               key={l.id}
               type="button"
-              disabled={locked}
               initial={{ y: 24, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: i * 0.06, type: 'spring', stiffness: 300, damping: 26 }}
-              whileHover={locked ? undefined : { y: -6 }}
-              whileTap={locked ? undefined : { scale: 0.97 }}
+              whileHover={{ y: -6 }}
+              whileTap={{ scale: 0.97 }}
               onClick={() => {
                 play('pop')
                 onPick(l)
               }}
-              className="flex h-[min(300px,42vh)] w-60 flex-col items-center justify-between rounded-[32px] p-6 text-center shadow-card ring-1 ring-ink-900/5 disabled:cursor-default"
-              style={{ background: locked ? 'var(--color-ink-50)' : tint.bg }}
+              className="flex h-[min(300px,42vh)] w-60 flex-col items-center justify-between rounded-[32px] p-6 text-center shadow-card ring-1 ring-ink-900/5"
+              style={{ background: tint.bg }}
             >
               <span
                 className="grid size-20 place-items-center rounded-[24px] font-display text-4xl font-extrabold"
-                style={{ background: locked ? 'var(--color-ink-100)' : tint.chip, color: locked ? 'var(--color-ink-700)' : tint.ink }}
+                style={{ background: tint.chip, color: tint.ink }}
               >
-                {locked ? <LockSimple size={34} weight="bold" /> : i + 1}
+                {i + 1}
               </span>
               <span className="flex flex-col gap-1">
-                <span className="font-display text-2xl font-bold" style={{ color: locked ? 'var(--color-ink-700)' : tint.ink }}>
+                <span className="font-display text-2xl font-bold" style={{ color: tint.ink }}>
                   {l.title}
                 </span>
                 {l.subtitle && <span className="font-body text-xl text-ink-700">{l.subtitle}</span>}
               </span>
-              {locked ? (
-                <span className="flex items-center gap-1 font-display text-xl font-bold text-ink-700" aria-label={pl.game.locked(l.unlockStars)}>
-                  <Star size={24} weight="fill" className="text-butter-500" /> {l.unlockStars}
-                </span>
-              ) : (
+              {(
                 <span className="flex gap-1" aria-label={`${best} z 3`}>
                   {[0, 1, 2].map((s) => (
                     <Star key={s} size={30} weight="fill" className={s < best ? 'text-butter-400 drop-shadow-[0_1px_0_var(--color-butter-600)]' : 'text-white'} />

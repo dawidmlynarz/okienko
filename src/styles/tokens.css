@@ -144,6 +144,15 @@
   --accent-deep: var(--color-peach-900);   /* text on any 50-300 pastel (>=8:1) */
 }
 
+[data-app="shop"] {
+  --accent-soft: var(--color-coral-100);
+  --accent-pastel: var(--color-coral-300);
+  --accent: var(--color-coral-500);
+  --accent-edge: var(--color-coral-600);
+  --accent-strong: var(--color-coral-700);
+  --accent-deep: var(--color-coral-900);
+}
+
 [data-app="error"] {
   --accent-soft: var(--color-coral-100);   /* window tint, backgrounds */
   --accent-pastel: var(--color-coral-300); /* pastel buttons, tiles; label = --accent-deep */

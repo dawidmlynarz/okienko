@@ -3,7 +3,8 @@ export interface LevelBase {
   id: string
   title: string
   subtitle: string
-  unlockStars: number
+  /** Old unlock threshold; every level is open now. */
+  unlockStars?: number
 }
 
 export type Stars = 1 | 2 | 3

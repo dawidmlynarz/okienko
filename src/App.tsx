@@ -7,20 +7,18 @@ import { Home } from './screens/Home'
 import { Login, ParentButton } from './screens/Login'
 import { ParentDialog } from './screens/Parent'
 import { Setup } from './screens/Setup'
-import { UpgradeOverlay } from './screens/Upgrade'
 import { useDomek } from './store/useDomek'
 
 export default function App() {
   const screen = useDomek((s) => s.screen)
   const openApp = useDomek((s) => s.openApp)
   const wallpaper = useDomek((s) => s.settings.wallpaper)
-  const version = useDomek((s) => s.os.version)
   const app = appById(openApp)
   const signedIn = screen === 'home' || screen === 'app'
 
   return (
     <div data-app="system" className="grain relative flex h-full flex-col overflow-hidden">
-      <Wallpaper kind={version === '1.0' ? 'day' : wallpaper} />
+      <Wallpaper kind={wallpaper} />
       <AnimatePresence mode="wait">
         <motion.main
           key={signedIn ? 'desk' : screen}
@@ -46,7 +44,6 @@ export default function App() {
         </motion.main>
       </AnimatePresence>
       <AnimatePresence>{screen === 'app' && app && <AppFrame key={app.id} app={app} />}</AnimatePresence>
-      <UpgradeOverlay />
       <ParentDialog />
     </div>
   )
