@@ -1,6 +1,6 @@
 import { Check, LockKey, UserCircle, Wrench } from '@phosphor-icons/react'
 import { AnimatePresence, motion } from 'motion/react'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { PictureId } from '../assets/pictures'
 import { ChatBubble } from '../components/ChatBubble'
 import { useTalk } from '../components/Companion'
@@ -24,8 +24,8 @@ export function Login() {
   const profile = useDomek((s) => s.profile)!
   const [step, setStep] = useState<Step>('name')
   const [line, setLine] = useState<{ text: string; say?: string; pose: Pose; key: number }>(() => ({
-    text: pl.login.hello(COMPANION_NAME),
-    say: `${pl.login.hello(COMPANION_NAME)} ${pl.login.typeNameSay(profile.childName)}`,
+    text: pl.login.who,
+    say: pl.login.whoSay,
     pose: 'happy',
     key: 0,
   }))
@@ -58,7 +58,7 @@ export function Login() {
                   onDone={() => {
                     setStep('pin')
                     const has = !!profile.pin
-                    tell(pl.login.welcome(profile.childName), 'happy', `${pl.login.welcome(profile.childName)} ${has ? pl.login.pinEnterSay : pl.login.pinChooseSay}`)
+                    tell(pl.login.nameDone, 'happy', has ? pl.login.pinEnterSay : pl.login.pinChooseSay)
                   }}
                 />
               </motion.div>
@@ -119,10 +119,9 @@ function NameStep({ name, onTell, onDone }: { name: string; onTell: (t: string, 
         if (pos + 1 >= letters.length) {
           play('fanfare')
           burst(0.6, 0.45)
-          onTell(pl.login.welcome(name), 'cheer')
-          window.setTimeout(onDone, 1600)
-        } else if (pos === 0) {
-          onTell(pl.game.correct[1], 'happy', '')
+          window.setTimeout(onDone, 900)
+        } else if (pos === 0 && target !== target.toLowerCase()) {
+          onTell(pl.login.nowSmall, 'happy', pl.login.nowSmallSay)
         }
       } else {
         play('wrong')
@@ -131,7 +130,7 @@ function NameStep({ name, onTell, onDone }: { name: string; onTell: (t: string, 
         window.setTimeout(() => setWrongCode(null), 350)
         const m = misses + 1
         setMisses(m)
-        if (m >= 2) onTell(`Szukaj litery ${target.toUpperCase()}`, 'thinking', `Szukaj litery ${letterName(target)}. Świeci się na klawiaturze.`)
+        if (m >= 2) onTell(pl.login.seek(target.toUpperCase()), 'thinking', pl.login.seekSay(letterName(target)))
       }
     },
     !done,
@@ -181,6 +180,7 @@ function PinStep({ onTell }: { onTell: (t: string, p?: Pose, say?: string) => vo
   const [picks, setPicks] = useState<PictureId[]>([])
   const [shake, setShake] = useState(0)
   const [busy, setBusy] = useState(false)
+  const wrong = useRef(0)
 
   useEffect(() => {
     if (picks.length < 3 || busy) return
@@ -210,13 +210,15 @@ function PinStep({ onTell }: { onTell: (t: string, p?: Pose, say?: string) => vo
   function succeed() {
     play('fanfare')
     burst(0.6, 0.5)
-    onTell(pl.login.welcome(profile!.childName), 'cheer')
-    window.setTimeout(login, 1500)
+    onTell(pl.login.opening, 'cheer', '')
+    window.setTimeout(login, 1200)
   }
   function fail(text: string, say: string) {
     play('wrong')
     setShake((s) => s + 1)
-    onTell(text, 'thinking', say)
+    wrong.current += 1
+    if (mode === 'enter' && wrong.current >= 2) onTell(pl.login.pinAskParent, 'thinking', pl.login.pinAskParentSay)
+    else onTell(text, 'thinking', say)
     window.setTimeout(() => {
       setPicks([])
       setBusy(false)
@@ -257,6 +259,8 @@ function PinStep({ onTell }: { onTell: (t: string, p?: Pose, say?: string) => vo
             onClick={() => {
               if (picks.length >= 3) return
               play('pop')
+              const n = picks.length + 1
+              if (n < 3) onTell(pl.login.pinOneLeft(3 - n), 'happy', '')
               setPicks((p) => [...p, id])
             }}
             className="pressable grid size-[min(112px,11vh)] place-items-center rounded-[24px] bg-white shadow-button hover:shadow-[0_0_0_3px_var(--color-sky-200),0_8px_20px_rgb(27_34_64/0.1)]"

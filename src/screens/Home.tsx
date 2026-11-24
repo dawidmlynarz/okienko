@@ -67,7 +67,7 @@ export function Home() {
   const nextApp = useBag(apps)
   const nextIdle = useBag(pl.smoczek.idle)
 
-  const [line, setLine] = useState<Line>(() => ({ text: canBuy ? pl.smoczek.canBuy(wallet) : greeting(name, new Date().getHours()), pose: canBuy ? 'cheer' : 'happy', key: 0, app: canBuy ? appById('szafa') ?? undefined : undefined }))
+  const [line, setLine] = useState<Line>(() => ({ text: greeting(name, new Date().getHours()) + (canBuy ? ` ${pl.smoczek.canBuy(wallet)}` : ''), pose: 'happy', key: 0, app: canBuy ? appById('szafa') ?? undefined : undefined }))
   const say = useCallback((text: string, pose: Pose = 'happy', app?: AppDef) => setLine((l) => ({ text, pose, app, key: l.key + 1 })), [])
   const { talking, repeat } = useTalk(line.text, line.key)
   const lastPoke = useRef(Date.now())
