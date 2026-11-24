@@ -17,7 +17,7 @@ import { SPOTS, makeQuestions, type Level } from './questions'
 const levels = data.levels as Level[]
 
 export default function LiczymyJablka(_: AppProps) {
-  return <GameShell levels={levels} lead={pl.counting.lead} backdrop={<Backdrop />} className="bg-lavender-50" Round={Round} />
+  return <GameShell levels={levels} lead={pl.counting.lead} hint={pl.parentHint.games['liczymy-jablka']} backdrop={<Backdrop />} className="bg-lavender-50" Round={Round} />
 }
 
 function Backdrop() {
@@ -70,7 +70,7 @@ function Round({ level, onDone, onBack }: RoundProps<Level>) {
         if (last) {
           play('fanfare')
           celebrate()
-          window.setTimeout(() => onDone(starsFor(good.current, questions.length), `${good.current} z ${questions.length} za pierwszym razem`), 700)
+          window.setTimeout(() => onDone(starsFor(good.current, questions.length), `${good.current} / ${questions.length}`), 700)
         } else setQi((i) => i + 1)
       }, 1300)
     } else {

@@ -2,7 +2,7 @@
   "$comment": "Liczymy Jabłka levels. mode count: how many apples; add: two plates, how many together. max: largest answer (1-9).",
   "levels": [
     { "id": "liczenie-5", "title": "Do pięciu", "subtitle": "1 2 3 4 5", "mode": "count", "max": 5, "questions": 8, "hintAfterMs": 4000, "unlockStars": 0 },
-    { "id": "liczenie-9", "title": "Do dziewięciu", "subtitle": "od 1 do 9", "mode": "count", "max": 9, "questions": 8, "hintAfterMs": 6000, "unlockStars": 2 },
+    { "id": "liczenie-9", "title": "Do dziewięciu", "subtitle": "1 … 9", "mode": "count", "max": 9, "questions": 8, "hintAfterMs": 6000, "unlockStars": 2 },
     { "id": "liczenie-dodawanie", "title": "Dodawanie", "subtitle": "2 + 3 = ?", "mode": "add", "max": 9, "questions": 8, "hintAfterMs": 8000, "unlockStars": 4 }
   ]
 }

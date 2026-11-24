@@ -1,8 +1,8 @@
-import { SpeakerHigh } from '@phosphor-icons/react'
-import { AnimatePresence, motion } from 'motion/react'
+import { AnimatePresence } from 'motion/react'
 import { useEffect, useState } from 'react'
 import { speak } from '../lib/speak'
 import { useDomek } from '../store/useDomek'
+import { ChatBubble } from './ChatBubble'
 import { Smoczek, type Pose } from './Smoczek'
 
 interface Props {
@@ -46,26 +46,13 @@ export function Companion({ text, say, sayKey, pose = 'idle', size = 220, bubble
   const bubble = (
     <AnimatePresence>
       {text && (
-        <motion.div
+        <ChatBubble
           key={`${text}-${sayKey ?? ''}`}
-          initial={{ opacity: 0, scale: 0.9, y: 8 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, transition: { duration: 0 } }}
-          transition={{ type: 'spring', stiffness: 400, damping: 28 }}
-          className={`relative flex items-start gap-3 leading-snug text-ink ${narrow ? 'max-w-[290px] text-xl' : 'max-w-md text-2xl'} ${variant === 'bubble' ? 'rounded-[22px] bg-surface py-4 pr-4 pl-6 shadow-card' : ''}`}
-          role="status"
-        >
-          <span className="flex-1">{text}</span>
-          <button
-            type="button"
-            aria-label="Powiedz jeszcze raz"
-            title="Powiedz jeszcze raz"
-            className="grid size-10 shrink-0 place-items-center rounded-full text-sky-700 transition-colors hover:bg-sky-100"
-            onClick={repeat}
-          >
-            <SpeakerHigh size={22} weight="bold" />
-          </button>
-        </motion.div>
+          text={text}
+          onRepeat={repeat}
+          tail={bubbleSide === 'top' ? 'bottom' : 'left'}
+          size={narrow ? 'sm' : 'md'}
+        />
       )}
     </AnimatePresence>
   )
@@ -74,7 +61,7 @@ export function Companion({ text, say, sayKey, pose = 'idle', size = 220, bubble
   return (
     <div className={`flex gap-4 ${dir} ${className}`}>
       <Smoczek pose={pose} talking={talking && pose !== 'thinking'} color={profile?.companionColor} size={size} label="Smoczek" />
-      <div className={bubbleSide === 'top' || variant === 'plain' ? 'self-center' : 'self-start pt-4'}>{bubble}</div>
+      <div className={`${narrow ? 'max-w-[300px]' : 'max-w-md'} ${bubbleSide === 'top' || variant === 'plain' ? 'self-center' : 'self-start pt-4'}`}>{bubble}</div>
     </div>
   )
 }

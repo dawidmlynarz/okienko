@@ -23,11 +23,11 @@ const BALLOONS = [
 ]
 
 export default function BalonowyLas(_: AppProps) {
-  return <GameShell levels={levels} lead="Wpisuj litery z baloników" backdrop={<Forest />} className="bg-mint-50" Round={BalloonRound} />
+  return <GameShell levels={levels} lead="Wpisuj litery z baloników" hint={pl.parentHint.games['balonowy-las']} backdrop={<Forest />} className="bg-mint-50" Round={BalloonRound} />
 }
 
 function BalloonRound({ level, onDone, onBack }: RoundProps<Level>) {
-  return <Round level={level} onBack={onBack} onDone={(firstTry, total) => onDone(starsFor(firstTry, total), pl.game.accuracy(firstTry, total))} />
+  return <Round level={level} onBack={onBack} onDone={(firstTry, total) => onDone(starsFor(firstTry, total), `${firstTry} / ${total}`)} />
 }
 
 /** Soft flat forest: rounded tree shapes in three depths of mint, no outlines. */
@@ -79,7 +79,7 @@ function Round({ level, onDone, onBack }: { level: Level; onDone: (firstTry: num
   const [hint, setHint] = useState(level.hintAfterMs === 0)
   const [wrongCode, setWrongCode] = useState<string | null>(null)
   const [wobble, setWobble] = useState(0)
-  const [companion, setCompanion] = useState<{ text: string | null; say?: string; pose: Pose; key: number }>({ text: pl.game.startSay, pose: 'happy', key: 0 })
+  const [companion, setCompanion] = useState<{ text: string | null; say?: string; pose: Pose; key: number }>({ text: pl.game.startShow, say: pl.game.startSay, pose: 'happy', key: 0 })
   const firstTry = useRef(0)
   const misses = useRef(0)
   const scene = useRef<HTMLDivElement>(null)
@@ -114,6 +114,13 @@ function Round({ level, onDone, onBack }: { level: Level; onDone: (firstTry: num
     return () => window.clearTimeout(t)
   }, [balloon, hint, level.hintAfterMs])
 
+  /** On screen only the keys (option + A); the full sentence is spoken. */
+  const keys = (c: string) => {
+    const ch = chordFor(c)
+    if (ch?.alt) return pl.game.keysAlt(altKeyLabel(platform), ch.code.slice(3))
+    if (ch?.shift) return pl.game.keysShift(c.toUpperCase())
+    return c.toUpperCase()
+  }
   const instruction = (c: string) => {
     const ch = chordFor(c)
     const shown = c.toUpperCase()
@@ -154,7 +161,7 @@ function Round({ level, onDone, onBack }: { level: Level; onDone: (firstTry: num
       window.setTimeout(() => setWrongCode(null), 350)
       misses.current += 1
       const say = misses.current >= 2 ? `${instruction(balloon.char)}.` : ''
-      tell(misses.current >= 2 ? instruction(balloon.char) : pl.game.tryAgain, 'thinking', say || pl.game.tryAgain)
+      tell(misses.current >= 2 ? keys(balloon.char) : pl.game.almost, 'thinking', say || pl.game.tryAgain)
     }
   })
 

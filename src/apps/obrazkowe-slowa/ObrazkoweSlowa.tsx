@@ -22,7 +22,7 @@ interface Level extends LevelBase {
 const levels = data.levels as Level[]
 
 export default function ObrazkoweSlowa(_: AppProps) {
-  return <GameShell levels={levels} lead={pl.words.lead} backdrop={<Backdrop />} className="bg-pink-50" Round={Round} />
+  return <GameShell levels={levels} lead={pl.words.lead} hint={pl.parentHint.games['obrazkowe-slowa']} backdrop={<Backdrop />} className="bg-pink-50" Round={Round} />
 }
 
 function Backdrop() {
@@ -70,6 +70,12 @@ function Round({ level, onDone, onBack }: RoundProps<Level>) {
     return () => window.clearTimeout(t)
   }, [hint, target, typed, level.hintAfterMs])
 
+  /** On screen only the keys (option + A); the full sentence is spoken. */
+  const keys = (c: string) => {
+    const ch = chordFor(c)
+    if (ch?.alt) return pl.game.keysAlt(altKeyLabel(platform), ch.code.slice(3))
+    return c.toUpperCase()
+  }
   const instruction = (c: string) => {
     const ch = chordFor(c)
     if (ch?.alt) return pl.game.pressAlt(altKeyLabel(platform), ch.code.slice(3))
@@ -92,12 +98,12 @@ function Round({ level, onDone, onBack }: RoundProps<Level>) {
       play('correct')
       burst(0.5, 0.35)
       const last = wi + 1 >= words.length
-      tell(pl.words.good(current.word.toLocaleUpperCase('pl')), last ? 'cheer' : 'happy', pl.words.good(current.word))
+      tell(pl.game.good[wi % pl.game.good.length], last ? 'cheer' : 'happy', pl.words.good(current.word))
       window.setTimeout(() => {
         if (last) {
           play('fanfare')
           celebrate()
-          window.setTimeout(() => onDone(starsFor(good.current, total), `${good.current} z ${total} liter za pierwszym razem`), 700)
+          window.setTimeout(() => onDone(starsFor(good.current, total), `${good.current} / ${total}`), 700)
         } else setWi((i) => i + 1)
       }, 1500)
     } else {
@@ -107,7 +113,7 @@ function Round({ level, onDone, onBack }: RoundProps<Level>) {
       setShake((s) => s + 1)
       setWrongCode(e.code)
       window.setTimeout(() => setWrongCode(null), 350)
-      tell(instruction(target), 'thinking', instruction(target))
+      tell(keys(target), 'thinking', instruction(target))
     }
   })
 

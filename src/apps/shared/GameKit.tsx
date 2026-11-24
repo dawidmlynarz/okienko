@@ -2,7 +2,9 @@ import { ArrowLeft, LockSimple, Star } from '@phosphor-icons/react'
 import { AnimatePresence, motion } from 'motion/react'
 import { useEffect, useState, type ReactNode } from 'react'
 import { Button } from '../../components/Button'
-import { Companion } from '../../components/Companion'
+import { ParentHint } from '../../components/ParentHint'
+import { Smoczek } from '../../components/Smoczek'
+import { speak } from '../../lib/speak'
 import { pl } from '../../i18n/pl'
 import { play } from '../../lib/sound'
 import { useDomek } from '../../store/useDomek'
@@ -28,13 +30,17 @@ export function GameShell<L extends LevelBase>({
   levels,
   heading = pl.game.pickLevel,
   lead,
+  hint,
   backdrop,
   className = '',
   Round,
 }: {
   levels: L[]
   heading?: string
+  /** Spoken when the level picker opens; not shown. */
   lead: string
+  /** What the game teaches, for the parent's (?). */
+  hint?: string
   backdrop?: ReactNode
   className?: string
   Round: (p: RoundProps<L>) => ReactNode
@@ -49,7 +55,7 @@ export function GameShell<L extends LevelBase>({
       <AnimatePresence mode="wait">
         {view.kind === 'pick' && (
           <motion.div key="pick" className="absolute inset-0" exit={{ opacity: 0 }}>
-            <LevelPicker levels={levels} heading={heading} lead={lead} onPick={start} />
+            <LevelPicker levels={levels} heading={heading} lead={lead} hint={hint} onPick={start} />
           </motion.div>
         )}
         {view.kind === 'play' && (
@@ -82,14 +88,13 @@ const LEVEL_TINTS = [
   { bg: 'var(--color-peach-100)', chip: 'var(--color-peach-200)', ink: 'var(--color-peach-900)' },
 ]
 
-export function LevelPicker<L extends LevelBase>({ levels, heading, lead, onPick }: { levels: L[]; heading: string; lead: string; onPick: (l: L) => void }) {
+export function LevelPicker<L extends LevelBase>({ levels, heading, lead, hint, onPick }: { levels: L[]; heading: string; lead: string; hint?: string; onPick: (l: L) => void }) {
   const progress = useDomek((s) => s.progress)
+  useEffect(() => speak(`${lead}. ${heading}.`), [lead, heading])
   return (
     <div className="relative flex h-full flex-col items-center justify-center gap-8 p-8">
-      <div className="flex flex-col items-center gap-1 text-center">
-        <h2 className="font-display text-5xl font-extrabold tracking-tight text-ink">{heading}</h2>
-        <p className="text-2xl text-muted">{lead}</p>
-      </div>
+      {hint && <ParentHint text={hint} className="absolute top-5 right-6" />}
+      <h2 className="font-display text-5xl font-extrabold tracking-tight text-ink">{heading}</h2>
       <div className="flex flex-wrap justify-center gap-5">
         {levels.map((l, i) => {
           const locked = progress.stars < l.unlockStars
@@ -122,10 +127,12 @@ export function LevelPicker<L extends LevelBase>({ levels, heading, lead, onPick
                 <span className="font-display text-2xl font-bold" style={{ color: locked ? 'var(--color-ink-700)' : tint.ink }}>
                   {l.title}
                 </span>
-                <span className="font-body text-xl text-ink-700">{l.subtitle}</span>
+                {l.subtitle && <span className="font-body text-xl text-ink-700">{l.subtitle}</span>}
               </span>
               {locked ? (
-                <span className="text-base text-ink-700">{pl.game.locked(l.unlockStars)}</span>
+                <span className="flex items-center gap-1 font-display text-xl font-bold text-ink-700" aria-label={pl.game.locked(l.unlockStars)}>
+                  <Star size={24} weight="fill" className="text-butter-500" /> {l.unlockStars}
+                </span>
               ) : (
                 <span className="flex gap-1" aria-label={`${best} z 3`}>
                   {[0, 1, 2].map((s) => (
@@ -162,7 +169,9 @@ export function GameHud({ onBack, done, total, title, label }: { onBack: () => v
 }
 
 export function Result({ stars, line, onAgain, onDone }: { stars: Stars; line: string; onAgain: () => void; onDone: () => void }) {
+  const color = useDomek((s) => s.profile?.companionColor)
   useEffect(() => {
+    speak(pl.game.resultSay(stars))
     const ts = [0, 1, 2].filter((i) => i < stars).map((i) => window.setTimeout(() => play('star'), 500 + i * 350))
     return () => ts.forEach(window.clearTimeout)
   }, [stars])
@@ -176,7 +185,6 @@ export function Result({ stars, line, onAgain, onDone }: { stars: Stars; line: s
       >
         <Sunburst />
         <h2 className="relative font-display text-5xl font-extrabold tracking-tight text-accent-deep">{stars === 3 ? 'Doskonale!' : stars === 2 ? 'Świetnie!' : 'Dobra robota!'}</h2>
-        <p className="relative -mt-2 text-2xl text-muted">{pl.game.done}</p>
         <div className="relative flex gap-4">
           {[0, 1, 2].map((i) => (
             <motion.span key={i} initial={{ scale: 0, rotate: -40 }} animate={{ scale: 1, rotate: 0 }} transition={{ delay: 0.5 + i * 0.35, type: 'spring', stiffness: 400, damping: 14 }}>
@@ -184,7 +192,10 @@ export function Result({ stars, line, onAgain, onDone }: { stars: Stars; line: s
             </motion.span>
           ))}
         </div>
-        <Companion text={line} say={pl.game.resultSay(stars)} pose="cheer" size={150} className="relative" />
+        <div className="relative flex items-center gap-5">
+          <Smoczek pose="cheer" size={130} color={color} />
+          <span className="rounded-full bg-accent-soft px-5 py-2 font-display text-3xl font-extrabold text-accent-deep tabular-nums">{line}</span>
+        </div>
         <div className="relative flex gap-4">
           <Button variant="plain" size="lg" onClick={onDone}>
             {pl.game.finish}

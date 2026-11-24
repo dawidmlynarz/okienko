@@ -21,7 +21,7 @@ interface Level extends LevelBase {
 const levels = data.levels as Level[]
 
 export default function SmoczeMemory(_: AppProps) {
-  return <GameShell levels={levels} lead={pl.memory.lead} backdrop={<Backdrop />} className="bg-sky-50" Round={Round} />
+  return <GameShell levels={levels} lead={pl.memory.lead} hint={pl.parentHint.games['smocze-memory']} backdrop={<Backdrop />} className="bg-sky-50" Round={Round} />
 }
 
 function Backdrop() {
@@ -46,7 +46,7 @@ function Round({ level, onDone, onBack }: RoundProps<Level>) {
   const [open, setOpen] = useState<number[]>([])
   const [found, setFound] = useState<Set<PictureId>>(() => new Set())
   const [moves, setMoves] = useState(0)
-  const [talk, setTalk] = useState<{ text: string | null; say?: string; pose: Pose; key: number }>({ text: pl.memory.lead, say: pl.memory.startSay, pose: 'happy', key: 0 })
+  const [talk, setTalk] = useState<{ text: string | null; say?: string; pose: Pose; key: number }>({ text: pl.memory.show, say: pl.memory.startSay, pose: 'happy', key: 0 })
   const busy = useRef(false)
   const tell = useCallback((text: string | null, pose: Pose, say?: string) => setTalk((c) => ({ text, pose, say: say ?? '', key: c.key + 1 })), [])
 
@@ -75,7 +75,7 @@ function Round({ level, onDone, onBack }: RoundProps<Level>) {
           celebrate()
           tell(pl.game.done, 'cheer')
           const stars: Stars = memoryStars(m, level.pairs)
-          window.setTimeout(() => onDone(stars, pl.memory.resultLine(m)), 1000)
+          window.setTimeout(() => onDone(stars, pl.memory.moves(m)), 1000)
         } else {
           const p = pl.memory.pair[f.size % pl.memory.pair.length]
           tell(p, 'happy', p)
@@ -86,7 +86,7 @@ function Round({ level, onDone, onBack }: RoundProps<Level>) {
       window.setTimeout(() => {
         setOpen([])
         busy.current = false
-        tell('Hmm, inne obrazki. Zapamiętaj, gdzie były!', 'thinking', '')
+        tell(pl.memory.different, 'thinking', pl.memory.different)
       }, 1100)
     }
   }

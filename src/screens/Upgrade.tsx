@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from 'motion/react'
 import { useEffect, useState } from 'react'
 import { Button } from '../components/Button'
 import { Companion } from '../components/Companion'
+import { ParentHint } from '../components/ParentHint'
 import { pl } from '../i18n/pl'
 import { celebrate } from '../lib/confetti'
 import { play } from '../lib/sound'
@@ -64,7 +65,6 @@ export function UpgradeOverlay() {
     return () => window.clearTimeout(t)
   }, [phase, upgradeTo])
 
-  const stepIdx = Math.min(pl.upgrade.steps.length - 1, Math.floor(progress * pl.upgrade.steps.length))
 
   return (
     <AnimatePresence>
@@ -79,7 +79,6 @@ export function UpgradeOverlay() {
             {phase === 'restart' ? (
               <motion.div key="restart" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col items-center gap-8 text-white">
                 <Door />
-                <span className="font-display text-4xl font-extrabold">{pl.upgrade.restarting}</span>
               </motion.div>
             ) : (
               <motion.div
@@ -88,8 +87,9 @@ export function UpgradeOverlay() {
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: -12 }}
                 transition={{ type: 'spring', stiffness: 300, damping: 26 }}
-                className="card relative flex max-h-full w-full max-w-4xl flex-col items-center gap-5 overflow-hidden rounded-[40px] p-10 text-center"
+                className="card relative flex max-h-full w-full max-w-4xl flex-col items-center gap-6 rounded-[40px] p-10 text-center"
               >
+                <ParentHint text={pl.parentHint.update} className="absolute top-5 right-5" />
                 {phase === 'offer' && (
                   <>
                     <div className="flex items-center gap-6">
@@ -97,7 +97,6 @@ export function UpgradeOverlay() {
                       <Building progress={0} />
                     </div>
                     <h2 className="font-display text-5xl font-extrabold tracking-tight">{pl.upgrade.ready}</h2>
-                    <p className="text-2xl text-muted">{pl.upgrade.readyLead}</p>
                     <div className="flex gap-4">
                       <Button variant="plain" size="lg" onClick={() => setUpgradeOpen(false)}>
                         {pl.upgrade.later}
@@ -106,7 +105,6 @@ export function UpgradeOverlay() {
                         {pl.upgrade.install}
                       </Button>
                     </div>
-                    <WhatIsIt />
                   </>
                 )}
                 {phase === 'installing' && (
@@ -115,25 +113,14 @@ export function UpgradeOverlay() {
                       <Companion pose="thinking" say={pl.upgrade.installingSay} size={150} />
                       <Building progress={progress} />
                     </div>
-                    <h2 className="font-display text-4xl font-extrabold tracking-tight">{pl.upgrade.installing}</h2>
                     <div className="h-5 w-full overflow-hidden rounded-full bg-butter-100 ring-1 ring-butter-200" role="progressbar" aria-valuenow={Math.round(progress * 100)} aria-valuemin={0} aria-valuemax={100}>
                       <div className="h-full w-full origin-left rounded-full bg-[repeating-linear-gradient(90deg,var(--color-peach-400)_0_22px,var(--color-peach-300)_22px_24px)]" style={{ transform: `scaleX(${Math.max(0.04, progress)})` }} />
                     </div>
-                    <div className="flex w-full justify-between text-xl">
-                      <AnimatePresence mode="wait">
-                        <motion.span key={stepIdx} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} className="text-muted">
-                          {pl.upgrade.steps[stepIdx]}
-                        </motion.span>
-                      </AnimatePresence>
-                      <span className="font-display font-bold tabular-nums text-peach-900">{Math.round(progress * 100)}%</span>
-                    </div>
-                    <p className="text-lg text-muted">{pl.upgrade.dontClose}</p>
                   </>
                 )}
                 {phase === 'new' && (
                   <>
                     <Companion pose="cheer" say={pl.upgrade.doneSay} size={150} />
-                    <h2 className="font-display text-5xl font-extrabold tracking-tight">{pl.upgrade.whatsNew}</h2>
                     <ul className="grid w-full grid-cols-2 gap-4 text-left">
                       {pl.upgrade.features.map((f, i) => (
                         <motion.li
@@ -147,15 +134,13 @@ export function UpgradeOverlay() {
                           <span className="grid size-14 place-items-center rounded-[18px] bg-white text-accent-strong shadow-button">
                             {i === 0 ? <BookOpenText size={32} weight="bold" /> : <SunHorizon size={32} weight="bold" />}
                           </span>
-                          <span className="block font-display text-2xl font-extrabold text-accent-deep">{f.title}</span>
-                          <span className="text-xl text-ink-700">{f.body}</span>
+                          <span className="block font-display text-3xl font-extrabold text-accent-deep">{f.title}</span>
                         </motion.li>
                       ))}
                     </ul>
                     <Button variant="strong" size="lg" onClick={() => setUpgradeOpen(false)}>
                       {pl.upgrade.ok}
                     </Button>
-                    <WhatIsIt />
                   </>
                 )}
               </motion.div>
@@ -167,9 +152,6 @@ export function UpgradeOverlay() {
   )
 }
 
-function WhatIsIt() {
-  return <p className="max-w-xl rounded-full bg-ink-50 px-5 py-2 text-base text-ink-700">{pl.upgrade.whatIsIt}</p>
-}
 
 /** Smoczek's house with the new room going up brick by brick as the update runs. */
 function Building({ progress }: { progress: number }) {

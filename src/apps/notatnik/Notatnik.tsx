@@ -93,7 +93,6 @@ export default function Notatnik(_: AppProps) {
           {canRead && (
             <Button variant="pastel" icon={<SpeakerHigh size={24} weight="bold" />} onClick={() => speak(draft || pl.notes.empty, { force: true })} disabled={!draft.trim()}>
               {pl.notes.readAloud}
-              <span className="ml-1 rounded-full bg-white px-2 py-0.5 text-sm text-butter-900">{pl.notes.newFeature}</span>
             </Button>
           )}
           <div className="flex-1" />

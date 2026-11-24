@@ -20,7 +20,7 @@ interface Level extends LevelBase {
 const levels = data.levels as Level[]
 
 export default function LapBiedronki(_: AppProps) {
-  return <GameShell levels={levels} lead={pl.ladybugs.lead} backdrop={<Garden />} className="bg-mint-50" Round={Round} />
+  return <GameShell levels={levels} lead={pl.ladybugs.lead} hint={pl.parentHint.games['lap-biedronki']} backdrop={<Garden />} className="bg-mint-50" Round={Round} />
 }
 
 /** Flat garden: soft sky, rolling grass and a few big leaves to land on. */
@@ -69,7 +69,7 @@ function Round({ level, onDone, onBack }: RoundProps<Level>) {
   const [bug, setBug] = useState<Bug | null>(null)
   const [caughtId, setCaughtId] = useState<number | null>(null)
   const [caught, setCaught] = useState(0)
-  const [talk, setTalk] = useState<{ text: string | null; say?: string; pose: Pose; key: number }>({ text: pl.ladybugs.lead, say: pl.ladybugs.startSay, pose: 'happy', key: 0 })
+  const [talk, setTalk] = useState<{ text: string | null; say?: string; pose: Pose; key: number }>({ text: pl.ladybugs.show, say: pl.ladybugs.startSay, pose: 'happy', key: 0 })
   const field = useRef<HTMLDivElement>(null)
   const caughtRef = useRef(0)
   const tell = useCallback((text: string | null, pose: Pose, say?: string) => setTalk((c) => ({ text, pose, say: say ?? '', key: c.key + 1 })), [])
@@ -84,7 +84,7 @@ function Round({ level, onDone, onBack }: RoundProps<Level>) {
     play('fanfare')
     celebrate()
     const c = caughtRef.current
-    window.setTimeout(() => done.current(starsFor(c, level.count), pl.ladybugs.resultLine(c, level.count)), 700)
+    window.setTimeout(() => done.current(starsFor(c, level.count), `${c} / ${level.count}`), 700)
   }, [level.count])
 
   // Land the next ladybug somewhere new; it flies off by itself after lifeMs.
