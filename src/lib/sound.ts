@@ -1,4 +1,4 @@
-import { useOkienko } from '../store/useOkienko'
+import { useDomek } from '../store/useDomek'
 
 /**
  * Tiny synthesised sound kit (Web Audio), so the PoC needs no audio files.
@@ -90,7 +90,7 @@ const kit: Record<SoundName, () => void> = {
 }
 
 export function play(name: SoundName) {
-  if (!useOkienko.getState().settings.sound) return
+  if (!useDomek.getState().settings.sound) return
   try {
     kit[name]()
   } catch {

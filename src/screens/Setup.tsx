@@ -5,7 +5,7 @@ import { Button } from '../components/Button'
 import { pl } from '../i18n/pl'
 import { unlockAudio } from '../lib/sound'
 import { requestPersistentStorage } from '../store/storage'
-import { useOkienko, type CompanionColor } from '../store/useOkienko'
+import { COMPANION_NAME, useDomek, type CompanionColor } from '../store/useDomek'
 import { BackupButtons } from './Parent'
 
 export function ColorPicker({ value, onChange }: { value: CompanionColor; onChange: (c: CompanionColor) => void }) {
@@ -47,13 +47,12 @@ export function Field({ label, hint, value, onChange, id }: { label: string; hin
 }
 
 export function Setup() {
-  const completeSetup = useOkienko((s) => s.completeSetup)
+  const completeSetup = useDomek((s) => s.completeSetup)
   const [childName, setChildName] = useState('')
-  const [companionName, setCompanionName] = useState('Smoczek')
   const [color, setColor] = useState<CompanionColor>('mint')
   // Names are typed letter by letter on login, so keep letters only.
   const clean = (s: string) => s.replace(/[^\p{L}]/gu, '')
-  const ok = clean(childName).length >= 2 && companionName.trim().length >= 2
+  const ok = clean(childName).length >= 2
 
   return (
     <div className="relative z-10 flex flex-1 items-center justify-center p-6">
@@ -64,6 +63,7 @@ export function Setup() {
       >
         <div className="flex w-64 flex-col items-center justify-center">
           <Smoczek pose="happy" color={color} size={240} />
+          <p className="mt-3 font-display text-2xl font-extrabold text-ink">{pl.setup.meet}</p>
         </div>
         <form
           className="flex min-w-0 flex-1 flex-col gap-6"
@@ -73,7 +73,7 @@ export function Setup() {
             unlockAudio()
             void requestPersistentStorage()
             const n = clean(childName)
-            completeSetup({ childName: n[0].toLocaleUpperCase('pl') + n.slice(1), companionName: companionName.trim(), companionColor: color })
+            completeSetup({ childName: n[0].toLocaleUpperCase('pl') + n.slice(1), companionName: COMPANION_NAME, companionColor: color })
           }}
         >
           <div>
@@ -81,16 +81,17 @@ export function Setup() {
             <p className="mt-2 text-xl text-muted">{pl.setup.lead}</p>
           </div>
           <Field id="child" label={pl.setup.childName} hint={pl.setup.childNameHint} value={childName} onChange={setChildName} />
-          <Field id="companion" label={pl.setup.companionName} value={companionName} onChange={setCompanionName} />
           <div className="flex flex-col gap-3">
             <span className="font-display text-lg font-semibold">{pl.setup.companionColor}</span>
             <ColorPicker value={color} onChange={setColor} />
           </div>
-          <div className="mt-2 flex items-center justify-between gap-4">
-            <BackupButtons importOnly />
-            <Button type="submit" variant="strong" size="lg" disabled={!ok}>
+          <div className="mt-2 flex flex-col gap-3">
+            <Button type="submit" variant="strong" size="lg" disabled={!ok} className="w-full">
               {pl.setup.start}
             </Button>
+            <div className="flex justify-center">
+              <BackupButtons importOnly />
+            </div>
           </div>
         </form>
       </motion.div>

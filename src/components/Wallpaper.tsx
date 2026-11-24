@@ -1,4 +1,4 @@
-import type { Wallpaper as W } from '../store/useOkienko'
+import type { Wallpaper as W } from '../store/useDomek'
 
 /** Soft sky: layered gradients with a few large, slowly drifting colour fields. */
 export function Wallpaper({ kind = 'day' }: { kind?: W }) {

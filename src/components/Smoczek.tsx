@@ -1,5 +1,69 @@
-import type { CSSProperties } from 'react'
-import type { CompanionColor } from '../store/useOkienko'
+import { useEffect, useRef, type CSSProperties } from 'react'
+import type { CompanionColor } from '../store/useDomek'
+
+/* Eyes that follow the pointer. One window listener feeds every Smoczek on screen. */
+const watchers = new Set<() => void>()
+let pointer: { x: number; y: number; t: number } | null = null
+let frame = 0
+function onPointer(e: PointerEvent) {
+  pointer = { x: e.clientX, y: e.clientY, t: performance.now() }
+  if (!frame) frame = requestAnimationFrame(() => {
+    frame = 0
+    watchers.forEach((w) => w())
+  })
+}
+function watchPointer(fn: () => void) {
+  if (!watchers.size) window.addEventListener('pointermove', onPointer, { passive: true })
+  watchers.add(fn)
+  return () => {
+    watchers.delete(fn)
+    if (!watchers.size) window.removeEventListener('pointermove', onPointer)
+  }
+}
+
+/** Eye centre and resting pupil position, in viewBox units. */
+const EYE = { x: 120, y: 94 }
+const REST = { x: 2, y: 4 }
+const REACH = { x: 6.5, y: 7 }
+
+/** Move the pupils toward the pointer; relax back to centre when the pointer goes quiet. */
+function useFollowEyes(svg: React.RefObject<SVGSVGElement | null>, enabled: boolean, remount?: number) {
+  useEffect(() => {
+    const el = svg.current
+    const pupils = el?.querySelector<SVGGElement>('.pupils')
+    if (!el || !pupils) return
+    if (!enabled) {
+      pupils.style.transform = ''
+      return
+    }
+    let idle = 0
+    const look = () => {
+      if (!pointer) return
+      const r = el.getBoundingClientRect()
+      if (!r.width) return
+      const scale = r.width / 240
+      const cx = r.left + EYE.x * scale
+      const cy = r.top + EYE.y * scale
+      const dx = pointer.x - cx
+      const dy = pointer.y - cy
+      const dist = Math.hypot(dx, dy) || 1
+      // Full reach once the pointer is a little way off; gentle when it is right on him.
+      const k = Math.min(1, dist / (r.width * 0.9))
+      const x = (dx / dist) * REACH.x * k - REST.x
+      const y = (dy / dist) * REACH.y * k - REST.y
+      pupils.style.transform = `translate(${x.toFixed(2)}px, ${y.toFixed(2)}px)`
+      window.clearTimeout(idle)
+      idle = window.setTimeout(() => (pupils.style.transform = ''), 6000)
+    }
+    look()
+    const stop = watchPointer(look)
+    return () => {
+      stop()
+      window.clearTimeout(idle)
+      pupils.style.transform = ''
+    }
+  }, [svg, enabled, remount])
+}
 
 export type Pose = 'idle' | 'happy' | 'cheer' | 'thinking'
 
@@ -21,13 +85,18 @@ interface Props {
   label?: string
   /** Re-trigger a one-shot pose animation by changing this key. */
   beat?: number
+  /** Eyes follow the mouse pointer (on by default). */
+  followEyes?: boolean
 }
 
-export function Smoczek({ pose = 'idle', color = 'mint', talking = false, size = 240, className = '', label = 'Smoczek', beat }: Props) {
+export function Smoczek({ pose = 'idle', color = 'mint', talking = false, size = 240, className = '', label = 'Smoczek', beat, followEyes = true }: Props) {
+  const ref = useRef<SVGSVGElement>(null)
+  // Thinking looks up and away on purpose, so the eyes stop following then.
+  useFollowEyes(ref, followEyes && pose !== 'thinking' && pose !== 'cheer', beat)
   const [body, belly, spike, line] = COMPANION_COLORS[color]
   const style = { '--body': body, '--belly': belly, '--spike': spike, '--line': line, width: size, height: 'auto' } as CSSProperties
   return (
-    <svg key={beat} className={`smok ${pose} ${talking ? 'talking' : ''} ${className}`} viewBox="0 0 240 260" role="img" aria-label={label} style={style}>
+    <svg ref={ref} key={beat} className={`smok ${pose} ${talking ? 'talking' : ''} ${className}`} viewBox="0 0 240 260" role="img" aria-label={label} style={style}>
       <ellipse cx="120" cy="248" rx="70" ry="8" fill="#1B2240" opacity=".08" />
       <g className="whole">
         <g className="spark" fill="#F7DEAB" stroke="#9A7405" strokeWidth="2.5" strokeLinejoin="round">

@@ -1,7 +1,7 @@
 /**
  * Polish keyboard module.
  *
- * Okienko runs in Chrome on a MacBook (macOS "Polish Pro" layout: Option + letter)
+ * Smoczy Domek runs in Chrome on a MacBook (macOS "Polish Pro" layout: Option + letter)
  * or a Windows PC ("Polish (Programmers)" layout: right Alt, i.e. AltGr + letter).
  * Both layouts report the produced letter in KeyboardEvent.key, so `key` is the
  * source of truth. `code` is only used to (a) draw the on-screen keyboard and
@@ -60,7 +60,7 @@ export function detectPlatform(nav: { platform?: string; userAgent?: string } = 
 }
 
 /**
- * Turn a keydown event into something Okienko cares about, or null to ignore it.
+ * Turn a keydown event into something the app cares about, or null to ignore it.
  * Shortcuts (Cmd+R, Ctrl+C) return null so the browser keeps them, but AltGr,
  * which Windows reports as Ctrl+Alt, still types letters.
  */

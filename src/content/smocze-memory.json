@@ -1,0 +1,9 @@
+{
+  "$comment": "Smocze Memory levels. pairs: how many pairs on the table. columns: grid width.",
+  "pictures": ["kot", "pies", "lis", "sowa", "zaba", "jez", "mis", "slon", "truskawka", "banan", "wisnie", "lizak"],
+  "levels": [
+    { "id": "memory-3", "title": "Trzy pary", "subtitle": "6 kart", "pairs": 3, "columns": 3, "unlockStars": 0 },
+    { "id": "memory-4", "title": "Cztery pary", "subtitle": "8 kart", "pairs": 4, "columns": 4, "unlockStars": 1 },
+    { "id": "memory-6", "title": "Sześć par", "subtitle": "12 kart", "pairs": 6, "columns": 4, "unlockStars": 3 }
+  ]
+}

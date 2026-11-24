@@ -5,11 +5,11 @@ import { AppIcon } from '../components/Dock'
 import { pl } from '../i18n/pl'
 import { play } from '../lib/sound'
 import { stopSpeaking } from '../lib/speak'
-import { useOkienko } from '../store/useOkienko'
+import { useDomek } from '../store/useDomek'
 import type { AppDef } from './registry'
 
 /**
- * The one wrapper every app renders in. In Okienko 1.x it is full screen with a
+ * The one wrapper every app renders in. In the first version it is full screen with a
  * big Home button; when windows unlock, the same frame becomes a movable window.
  */
 
@@ -20,7 +20,7 @@ const GuardContext = createContext<(g: Guard | null) => void>(() => {})
 export const useCloseGuard = () => useContext(GuardContext)
 
 export function AppFrame({ app }: { app: AppDef }) {
-  const goHome = useOkienko((s) => s.goHome)
+  const goHome = useDomek((s) => s.goHome)
   const guard = useRef<Guard | null>(null)
   const setGuard = useCallback((g: Guard | null) => {
     guard.current = g

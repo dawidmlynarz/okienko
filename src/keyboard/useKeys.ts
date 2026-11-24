@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { readKey, type TypedKey } from './polish'
 
-/** Listen to the physical keyboard and get Okienko-level keys (letters incl. Polish, backspace, enter). */
+/** Listen to the physical keyboard and get app-level keys (letters incl. Polish, backspace, enter). */
 export function useTypedKeys(handler: (k: TypedKey, e: KeyboardEvent) => void, enabled = true) {
   const ref = useRef(handler)
   ref.current = handler

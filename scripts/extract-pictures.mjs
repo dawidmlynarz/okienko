@@ -1,4 +1,4 @@
-// Copies the few Fluent Emoji Flat pictures (MIT, Microsoft) that Okienko uses
+// Copies the few Fluent Emoji Flat pictures (MIT, Microsoft) that Smoczy Domek uses
 // into src/assets/pictures.ts, so the app ships only what it needs.
 // Run: node scripts/extract-pictures.mjs
 import { readFileSync, writeFileSync } from 'node:fs'
@@ -21,6 +21,37 @@ const pictures = {
   notes: 'memo',
   choinka: 'evergreen-tree',
   drzewo: 'deciduous-tree',
+  dom: 'house-with-garden',
+  domek: 'house',
+  prezent: 'wrapped-gift',
+  biedronka: 'lady-beetle',
+  lis: 'fox',
+  lew: 'lion',
+  ser: 'cheese-wedge',
+  nos: 'nose',
+  oko: 'eye',
+  ryba: 'fish',
+  sowa: 'owl',
+  mysz: 'mouse-face',
+  auto: 'automobile',
+  zaba: 'frog',
+  jez: 'hedgehog',
+  mis: 'teddy-bear',
+  kon: 'horse-face',
+  slon: 'elephant',
+  lody: 'soft-ice-cream',
+  tort: 'birthday-cake',
+  truskawka: 'strawberry',
+  banan: 'banana',
+  wisnie: 'cherries',
+  lizak: 'lollipop',
+  puzzle: 'puzzle-piece',
+  liczydlo: 'abacus',
+  obrazek: 'framed-picture',
+  koniczyna: 'four-leaf-clover',
+  iskry: 'sparkles',
+  cegla: 'brick',
+  korona: 'crown',
 }
 
 const out = {}

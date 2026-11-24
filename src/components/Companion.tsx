@@ -2,7 +2,7 @@ import { SpeakerHigh } from '@phosphor-icons/react'
 import { AnimatePresence, motion } from 'motion/react'
 import { useEffect, useState } from 'react'
 import { speak } from '../lib/speak'
-import { useOkienko } from '../store/useOkienko'
+import { useDomek } from '../store/useDomek'
 import { Smoczek, type Pose } from './Smoczek'
 
 interface Props {
@@ -17,6 +17,8 @@ interface Props {
   /** 'plain' drops the bubble chrome, for use inside a card. */
   variant?: 'bubble' | 'plain'
   className?: string
+  /** A smaller bubble for game screens, so it never runs into the board. */
+  narrow?: boolean
 }
 
 /** Speak a line whenever it (or its key) changes, and report whether Smoczek is talking. */
@@ -36,8 +38,8 @@ export function useTalk(line: string | null | undefined, key?: string | number) 
 }
 
 /** Smoczek with a speech bubble. Speaks each new line aloud and moves his mouth while talking. */
-export function Companion({ text, say, sayKey, pose = 'idle', size = 220, bubbleSide = 'right', variant = 'bubble', className = '' }: Props) {
-  const profile = useOkienko((s) => s.profile)
+export function Companion({ text, say, sayKey, pose = 'idle', size = 220, bubbleSide = 'right', variant = 'bubble', className = '', narrow = false }: Props) {
+  const profile = useDomek((s) => s.profile)
   const line = say ?? text
   const { talking, repeat } = useTalk(line, sayKey)
 
@@ -50,7 +52,7 @@ export function Companion({ text, say, sayKey, pose = 'idle', size = 220, bubble
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, transition: { duration: 0 } }}
           transition={{ type: 'spring', stiffness: 400, damping: 28 }}
-          className={`relative flex max-w-md items-start gap-3 text-2xl leading-snug text-ink ${variant === 'bubble' ? 'rounded-[22px] bg-surface py-4 pr-4 pl-6 shadow-card' : ''}`}
+          className={`relative flex items-start gap-3 leading-snug text-ink ${narrow ? 'max-w-[290px] text-xl' : 'max-w-md text-2xl'} ${variant === 'bubble' ? 'rounded-[22px] bg-surface py-4 pr-4 pl-6 shadow-card' : ''}`}
           role="status"
         >
           <span className="flex-1">{text}</span>
@@ -71,7 +73,7 @@ export function Companion({ text, say, sayKey, pose = 'idle', size = 220, bubble
   const dir = bubbleSide === 'top' ? 'flex-col-reverse items-center' : bubbleSide === 'left' ? 'flex-row-reverse items-end' : 'flex-row items-end'
   return (
     <div className={`flex gap-4 ${dir} ${className}`}>
-      <Smoczek pose={pose} talking={talking && pose !== 'thinking'} color={profile?.companionColor} size={size} label={profile?.companionName ?? 'Smoczek'} />
+      <Smoczek pose={pose} talking={talking && pose !== 'thinking'} color={profile?.companionColor} size={size} label="Smoczek" />
       <div className={bubbleSide === 'top' || variant === 'plain' ? 'self-center' : 'self-start pt-4'}>{bubble}</div>
     </div>
   )

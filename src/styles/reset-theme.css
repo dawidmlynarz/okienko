@@ -1,4 +1,4 @@
-/* Drop Tailwind's default palette: app code may only use Okienko tokens. */
+/* Drop Tailwind's default palette: app code may only use Smoczy Domek tokens. */
 @theme {
   --color-*: initial;
   --color-white: #ffffff;

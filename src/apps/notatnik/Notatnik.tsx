@@ -7,7 +7,7 @@ import { pl } from '../../i18n/pl'
 import { readKey } from '../../keyboard/polish'
 import { play } from '../../lib/sound'
 import { speak, stopSpeaking } from '../../lib/speak'
-import { useOkienko, type Note } from '../../store/useOkienko'
+import { useDomek, type Note } from '../../store/useDomek'
 import { useCloseGuard } from '../AppFrame'
 import type { AppProps } from '../registry'
 
@@ -15,7 +15,7 @@ const titleOf = (n: Pick<Note, 'body'>) => n.body.split('\n').find((l) => l.trim
 const when = (t: number) => new Date(t).toLocaleDateString('pl-PL', { day: 'numeric', month: 'long' })
 
 export default function Notatnik(_: AppProps) {
-  const { notes, saveNote, deleteNote, os } = useOkienko()
+  const { notes, saveNote, deleteNote, os } = useDomek()
   const [currentId, setCurrentId] = useState<string | null>(notes[0]?.id ?? null)
   const current = notes.find((n) => n.id === currentId) ?? null
   const [draft, setDraft] = useState(current?.body ?? '')

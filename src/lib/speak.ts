@@ -1,4 +1,4 @@
-import { useOkienko } from '../store/useOkienko'
+import { useDomek } from '../store/useDomek'
 
 /**
  * Smoczek's voice. One function, so a better voice (recorded lines, a cloud TTS)
@@ -48,7 +48,7 @@ export function voiceQuality(v: SpeechSynthesisVoice): string {
 function pickVoice(): SpeechSynthesisVoice | null {
   const pl = polishVoices()
   if (!pl.length) return null
-  const chosen = useOkienko.getState().settings.voiceName
+  const chosen = useDomek.getState().settings.voiceName
   return (chosen && pl.find((v) => v.name === chosen)) || pl[0]
 }
 
@@ -75,7 +75,7 @@ export interface SpeakOptions {
 }
 
 export function speak(text: string, opts: SpeakOptions = {}) {
-  const { settings } = useOkienko.getState()
+  const { settings } = useDomek.getState()
   if (typeof speechSynthesis === 'undefined' || (!opts.force && (!settings.voice || !settings.sound))) {
     opts.onEnd?.()
     return

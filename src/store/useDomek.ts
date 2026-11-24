@@ -76,9 +76,12 @@ interface Actions {
   resetAll: () => void
 }
 
-export type OkienkoState = PersistedState & SessionState & Actions
+export type DomekState = PersistedState & SessionState & Actions
 
-/** Stars needed to unlock Okienko 1.1. Two good rounds. */
+/** The companion's name. Not asked any more: everyone knows him as Smoczek. */
+export const COMPANION_NAME = 'Smoczek'
+
+/** Stars Smoczek needs to build the new room (the 1.0 to 1.1 update). About two good rounds. */
 export const UPGRADE_STARS = 5
 export const today = () => new Date().toISOString().slice(0, 10)
 
@@ -93,7 +96,7 @@ const initialData = (): PersistedState => ({
 
 const uid = () => Math.random().toString(36).slice(2, 10) + Date.now().toString(36)
 
-export const useOkienko = create<OkienkoState>()(
+export const useDomek = create<DomekState>()(
   persist(
     (set, get) => ({
       ...initialData(),
@@ -184,13 +187,13 @@ export const useOkienko = create<OkienkoState>()(
 
 /** Where a fresh page load starts: setup until a parent has set it up, then login. */
 export function startScreen() {
-  const s = useOkienko.getState()
-  useOkienko.setState({ screen: s.profile ? 'login' : 'setup', openApp: null })
+  const s = useDomek.getState()
+  useDomek.setState({ screen: s.profile ? 'login' : 'setup', openApp: null })
 }
 
 /** The backup file format: persisted state plus a marker so we can recognise our own files. */
 export function backupFile() {
-  return JSON.stringify({ app: 'okienko', exportedAt: new Date().toISOString(), ...useOkienko.getState().exportData() }, null, 2)
+  return JSON.stringify({ app: 'okienko', exportedAt: new Date().toISOString(), ...useDomek.getState().exportData() }, null, 2)
 }
 
 export const starsToday = (p: Progress) => p.starsByDay[today()] ?? 0

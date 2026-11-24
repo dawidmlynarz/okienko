@@ -4,11 +4,11 @@ import { useMemo, useRef, useState } from 'react'
 import { Button, IconButton } from '../components/Button'
 import { pl } from '../i18n/pl'
 import { polishVoices, speak, voiceQuality } from '../lib/speak'
-import { backupFile, useOkienko } from '../store/useOkienko'
+import { backupFile, useDomek } from '../store/useDomek'
 import { ColorPicker, Field } from './Setup'
 
 export function BackupButtons({ importOnly = false }: { importOnly?: boolean }) {
-  const importData = useOkienko((s) => s.importData)
+  const importData = useDomek((s) => s.importData)
   const input = useRef<HTMLInputElement>(null)
   const [msg, setMsg] = useState<string | null>(null)
   return (
@@ -21,7 +21,7 @@ export function BackupButtons({ importOnly = false }: { importOnly?: boolean }) 
             const blob = new Blob([backupFile()], { type: 'application/json' })
             const a = document.createElement('a')
             a.href = URL.createObjectURL(blob)
-            a.download = `okienko-kopia-${new Date().toISOString().slice(0, 10)}.json`
+            a.download = `smoczy-domek-kopia-${new Date().toISOString().slice(0, 10)}.json`
             a.click()
             URL.revokeObjectURL(a.href)
           }}
@@ -91,7 +91,7 @@ function Gate({ onPass }: { onPass: () => void }) {
 }
 
 function Panel() {
-  const { profile, settings, updateProfile, setPin, setSettings, resetAll, setParentOpen } = useOkienko()
+  const { profile, settings, updateProfile, setPin, setSettings, resetAll, setParentOpen } = useDomek()
   const [pinMsg, setPinMsg] = useState(false)
   const [confirmReset, setConfirmReset] = useState(false)
   const voices = polishVoices()
@@ -100,7 +100,6 @@ function Panel() {
     <div className="flex flex-col gap-8">
       <div className="grid grid-cols-2 gap-6">
         <Field id="p-child" label={pl.setup.childName} value={profile.childName} onChange={(v) => updateProfile({ childName: v.replace(/[^\p{L}]/gu, '') })} />
-        <Field id="p-comp" label={pl.setup.companionName} value={profile.companionName} onChange={(v) => updateProfile({ companionName: v })} />
       </div>
       <div className="flex flex-col gap-3">
         <span className="font-display text-lg font-semibold">{pl.setup.companionColor}</span>
@@ -122,7 +121,7 @@ function Panel() {
                 </option>
               ))}
             </select>
-            <Button variant="plain" onClick={() => speak(`Cześć ${profile.childName}! Jestem ${profile.companionName}.`, { force: true })}>
+            <Button variant="plain" onClick={() => speak(`Cześć ${profile.childName}! Jestem Smoczek.`, { force: true })}>
               {pl.setup.voiceTest}
             </Button>
             <label className="flex items-center gap-2 text-lg">
@@ -168,7 +167,7 @@ function Panel() {
 }
 
 export function ParentDialog() {
-  const { parentOpen, setParentOpen } = useOkienko()
+  const { parentOpen, setParentOpen } = useDomek()
   const [passed, setPassed] = useState(false)
   const close = () => {
     setParentOpen(false)

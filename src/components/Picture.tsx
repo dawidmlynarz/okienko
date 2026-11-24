@@ -1,6 +1,6 @@
 import { pictureSvg, type PictureId } from '../assets/pictures'
 
-export function Picture({ id, size = 64, className = '' }: { id: PictureId; size?: number; className?: string }) {
+export function Picture({ id, size = 64, className = '' }: { id: PictureId; size?: number | string; className?: string }) {
   return (
     <span
       aria-hidden

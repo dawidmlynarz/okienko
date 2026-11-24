@@ -1,0 +1,8 @@
+{
+  "$comment": "Łap Biedronki levels. size: ladybug size in px. lifeMs: how long one stays before flying off. moving: walks across the leaf.",
+  "levels": [
+    { "id": "biedronki-duze", "title": "Duże biedronki", "subtitle": "powoli i spokojnie", "size": 140, "lifeMs": 5000, "count": 10, "moving": false, "unlockStars": 0 },
+    { "id": "biedronki-male", "title": "Mniejsze biedronki", "subtitle": "trochę szybciej", "size": 100, "lifeMs": 3400, "count": 12, "moving": false, "unlockStars": 2 },
+    { "id": "biedronki-ruchome", "title": "Biedronki w ruchu", "subtitle": "chodzą po ogrodzie", "size": 90, "lifeMs": 4000, "count": 12, "moving": true, "unlockStars": 4 }
+  ]
+}

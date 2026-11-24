@@ -1,7 +1,5 @@
-import { ArrowLeft, LockSimple, Star } from '@phosphor-icons/react'
 import { AnimatePresence, motion } from 'motion/react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Button } from '../../components/Button'
 import { Companion } from '../../components/Companion'
 import { OnScreenKeyboard } from '../../components/OnScreenKeyboard'
 import type { Pose } from '../../components/Smoczek'
@@ -11,9 +9,9 @@ import { useTypedKeys } from '../../keyboard/useKeys'
 import { burst, celebrate } from '../../lib/confetti'
 import { play } from '../../lib/sound'
 import { letterName, speak } from '../../lib/speak'
-import { useOkienko } from '../../store/useOkienko'
 import type { AppProps } from '../registry'
-import { levels, makeRound, starsFor, type Level } from './levels'
+import { GameHud, GameShell, starsFor, type RoundProps } from '../shared/GameKit'
+import { levels, makeRound, type Level } from './levels'
 
 /** Balloon colours: pastel 300 fill, hue 900 letter (8:1+), 600 knot. */
 const BALLOONS = [
@@ -24,48 +22,12 @@ const BALLOONS = [
   { fill: 'var(--color-peach-300)', ink: 'var(--color-peach-900)', edge: 'var(--color-peach-600)' },
 ]
 
-type View = { kind: 'pick' } | { kind: 'play'; level: Level } | { kind: 'result'; level: Level; firstTry: number; total: number; stars: 1 | 2 | 3 }
-
 export default function BalonowyLas(_: AppProps) {
-  const [view, setView] = useState<View>({ kind: 'pick' })
-  // A new key per round so "again" starts a fresh round component.
-  const [run, setRun] = useState(0)
-  const play_ = (level: Level) => {
-    setRun((r) => r + 1)
-    setView({ kind: 'play', level })
-  }
-  const addStars = useOkienko((s) => s.addStars)
+  return <GameShell levels={levels} lead="Wpisuj litery z baloników" backdrop={<Forest />} className="bg-mint-50" Round={BalloonRound} />
+}
 
-  return (
-    <div className="absolute inset-0 overflow-hidden bg-mint-50">
-      <Forest />
-      <AnimatePresence mode="wait">
-        {view.kind === 'pick' && (
-          <motion.div key="pick" className="absolute inset-0" exit={{ opacity: 0 }}>
-            <LevelPicker onPick={play_} />
-          </motion.div>
-        )}
-        {view.kind === 'play' && (
-          <motion.div key={`play-${run}`} className="absolute inset-0" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-            <Round
-              level={view.level}
-              onBack={() => setView({ kind: 'pick' })}
-              onDone={(firstTry, total) => {
-                const stars = starsFor(firstTry, total)
-                addStars(view.level.id, stars)
-                setView({ kind: 'result', level: view.level, firstTry, total, stars })
-              }}
-            />
-          </motion.div>
-        )}
-        {view.kind === 'result' && (
-          <motion.div key="result" className="absolute inset-0" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-            <Result {...view} onAgain={() => play_(view.level)} onDone={() => setView({ kind: 'pick' })} />
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  )
+function BalloonRound({ level, onDone, onBack }: RoundProps<Level>) {
+  return <Round level={level} onBack={onBack} onDone={(firstTry, total) => onDone(starsFor(firstTry, total), pl.game.accuracy(firstTry, total))} />
 }
 
 /** Soft flat forest: rounded tree shapes in three depths of mint, no outlines. */
@@ -97,73 +59,6 @@ function Forest() {
       ))}
       <path d="M0 748 Q 480 718 960 744 T 1440 736 V 800 H 0 Z" fill="var(--color-mint-200)" />
     </svg>
-  )
-}
-
-/** Each level card gets its own pastel, like category tiles. */
-const LEVEL_TINTS = [
-  { bg: 'var(--color-mint-100)', chip: 'var(--color-mint-200)', ink: 'var(--color-mint-900)' },
-  { bg: 'var(--color-sky-100)', chip: 'var(--color-sky-200)', ink: 'var(--color-sky-900)' },
-  { bg: 'var(--color-lavender-100)', chip: 'var(--color-lavender-200)', ink: 'var(--color-lavender-900)' },
-  { bg: 'var(--color-peach-100)', chip: 'var(--color-peach-200)', ink: 'var(--color-peach-900)' },
-]
-
-function LevelPicker({ onPick }: { onPick: (l: Level) => void }) {
-  const progress = useOkienko((s) => s.progress)
-  return (
-    <div className="relative flex h-full flex-col items-center justify-center gap-8 p-8">
-      <div className="flex flex-col items-center gap-1">
-        <h2 className="font-display text-5xl font-bold text-ink">{pl.game.pickLevel}</h2>
-        <p className="text-2xl text-muted">Wpisuj litery z baloników</p>
-      </div>
-      <div className="grid grid-cols-4 gap-5">
-        {levels.map((l, i) => {
-          const locked = progress.stars < l.unlockStars
-          const best = progress.levels[l.id] ?? 0
-          const tint = LEVEL_TINTS[i % LEVEL_TINTS.length]
-          return (
-            <motion.button
-              key={l.id}
-              type="button"
-              disabled={locked}
-              initial={{ y: 24, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: i * 0.06, type: 'spring', stiffness: 300, damping: 26 }}
-              whileHover={locked ? undefined : { y: -4 }}
-              whileTap={locked ? undefined : { scale: 0.97 }}
-              onClick={() => {
-                play('pop')
-                onPick(l)
-              }}
-              className="flex h-[300px] w-60 flex-col items-center justify-between rounded-[28px] p-6 text-center shadow-card disabled:cursor-default"
-              style={{ background: locked ? 'var(--color-ink-50)' : tint.bg }}
-            >
-              <span
-                className="grid size-20 place-items-center rounded-[24px] font-display text-4xl font-bold"
-                style={{ background: locked ? 'var(--color-ink-100)' : tint.chip, color: locked ? 'var(--color-ink-700)' : tint.ink }}
-              >
-                {locked ? <LockSimple size={34} weight="bold" /> : i + 1}
-              </span>
-              <span className="flex flex-col gap-1">
-                <span className="font-display text-2xl font-bold" style={{ color: locked ? 'var(--color-ink-700)' : tint.ink }}>
-                  {l.title}
-                </span>
-                <span className="font-body text-xl text-ink-700">{l.subtitle}</span>
-              </span>
-              {locked ? (
-                <span className="text-base text-ink-700">{pl.game.locked(l.unlockStars)}</span>
-              ) : (
-                <span className="flex gap-1" aria-label={`${best} z 3`}>
-                  {[0, 1, 2].map((s) => (
-                    <Star key={s} size={30} weight="fill" className={s < best ? 'text-butter-400 drop-shadow-[0_1px_0_var(--color-butter-600)]' : 'text-white'} />
-                  ))}
-                </span>
-              )}
-            </motion.button>
-          )
-        })}
-      </div>
-    </div>
   )
 }
 
@@ -266,21 +161,7 @@ function Round({ level, onDone, onBack }: { level: Level; onDone: (firstTry: num
   const left = letters.length - idx
   return (
     <div className="flex h-full flex-col">
-      {/* HUD */}
-      <div className="relative z-10 flex items-center gap-4 px-6 pt-4">
-        <Button variant="plain" icon={<ArrowLeft size={24} weight="bold" />} onClick={onBack}>
-          {pl.game.back}
-        </Button>
-        <div className="glass flex flex-1 items-center gap-4 rounded-full py-3 pr-5 pl-5" aria-label={pl.game.balloonsLeft(left)}>
-          <div className="h-3 flex-1 overflow-hidden rounded-full bg-mint-100">
-            <motion.div className="h-full rounded-full bg-mint-600" initial={false} animate={{ width: `${(idx / letters.length) * 100}%` }} transition={{ type: 'spring', stiffness: 200, damping: 26 }} />
-          </div>
-          <span className="font-display text-lg font-bold text-mint-900 tabular-nums">
-            {Math.min(idx, letters.length)} / {letters.length}
-          </span>
-        </div>
-        <span className="glass rounded-full px-5 py-3 font-display text-lg font-bold text-mint-900">{level.title}</span>
-      </div>
+      <GameHud onBack={onBack} done={idx} total={letters.length} title={level.title} label={pl.game.balloonsLeft(left)} />
 
       {/* Scene */}
       <div ref={scene} className="relative min-h-0 flex-1">
@@ -336,65 +217,5 @@ function Balloon({ char, color }: { char: string; color: (typeof BALLOONS)[numbe
         {char}
       </text>
     </svg>
-  )
-}
-
-function Result({ firstTry, total, stars, onAgain, onDone }: { firstTry: number; total: number; stars: 1 | 2 | 3; onAgain: () => void; onDone: () => void }) {
-  useEffect(() => {
-    const ts = [0, 1, 2].filter((i) => i < stars).map((i) => window.setTimeout(() => play('star'), 500 + i * 350))
-    return () => ts.forEach(window.clearTimeout)
-  }, [stars])
-  return (
-    <div className="relative flex h-full items-center justify-center p-8">
-      <motion.div
-        initial={{ scale: 0.9, y: 30 }}
-        animate={{ scale: 1, y: 0 }}
-        transition={{ type: 'spring', stiffness: 260, damping: 22 }}
-        className="glass-strong relative flex w-full max-w-2xl flex-col items-center gap-5 overflow-hidden rounded-[32px] p-10 text-center"
-      >
-        <Sunburst />
-        <h2 className="relative font-display text-5xl font-bold text-mint-800">{stars === 3 ? 'Doskonale!' : stars === 2 ? 'Świetnie!' : 'Dobra robota!'}</h2>
-        <p className="relative -mt-2 text-2xl text-muted">{pl.game.done}</p>
-        <div className="relative flex gap-4">
-          {[0, 1, 2].map((i) => (
-            <motion.span
-              key={i}
-              initial={{ scale: 0, rotate: -40 }}
-              animate={{ scale: 1, rotate: 0 }}
-              transition={{ delay: 0.5 + i * 0.35, type: 'spring', stiffness: 400, damping: 14 }}
-            >
-              <Star size={84} weight="fill" className={i < stars ? 'text-butter-400 drop-shadow-[0_2px_0_var(--color-butter-600)]' : 'text-ink-100'} />
-            </motion.span>
-          ))}
-        </div>
-        <Companion text={pl.game.accuracy(firstTry, total)} say={pl.game.resultSay(stars)} pose="cheer" size={160} className="relative" />
-        <div className="relative flex gap-4">
-          <Button variant="plain" size="lg" onClick={onDone}>
-            {pl.game.finish}
-          </Button>
-          <Button variant="strong" size="lg" onClick={onAgain}>
-            {pl.game.again}
-          </Button>
-        </div>
-      </motion.div>
-    </div>
-  )
-}
-
-/** Soft rays behind the result, like a medal moment. */
-function Sunburst() {
-  return (
-    <motion.svg
-      viewBox="-100 -100 200 200"
-      className="pointer-events-none absolute top-1/2 left-1/2 size-[900px] -translate-x-1/2 -translate-y-1/2 opacity-60"
-      initial={{ rotate: 0 }}
-      animate={{ rotate: 30 }}
-      transition={{ duration: 20, ease: 'linear', repeat: Infinity, repeatType: 'reverse' }}
-      aria-hidden
-    >
-      {Array.from({ length: 16 }, (_, i) => (
-        <path key={i} d="M0 0 L-7 -100 L7 -100 Z" fill="var(--color-butter-100)" transform={`rotate(${i * 22.5})`} />
-      ))}
-    </motion.svg>
   )
 }

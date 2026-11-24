@@ -8,18 +8,18 @@ import { Login, ParentButton } from './screens/Login'
 import { ParentDialog } from './screens/Parent'
 import { Setup } from './screens/Setup'
 import { UpgradeOverlay } from './screens/Upgrade'
-import { useOkienko } from './store/useOkienko'
+import { useDomek } from './store/useDomek'
 
 export default function App() {
-  const screen = useOkienko((s) => s.screen)
-  const openApp = useOkienko((s) => s.openApp)
-  const wallpaper = useOkienko((s) => s.settings.wallpaper)
-  const version = useOkienko((s) => s.os.version)
+  const screen = useDomek((s) => s.screen)
+  const openApp = useDomek((s) => s.openApp)
+  const wallpaper = useDomek((s) => s.settings.wallpaper)
+  const version = useDomek((s) => s.os.version)
   const app = appById(openApp)
   const signedIn = screen === 'home' || screen === 'app'
 
   return (
-    <div data-app="system" className="relative flex h-full flex-col overflow-hidden">
+    <div data-app="system" className="grain relative flex h-full flex-col overflow-hidden">
       <Wallpaper kind={version === '1.0' ? 'day' : wallpaper} />
       <AnimatePresence mode="wait">
         <motion.main

@@ -13,17 +13,17 @@ import { useTypedKeys } from '../keyboard/useKeys'
 import { burst } from '../lib/confetti'
 import { play, unlockAudio } from '../lib/sound'
 import { letterName } from '../lib/speak'
-import { useOkienko } from '../store/useOkienko'
+import { COMPANION_NAME, useDomek } from '../store/useDomek'
 
 type Step = 'name' | 'pin'
 const PIN_PICTURES: PictureId[] = ['kot', 'pies', 'slonce', 'gwiazda', 'jablko', 'rybka', 'kwiatek', 'rakieta', 'tecza']
 
 export function Login() {
-  const profile = useOkienko((s) => s.profile)!
+  const profile = useDomek((s) => s.profile)!
   const [step, setStep] = useState<Step>('name')
   const [line, setLine] = useState<{ text: string; say?: string; pose: Pose; key: number }>(() => ({
-    text: pl.login.hello(profile.companionName),
-    say: `${pl.login.hello(profile.companionName)} ${pl.login.typeNameSay(profile.childName)}`,
+    text: pl.login.hello(COMPANION_NAME),
+    say: `${pl.login.hello(COMPANION_NAME)} ${pl.login.typeNameSay(profile.childName)}`,
     pose: 'happy',
     key: 0,
   }))
@@ -35,7 +35,7 @@ export function Login() {
       <div className="relative flex flex-col items-center">
         {/* Smoczek as the account picture, overlapping the card like a real login screen */}
         <div className="relative z-10 -mb-20 grid size-44 place-items-center rounded-full bg-white shadow-float ring-8 ring-white/60">
-          <Smoczek pose={line.pose} talking={talking && line.pose !== 'thinking'} color={profile.companionColor} size={150} label={profile.companionName} className="translate-y-2" />
+          <Smoczek pose={line.pose} talking={talking && line.pose !== 'thinking'} color={profile.companionColor} size={150} label={COMPANION_NAME} className="translate-y-2" />
         </div>
         <motion.div layout className="glass-strong relative flex w-[860px] flex-col items-center gap-5 rounded-[32px] px-10 pt-24 pb-8">
           <div className="flex items-center gap-2">
@@ -186,7 +186,7 @@ function NameStep({ name, onTell, onDone }: { name: string; onTell: (t: string, 
 }
 
 function PinStep({ onTell }: { onTell: (t: string, p?: Pose, say?: string) => void }) {
-  const { profile, setPin, login } = useOkienko()
+  const { profile, setPin, login } = useDomek()
   const saved = profile?.pin ?? null
   const [mode] = useState<'enter' | 'choose'>(saved ? 'enter' : 'choose')
   const [first, setFirst] = useState<PictureId[] | null>(null)
@@ -283,7 +283,7 @@ function PinStep({ onTell }: { onTell: (t: string, p?: Pose, say?: string) => vo
 }
 
 export function ParentButton() {
-  const setParentOpen = useOkienko((s) => s.setParentOpen)
+  const setParentOpen = useDomek((s) => s.setParentOpen)
   return (
     <button
       type="button"

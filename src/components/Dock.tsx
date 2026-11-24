@@ -2,7 +2,7 @@ import { motion } from 'motion/react'
 import { apps } from '../apps/registry'
 import { pl } from '../i18n/pl'
 import { play } from '../lib/sound'
-import { useOkienko } from '../store/useOkienko'
+import { useDomek } from '../store/useDomek'
 import { Picture } from './Picture'
 
 /** App tile: a soft squircle in the app's own accent, used in the dock and on cards. */
@@ -18,7 +18,7 @@ export function AppIcon({ icon, size = 72 }: { icon: Parameters<typeof Picture>[
 }
 
 export function Dock() {
-  const launch = useOkienko((s) => s.launch)
+  const launch = useDomek((s) => s.launch)
   return (
     <nav aria-label="Dok" className="glass flex items-end gap-2 rounded-[30px] p-2.5">
       {apps.map((app, i) => (

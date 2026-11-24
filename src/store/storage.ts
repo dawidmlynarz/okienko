@@ -1,9 +1,10 @@
 import { createJSONStorage, type StateStorage } from 'zustand/middleware'
 
 /**
- * The one place Okienko touches browser storage. Today it is localStorage;
+ * The one place Smoczy Domek touches browser storage. Today it is localStorage;
  * swapping to IndexedDB later means writing another StateStorage here.
  */
+// Kept from the project's first name so saved progress survives the rename.
 export const STORAGE_KEY = 'okienko'
 export const SCHEMA_VERSION = 1
 

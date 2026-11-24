@@ -11,7 +11,7 @@
 .smok .armL { transform-origin: 72px 172px; }
 .smok .armR { transform-origin: 168px 172px; }
 .smok .eyes .lid { transform-origin: 120px 95px; }
-.smok .pupils { transition: transform 0.3s; }
+.smok .pupils { transition: transform 0.12s ease-out; }
 .smok .m, .smok .eyesHappy, .smok .dots, .smok .spark { display: none; }
 .smok.idle .m-idle, .smok.happy .m-happy, .smok.cheer .m-cheer, .smok.thinking .m-think { display: inline; }
 .smok.talking .m { display: none; }

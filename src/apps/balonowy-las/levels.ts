@@ -1,14 +1,11 @@
 import data from '../../content/balonowy-las.json'
+import type { LevelBase } from '../shared/scoring'
 
-export interface Level {
-  id: string
-  title: string
-  subtitle: string
+export interface Level extends LevelBase {
   letters: string
   balloons: number
   riseMs: number
   hintAfterMs: number
-  unlockStars: number
 }
 
 export const levels: Level[] = data.levels
@@ -30,7 +27,4 @@ export function makeRound(level: Level, rand = Math.random): string[] {
   return out
 }
 
-export function starsFor(firstTry: number, total: number): 1 | 2 | 3 {
-  const r = firstTry / total
-  return r >= 0.9 ? 3 : r >= 0.6 ? 2 : 1
-}
+export { starsFor } from '../shared/scoring'
