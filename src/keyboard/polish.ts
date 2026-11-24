@@ -133,7 +133,7 @@ export function chordFor(char: string): Chord | null {
 
 /** The modifier key a child must hold for Polish letters, as printed on her keyboard. */
 export function altKeyLabel(platform: Platform): string {
-  return platform === 'mac' ? 'option' : 'Alt'
+  return platform === 'mac' ? 'option' : 'prawy Alt'
 }
 
 /** Codes of the Alt keys to glow. Both Option keys work on a Mac; on Windows only the right Alt is AltGr. */
@@ -146,35 +146,45 @@ export function sameLetter(a: string, b: string): boolean {
   return a.normalize('NFC').toLocaleLowerCase('pl') === b.normalize('NFC').toLocaleLowerCase('pl')
 }
 
-/** Physical layout for the on-screen keyboard (ISO-ish, letters only rows matter). */
+/** Physical layout for the on-screen keyboard. Labels copy what is printed on the real keycaps. */
 export interface KeyCap {
   code: string
   label: string
+  /** Small symbol printed next to the label (⇧, ⌥, ⌘). */
+  symbol?: string
   width?: number
 }
 
 export function keyboardRows(platform: Platform): KeyCap[][] {
-  const letters = (s: string) => [...s].map((c) => ({ code: `Key${c.toUpperCase()}`, label: c }))
-  const alt = platform === 'mac' ? 'option' : 'alt'
+  // Both MacBook and Windows keyboards print capital letters on the keycaps.
+  const letters = (s: string) => [...s].map((c) => ({ code: `Key${c.toUpperCase()}`, label: c.toUpperCase() }))
+  if (platform === 'mac') {
+    return [
+      letters('QWERTYUIOP'),
+      letters('ASDFGHJKL'),
+      [{ code: 'ShiftLeft', label: 'shift', symbol: '⇧', width: 1.6 }, ...letters('ZXCVBNM'), { code: 'ShiftRight', label: 'shift', symbol: '⇧', width: 1.6 }],
+      [
+        { code: 'ControlLeft', label: 'control', width: 1.3 },
+        { code: 'AltLeft', label: 'option', symbol: '⌥', width: 1.3 },
+        { code: 'MetaLeft', label: 'command', symbol: '⌘', width: 1.6 },
+        { code: 'Space', label: '', width: 5.2 },
+        { code: 'MetaRight', label: 'command', symbol: '⌘', width: 1.6 },
+        { code: 'AltRight', label: 'option', symbol: '⌥', width: 1.3 },
+      ],
+    ]
+  }
   return [
-    letters('qwertyuiop'),
-    letters('asdfghjkl'),
-    [{ code: 'ShiftLeft', label: 'shift', width: 1.6 }, ...letters('zxcvbnm'), { code: 'ShiftRight', label: 'shift', width: 1.6 }],
-    platform === 'mac'
-      ? [
-          { code: 'AltLeft', label: alt, width: 1.5 },
-          { code: 'MetaLeft', label: 'cmd', width: 1.5 },
-          { code: 'Space', label: '', width: 6 },
-          { code: 'MetaRight', label: 'cmd', width: 1.5 },
-          { code: 'AltRight', label: alt, width: 1.5 },
-        ]
-      : [
-          { code: 'ControlLeft', label: 'ctrl', width: 1.5 },
-          { code: 'AltLeft', label: 'alt', width: 1.5 },
-          { code: 'Space', label: '', width: 6 },
-          { code: 'AltRight', label: 'alt gr', width: 1.5 },
-          { code: 'ControlRight', label: 'ctrl', width: 1.5 },
-        ],
+    letters('QWERTYUIOP'),
+    letters('ASDFGHJKL'),
+    [{ code: 'ShiftLeft', label: 'Shift', symbol: '⇧', width: 1.6 }, ...letters('ZXCVBNM'), { code: 'ShiftRight', label: 'Shift', symbol: '⇧', width: 1.6 }],
+    [
+      { code: 'ControlLeft', label: 'Ctrl', width: 1.3 },
+      { code: 'MetaLeft', label: '', symbol: '⊞', width: 1.1 },
+      { code: 'AltLeft', label: 'Alt', width: 1.3 },
+      { code: 'Space', label: '', width: 5.2 },
+      { code: 'AltRight', label: 'Alt Gr', width: 1.5 },
+      { code: 'ControlRight', label: 'Ctrl', width: 1.3 },
+    ],
   ]
 }
 

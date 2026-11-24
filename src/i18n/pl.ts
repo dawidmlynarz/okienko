@@ -41,6 +41,9 @@ export const pl = {
     gateGo: 'Dalej',
     voice: 'Głos',
     voiceTest: 'Posłuchaj',
+    keyboard: 'Klawiatura na ekranie',
+    keyboardTip: 'Zwykle wykrywa się sama. Na Windows polskie litery pisze się prawym Altem (Alt Gr), na Macu klawiszem option.',
+    keyboardChoices: { auto: 'Automatycznie', mac: 'Mac', win: 'Windows' },
     voiceNone: 'Ta przeglądarka nie ma polskiego głosu. Napisy nadal działają.',
     voiceTip:
       'Najładniej brzmią głosy oznaczone jako „naturalny”. Na Macu: Ustawienia systemowe → Dostępność → Treść mówiona → Głos systemowy → Zarządzaj głosami → Polski → pobierz „Ewa (Premium)” lub „Zosia (rozszerzony)”, potem odśwież stronę. Na Windows w Chrome wybierz „Google polski”.',
@@ -116,7 +119,7 @@ export const pl = {
     startShow: 'Przebij balonik!',
     /** On screen: the keys only. Spoken: the full sentence (pressKey and friends). */
     keysAlt: (alt: string, letter: string) => `${alt} + ${letter}`,
-    keysShift: (letter: string) => `shift + ${letter}`,
+    keysShift: (letter: string) => `⇧ + ${letter}`,
     almost: 'Prawie!',
     pressKey: (letter: string) => `Naciśnij ${letter}`,
     pressAlt: (alt: string, letter: string) => `Przytrzymaj ${alt} i naciśnij ${letter}`,

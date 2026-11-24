@@ -35,6 +35,8 @@ export interface Settings {
   voice: boolean
   voiceName: string | null
   wallpaper: Wallpaper
+  /** Which keyboard to draw. 'auto' guesses from the browser. */
+  keyboard?: 'auto' | 'mac' | 'win'
 }
 
 export interface PersistedState {
@@ -88,7 +90,7 @@ export const today = () => new Date().toISOString().slice(0, 10)
 const initialData = (): PersistedState => ({
   schemaVersion: SCHEMA_VERSION,
   profile: null,
-  settings: { sound: true, voice: true, voiceName: null, wallpaper: 'day' },
+  settings: { sound: true, voice: true, voiceName: null, wallpaper: 'day', keyboard: 'auto' },
   progress: { stars: 0, starsByDay: {}, levels: {}, rounds: 0 },
   os: { version: '1.0', upgradeOffered: false },
   notes: [],

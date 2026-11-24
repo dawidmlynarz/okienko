@@ -99,7 +99,7 @@ export function Smoczek({ pose = 'idle', color = 'mint', talking = false, size =
     <svg ref={ref} key={beat} className={`smok ${pose} ${talking ? 'talking' : ''} ${className}`} viewBox="0 0 240 260" role="img" aria-label={label} style={style}>
       <ellipse cx="120" cy="248" rx="70" ry="8" fill="#1B2240" opacity=".08" />
       <g className="whole">
-        <g className="spark" fill="#F7DEAB" stroke="#9A7405" strokeWidth="2.5" strokeLinejoin="round">
+        <g className="spark" fill="#F7DEAB" stroke="#AC6B22" strokeWidth="2.5" strokeLinejoin="round">
           <path d="M30 70l5 11 11 5-11 5-5 11-5-11-11-5 11-5z" />
           <path d="M206 92l4 8 8 4-8 4-4 8-4-8-8-4 8-4z" />
           <path d="M196 26l3 6 6 3-6 3-3 6-3-6-6-3 6-3z" />

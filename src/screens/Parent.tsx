@@ -135,6 +135,27 @@ function Panel() {
         <p className="max-w-2xl text-base text-muted">{pl.setup.voiceTip}</p>
       </div>
       <div className="flex flex-col gap-3">
+        <span className="font-display text-lg font-semibold">{pl.setup.keyboard}</span>
+        <div className="flex gap-2" role="radiogroup" aria-label={pl.setup.keyboard}>
+          {(['auto', 'mac', 'win'] as const).map((k) => {
+            const on = (settings.keyboard ?? 'auto') === k
+            return (
+              <button
+                key={k}
+                type="button"
+                role="radio"
+                aria-checked={on}
+                onClick={() => setSettings({ keyboard: k })}
+                className={`pressable h-12 rounded-full px-5 text-lg font-semibold ${on ? 'bg-sky-700 text-white' : 'bg-surface text-ink shadow-[inset_0_0_0_2px_var(--color-ink-200)]'}`}
+              >
+                {pl.setup.keyboardChoices[k]}
+              </button>
+            )
+          })}
+        </div>
+        <p className="max-w-2xl text-base text-muted">{pl.setup.keyboardTip}</p>
+      </div>
+      <div className="flex flex-col gap-3">
         <span className="font-display text-lg font-semibold">{pl.setup.backup}</span>
         <BackupButtons />
       </div>

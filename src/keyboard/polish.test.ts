@@ -4,6 +4,8 @@ import {
   POLISH_LETTERS,
   chordFor,
   detectPlatform,
+  keyboardRows,
+  altKeyLabel,
   glowCodes,
   readKey,
   sameLetter,
@@ -115,6 +117,15 @@ describe('on-screen keyboard hints', () => {
   it('detects the platform', () => {
     expect(detectPlatform({ platform: 'MacIntel' })).toBe('mac')
     expect(detectPlatform({ platform: 'Win32' })).toBe('win')
+  })
+
+  it('draws the keycaps printed on each keyboard', () => {
+    const labels = (p: 'mac' | 'win') => keyboardRows(p).flat().map((k) => k.label)
+    expect(labels('win')).toEqual(expect.arrayContaining(['Q', 'Ctrl', 'Alt', 'Alt Gr', 'Shift']))
+    expect(labels('mac')).toEqual(expect.arrayContaining(['Q', 'control', 'option', 'command', 'shift']))
+    expect(labels('win')).not.toContain('command')
+    expect(altKeyLabel('win')).toBe('prawy Alt')
+    expect(altKeyLabel('mac')).toBe('option')
   })
 
   it('glows right Alt only on Windows, both Option keys on Mac', () => {

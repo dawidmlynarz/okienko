@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
-import { POLISH_LETTERS, detectPlatform, glowCodes, keyboardRows, type Platform } from '../keyboard/polish'
+import { POLISH_LETTERS, glowCodes, keyboardRows, type Platform } from '../keyboard/polish'
+import { usePlatform } from '../keyboard/usePlatform'
 import { usePressedCodes } from '../keyboard/useKeys'
 
 interface Props {
@@ -15,7 +16,9 @@ interface Props {
 
 const PL_BY_CODE: Record<string, string> = Object.fromEntries(Object.entries(POLISH_LETTERS).map(([b, p]) => [`Key${b.toUpperCase()}`, p]))
 
-export function OnScreenKeyboard({ target, hint = true, wrongCode, platform = detectPlatform(), compact = false }: Props) {
+export function OnScreenKeyboard({ target, hint = true, wrongCode, platform: forced, compact = false }: Props) {
+  const detected = usePlatform()
+  const platform = forced ?? detected
   const rows = useMemo(() => keyboardRows(platform), [platform])
   const pressed = usePressedCodes()
   const glow = new Set(target && hint ? glowCodes(target, platform) : [])
@@ -49,12 +52,20 @@ export function OnScreenKeyboard({ target, hint = true, wrongCode, platform = de
               <div
                 key={k.code}
                 className={`relative grid place-items-center rounded-[12px] font-body transition-[transform,background-color] duration-100 ${isDown ? 'scale-95' : ''} ${tone}`}
-                style={{ width: w, height: unit, fontSize: k.label.length > 1 ? unit * 0.26 : unit * 0.46, cursor: 'default' }}
+                style={{ width: w, height: unit, fontSize: k.label.length > 1 ? unit * 0.24 : unit * 0.42, cursor: 'default' }}
               >
-                <span className="leading-none">{k.label}</span>
+                {k.label.length > 1 || k.symbol ? (
+                  // Modifier keys: symbol above the word, like the real keycap.
+                  <span className="flex flex-col items-center gap-0.5 leading-none font-medium">
+                    {k.symbol && <span style={{ fontSize: k.label ? unit * 0.28 : unit * 0.4 }}>{k.symbol}</span>}
+                    {k.label && <span>{k.label}</span>}
+                  </span>
+                ) : (
+                  <span className="leading-none font-medium">{k.label}</span>
+                )}
                 {pl && altNeeded && (
                   <span className={`absolute right-1.5 bottom-1 leading-none ${isGlow ? 'text-white' : 'text-muted'}`} style={{ fontSize: unit * 0.24 }}>
-                    {pl}
+                    {pl.toUpperCase()}
                   </span>
                 )}
               </div>

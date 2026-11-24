@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from 'motion/react'
 import { useEffect, useState } from 'react'
 import { Button } from '../components/Button'
 import { Companion } from '../components/Companion'
+import { House } from '../components/House'
 import { ParentHint } from '../components/ParentHint'
 import { pl } from '../i18n/pl'
 import { celebrate } from '../lib/confetti'
@@ -94,7 +95,7 @@ export function UpgradeOverlay() {
                   <>
                     <div className="flex items-center gap-6">
                       <Companion pose="cheer" say={pl.upgrade.readySay} size={170} />
-                      <Building progress={0} />
+                      <House progress={0} />
                     </div>
                     <h2 className="font-display text-5xl font-extrabold tracking-tight">{pl.upgrade.ready}</h2>
                     <div className="flex gap-4">
@@ -111,7 +112,7 @@ export function UpgradeOverlay() {
                   <>
                     <div className="flex items-center gap-6">
                       <Companion pose="thinking" say={pl.upgrade.installingSay} size={150} />
-                      <Building progress={progress} />
+                      <House progress={progress} />
                     </div>
                     <div className="h-5 w-full overflow-hidden rounded-full bg-butter-100 ring-1 ring-butter-200" role="progressbar" aria-valuenow={Math.round(progress * 100)} aria-valuemin={0} aria-valuemax={100}>
                       <div className="h-full w-full origin-left rounded-full bg-[repeating-linear-gradient(90deg,var(--color-peach-400)_0_22px,var(--color-peach-300)_22px_24px)]" style={{ transform: `scaleX(${Math.max(0.04, progress)})` }} />
@@ -152,50 +153,6 @@ export function UpgradeOverlay() {
   )
 }
 
-
-/** Smoczek's house with the new room going up brick by brick as the update runs. */
-function Building({ progress }: { progress: number }) {
-  const rows = 8
-  const shown = Math.floor(progress * (rows + 3))
-  const roof = shown > rows
-  const windowOn = shown > rows + 1
-  return (
-    <svg viewBox="0 0 300 200" width={300} height={200} aria-hidden>
-      <ellipse cx="150" cy="190" rx="140" ry="8" fill="var(--color-ink-900)" opacity=".06" />
-      {/* The house she already has */}
-      <path d="M20 90 L90 34 L160 90" fill="var(--color-sky-300)" />
-      <path d="M14 94 L90 30 L166 94" fill="none" stroke="var(--color-peach-500)" strokeWidth="10" strokeLinecap="round" strokeLinejoin="round" />
-      <rect x="32" y="88" width="116" height="98" rx="10" fill="var(--color-sky-300)" />
-      <rect x="54" y="106" width="34" height="34" rx="6" fill="var(--color-butter-100)" />
-      <path d="M71 106v34M54 123h34" stroke="var(--color-sky-400)" strokeWidth="4" />
-      <rect x="100" y="128" width="30" height="58" rx="8" fill="var(--color-sky-600)" />
-      {/* The new room */}
-      <rect x="156" y="88" width="120" height="98" rx="10" fill="none" stroke="var(--color-ink-300)" strokeWidth="3" strokeDasharray="8 7" />
-      {Array.from({ length: rows }, (_, i) => (
-        <motion.g key={i} initial={false} animate={{ opacity: i < shown ? 1 : 0, y: i < shown ? 0 : -30 }} transition={{ type: 'spring', stiffness: 400, damping: 22 }}>
-          {Array.from({ length: 4 }, (_, j) => {
-            const off = i % 2 ? 15 : 0
-            const x = 158 + j * 30 + off
-            const w = Math.min(28, 274 - x)
-            return w > 4 ? <rect key={j} x={x} y={174 - i * 12} width={w} height={10} rx="2.5" fill={(i + j) % 3 ? 'var(--color-peach-300)' : 'var(--color-peach-400)'} /> : null
-          })}
-          {i % 2 === 1 && <rect x={158} y={174 - i * 12} width={13} height={10} rx="2.5" fill="var(--color-peach-300)" />}
-        </motion.g>
-      ))}
-      <motion.path d="M150 92 L216 40 L282 92" fill="none" stroke="var(--color-pink-500)" strokeWidth="10" strokeLinecap="round" strokeLinejoin="round" initial={false} animate={{ opacity: roof ? 1 : 0, y: roof ? 0 : -40 }} transition={{ type: 'spring', stiffness: 300, damping: 18 }} />
-      <motion.g initial={false} animate={{ opacity: windowOn ? 1 : 0, scale: windowOn ? 1 : 0.4 }} style={{ transformOrigin: '216px 128px', transformBox: 'view-box' }}>
-        <defs>
-          <linearGradient id="up-sunset" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stopColor="var(--color-lavender-300)" />
-            <stop offset="1" stopColor="var(--color-peach-300)" />
-          </linearGradient>
-        </defs>
-        <rect x="192" y="106" width="48" height="44" rx="8" fill="url(#up-sunset)" stroke="#fff" strokeWidth="5" />
-        <circle cx="216" cy="140" r="9" fill="var(--color-butter-200)" />
-      </motion.g>
-    </svg>
-  )
-}
 
 /** The "restart": the door to the new room swings open and light spills out. */
 function Door() {

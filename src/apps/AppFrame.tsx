@@ -1,7 +1,7 @@
 import { House } from '@phosphor-icons/react'
 import { motion } from 'motion/react'
-import { Suspense, createContext, useCallback, useContext, useRef } from 'react'
-import { AppIcon } from '../components/Dock'
+import { Suspense, createContext, useCallback, useContext, useRef, useState } from 'react'
+import { AppIcon, launchOrigin } from '../components/Dock'
 import { pl } from '../i18n/pl'
 import { play } from '../lib/sound'
 import { stopSpeaking } from '../lib/speak'
@@ -37,12 +37,16 @@ export function AppFrame({ app }: { app: AppDef }) {
   }, [goHome])
 
   const App = app.component
+  // The frame sits at inset-4 (16px), so the origin is the icon centre relative to it.
+  const [origin] = useState(() => (launchOrigin ? `${launchOrigin.x - 16}px ${launchOrigin.y - 16}px` : '50% 100%'))
   return (
     <motion.section
       data-app={app.accent}
-      initial={{ opacity: 0, scale: 0.96, y: 24 }}
-      animate={{ opacity: 1, scale: 1, y: 0 }}
-      transition={{ type: 'spring', stiffness: 260, damping: 26 }}
+      // Genie: the window pours out of its dock icon (and back into it on close).
+      style={{ transformOrigin: origin }}
+      initial={{ opacity: 0, scaleX: 0.06, scaleY: 0.04 }}
+      animate={{ opacity: 1, scaleX: 1, scaleY: 1, transition: { scaleY: { duration: 0.42, ease: [0.2, 0.8, 0.25, 1] }, scaleX: { duration: 0.5, delay: 0.06, ease: [0.3, 0.9, 0.3, 1] }, opacity: { duration: 0.12 } } }}
+      exit={{ opacity: 0, scaleX: 0.06, scaleY: 0.04, transition: { scaleX: { duration: 0.3, ease: [0.5, 0, 0.8, 0.4] }, scaleY: { duration: 0.38, delay: 0.05, ease: [0.5, 0, 0.8, 0.4] }, opacity: { duration: 0.2, delay: 0.2 } } }}
       className="absolute inset-4 z-20 flex flex-col overflow-hidden rounded-[28px] bg-surface shadow-float ring-1 ring-white/80"
       aria-label={app.name}
     >

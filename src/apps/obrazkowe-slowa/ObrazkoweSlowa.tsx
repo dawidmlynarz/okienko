@@ -7,7 +7,8 @@ import { Picture } from '../../components/Picture'
 import type { Pose } from '../../components/Smoczek'
 import data from '../../content/obrazkowe-slowa.json'
 import { pl } from '../../i18n/pl'
-import { altKeyLabel, chordFor, detectPlatform, sameLetter } from '../../keyboard/polish'
+import { altKeyLabel, chordFor, sameLetter } from '../../keyboard/polish'
+import { usePlatform } from '../../keyboard/usePlatform'
 import { useTypedKeys } from '../../keyboard/useKeys'
 import { burst, celebrate } from '../../lib/confetti'
 import { play } from '../../lib/sound'
@@ -36,7 +37,7 @@ function Backdrop() {
 }
 
 function Round({ level, onDone, onBack }: RoundProps<Level>) {
-  const platform = useMemo(() => detectPlatform(), [])
+  const platform = usePlatform()
   const words = useMemo(() => shuffle(level.words).slice(0, level.count), [level])
   const [wi, setWi] = useState(0)
   const [typed, setTyped] = useState(0)

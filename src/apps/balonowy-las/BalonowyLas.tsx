@@ -4,7 +4,8 @@ import { Companion } from '../../components/Companion'
 import { OnScreenKeyboard } from '../../components/OnScreenKeyboard'
 import type { Pose } from '../../components/Smoczek'
 import { pl } from '../../i18n/pl'
-import { altKeyLabel, chordFor, detectPlatform, sameLetter } from '../../keyboard/polish'
+import { altKeyLabel, chordFor, sameLetter } from '../../keyboard/polish'
+import { usePlatform } from '../../keyboard/usePlatform'
 import { useTypedKeys } from '../../keyboard/useKeys'
 import { burst, celebrate } from '../../lib/confetti'
 import { play } from '../../lib/sound'
@@ -70,7 +71,7 @@ interface BalloonState {
 }
 
 function Round({ level, onDone, onBack }: { level: Level; onDone: (firstTry: number, total: number) => void; onBack: () => void }) {
-  const platform = useMemo(() => detectPlatform(), [])
+  const platform = usePlatform()
   const letters = useMemo(() => makeRound(level), [level])
   const [idx, setIdx] = useState(0)
   const [balloon, setBalloon] = useState<BalloonState | null>(null)

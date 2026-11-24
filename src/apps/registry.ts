@@ -28,7 +28,7 @@ export const apps: AppDef[] = [
   { id: 'balonowy-las', name: pl.apps.typing, blurb: pl.appBlurb.typing, icon: 'balon', accent: 'typing', kind: 'game', host: 'smoczek', component: lazy(() => import('./balonowy-las/BalonowyLas')) },
   { id: 'obrazkowe-slowa', name: pl.apps.words, blurb: pl.appBlurb.words, icon: 'obrazek', accent: 'english', kind: 'game', host: 'smoczek', component: lazy(() => import('./obrazkowe-slowa/ObrazkoweSlowa')) },
   { id: 'lap-biedronki', name: pl.apps.ladybugs, blurb: pl.appBlurb.ladybugs, icon: 'biedronka', accent: 'web', kind: 'game', host: 'smoczek', component: lazy(() => import('./lap-biedronki/LapBiedronki')) },
-  { id: 'smocze-memory', name: pl.apps.memory, blurb: pl.appBlurb.memory, icon: 'puzzle', accent: 'system', kind: 'game', host: 'smoczek', component: lazy(() => import('./smocze-memory/SmoczeMemory')) },
+  { id: 'smocze-memory', name: pl.apps.memory, blurb: pl.appBlurb.memory, icon: 'karty', accent: 'system', kind: 'game', host: 'smoczek', component: lazy(() => import('./smocze-memory/SmoczeMemory')) },
   { id: 'liczymy-jablka', name: pl.apps.counting, blurb: pl.appBlurb.counting, icon: 'jablko', accent: 'maths', kind: 'game', host: 'smoczek', component: lazy(() => import('./liczymy-jablka/LiczymyJablka')) },
   { id: 'notatnik', name: pl.apps.notes, blurb: pl.appBlurb.notes, icon: 'notes', accent: 'notes', kind: 'tool', host: 'smoczek', component: lazy(() => import('./notatnik/Notatnik')) },
 ]

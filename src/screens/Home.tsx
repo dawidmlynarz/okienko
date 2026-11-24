@@ -2,9 +2,10 @@ import { GameController, Lightbulb, Play, Smiley, Star } from '@phosphor-icons/r
 import { AnimatePresence, motion } from 'motion/react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { apps, type AppDef } from '../apps/registry'
-import { AppIcon } from '../components/Dock'
+import { Dock } from '../components/Dock'
 import { Picture } from '../components/Picture'
 import { ChatBubble } from '../components/ChatBubble'
+import { House } from '../components/House'
 import { ParentHint } from '../components/ParentHint'
 import { Smoczek, type Pose } from '../components/Smoczek'
 import { useTalk } from '../components/Companion'
@@ -127,8 +128,6 @@ export function Home() {
     },
   ]
 
-  const games = apps.filter((a) => a.kind === 'game')
-  const tools = apps.filter((a) => a.kind === 'tool')
 
   return (
     <div className="relative flex min-h-0 flex-1 flex-col gap-4 p-4" onPointerDown={poked}>
@@ -203,66 +202,10 @@ export function Home() {
         </div>
       </div>
 
-      {/* Apps */}
-      <motion.section {...rise(0.1)} aria-label={pl.home.games} className="flex flex-col gap-3">
-        <div className="grid grid-cols-6 gap-4">
-          {[...games, ...tools].map((app, i) => (
-            <AppTile key={app.id} app={app} index={i} best={bestFor(app.id, progress.levels)} />
-          ))}
-        </div>
-      </motion.section>
+      <motion.div {...rise(0.1)} className="flex shrink-0 justify-center pt-6">
+        <Dock />
+      </motion.div>
     </div>
-  )
-}
-
-/** Best stars a game has seen, summed over its levels (level ids start with the game's prefix). */
-const LEVEL_PREFIX: Record<string, string[]> = {
-  'balonowy-las': ['domowy', 'gorny', 'alfabet', 'polskie'],
-  'obrazkowe-slowa': ['slowa-'],
-  'lap-biedronki': ['biedronki-'],
-  'smocze-memory': ['memory-'],
-  'liczymy-jablka': ['liczenie-'],
-}
-function bestFor(id: string, levels: Record<string, number>) {
-  const pre = LEVEL_PREFIX[id]
-  if (!pre) return null
-  return Object.entries(levels).reduce((n, [k, v]) => (pre.some((p) => (p.endsWith('-') ? k.startsWith(p) : k === p)) ? n + v : n), 0)
-}
-
-function AppTile({ app, index, best }: { app: AppDef; index: number; best: number | null }) {
-  const launch = useDomek((s) => s.launch)
-  return (
-    <motion.button
-      type="button"
-      data-app={app.accent}
-      initial={{ y: 24, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ delay: 0.15 + index * 0.05, type: 'spring', stiffness: 320, damping: 26 }}
-      whileHover={{ y: -6 }}
-      whileTap={{ scale: 0.97 }}
-      onClick={() => {
-        play('pop')
-        launch(app.id)
-      }}
-      aria-label={pl.home.open(app.name)}
-      className="tile group relative flex h-[min(200px,24vh)] cursor-pointer flex-col justify-between overflow-hidden rounded-[30px] p-4 text-left"
-    >
-      <span className="pointer-events-none absolute -top-10 -right-10 size-36 rounded-full bg-white/45" aria-hidden />
-      <span className="relative flex items-start justify-between">
-        <span className="transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-6">
-          <AppIcon icon={app.icon} size={64} />
-        </span>
-        {best !== null && best > 0 && (
-          <span className="flex items-center gap-1 rounded-full bg-white/85 px-2 py-0.5 font-display text-sm font-bold text-butter-900">
-            <Star size={14} weight="fill" className="text-butter-600" />
-            {best}
-          </span>
-        )}
-      </span>
-      <span className="relative">
-        <span className="block font-display text-[22px] leading-tight font-extrabold text-accent-deep">{app.name}</span>
-      </span>
-    </motion.button>
   )
 }
 
@@ -295,9 +238,9 @@ function RoomCard({ canUpgrade, onBuild }: { canUpgrade: boolean; onBuild: () =>
 
   if (built) {
     return (
-      <motion.section {...rise(0.1)} data-app="typing" className="tile relative flex flex-1 items-center gap-5 rounded-[32px] p-6">
+      <motion.section {...rise(0.1)} data-app="typing" className="tile relative flex flex-1 items-center gap-5 overflow-hidden rounded-[32px] p-6">
         <ParentHint text={pl.parentHint.room} className="absolute top-4 right-4" />
-        <Picture id="domek" size={84} />
+        <House progress={1} width="min(220px, 27vh)" />
         <p className="font-display text-3xl leading-tight font-extrabold text-accent-deep">{pl.home.roomDone}</p>
       </motion.section>
     )
@@ -306,7 +249,7 @@ function RoomCard({ canUpgrade, onBuild }: { canUpgrade: boolean; onBuild: () =>
   return (
     <motion.section {...rise(0.1)} data-app="notes" className="tile relative flex flex-1 items-center gap-5 overflow-hidden rounded-[32px] p-6">
       <ParentHint text={pl.parentHint.room} className="absolute top-4 right-4" />
-      <BrickHouse filled={have} />
+      <House progress={(have / UPGRADE_STARS) * 0.75} width="min(220px, 27vh)" smoke={false} />
       <div className="flex min-w-0 flex-1 flex-col gap-3">
         <p className="font-display text-3xl leading-tight font-extrabold text-accent-deep">{pl.home.roomTitle}</p>
         {canUpgrade ? (
@@ -324,29 +267,5 @@ function RoomCard({ canUpgrade, onBuild }: { canUpgrade: boolean; onBuild: () =>
         )}
       </div>
     </motion.section>
-  )
-}
-
-/** A tiny room outline that fills in, one brick row per star. */
-function BrickHouse({ filled }: { filled: number }) {
-  return (
-    <svg viewBox="0 0 64 60" className="h-[min(110px,13vh)] w-auto shrink-0" aria-hidden>
-      <path d="M6 26 32 6l26 20" fill="none" stroke="var(--color-butter-600)" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" strokeDasharray={filled >= UPGRADE_STARS ? undefined : '5 5'} />
-      <rect x="11" y="24" width="42" height="32" rx="5" fill="rgb(255 255 255 / 0.6)" stroke="var(--color-butter-600)" strokeWidth="2.5" strokeDasharray="4 4" />
-      {Array.from({ length: UPGRADE_STARS }, (_, i) => (
-        <motion.rect
-          key={i}
-          x="13"
-          width="38"
-          height="5"
-          rx="1.5"
-          y={50 - i * 6}
-          fill={i % 2 ? 'var(--color-peach-400)' : 'var(--color-peach-300)'}
-          initial={false}
-          animate={{ opacity: i < filled ? 1 : 0, y: i < filled ? 50 - i * 6 : 40 - i * 6 }}
-          transition={{ type: 'spring', stiffness: 300, damping: 20, delay: i * 0.08 }}
-        />
-      ))}
-    </svg>
   )
 }
