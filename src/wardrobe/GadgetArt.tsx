@@ -703,18 +703,19 @@ export const GADGET_ART: Record<string, Art> = {
     ),
   },
   tiara: {
-    head: onHead(
+    // Gold scallops rising to a heart in the middle, sitting on the forehead like a hairband.
+    head: (
       <g>
-        <path d="M80 70Q120 52 160 70L156 58L142 62L136 44L128 56L120 30L112 56L104 44L98 62L84 58Z" fill="#E6E2F4" {...ln} />
-        <path d="M86 66Q120 52 154 66" fill="none" stroke="#C9C2E6" strokeWidth="3" />
-        <path d={heart(120, 46, 6)} fill="#EC8CAB" {...ln} strokeWidth="2.5" />
-        <circle cx="104" cy="54" r="3.5" fill="#7DB9E8" {...ln} strokeWidth="2" />
-        <circle cx="136" cy="54" r="3.5" fill="#7DB9E8" {...ln} strokeWidth="2" />
-        <path d={star(120, 22, 5)} fill="#F6D58A" />
-        <path d={star(150, 40, 3.5)} fill="#F6D58A" />
-      </g>,
-      4,
-      1.2,
+        <path d="M80 72Q86 52 98 58Q104 40 120 30Q136 40 142 58Q154 52 160 72Q120 58 80 72Z" fill="#F6D58A" {...ln} />
+        <path d="M90 66Q96 58 102 62M138 62Q144 58 150 66" fill="none" stroke="#D9A441" strokeWidth="2.5" strokeLinecap="round" />
+        <path d={heart(120, 50, 8)} fill="#EC8CAB" {...ln} strokeWidth="2.5" />
+        <path d="M115 47q2-3 5-3" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" />
+        <circle cx="98" cy="62" r="3.5" fill="#7DB9E8" {...ln} strokeWidth="2" />
+        <circle cx="142" cy="62" r="3.5" fill="#7DB9E8" {...ln} strokeWidth="2" />
+        <circle cx="120" cy="28" r="4.5" fill="#FFFDF5" {...ln} strokeWidth="2.5" />
+        <circle cx="98" cy="54" r="3" fill="#FFFDF5" {...ln} strokeWidth="2" />
+        <circle cx="142" cy="54" r="3" fill="#FFFDF5" {...ln} strokeWidth="2" />
+      </g>
     ),
   },
   rzesy: {
@@ -856,15 +857,23 @@ export const GADGET_ART: Record<string, Art> = {
     ),
   },
   kolo: {
+    // The ring goes round the waist: the back half sits behind the body, only the front half is drawn over it.
+    back: (
+      <g>
+        <path d="M40 204A80 20 0 0 1 200 204" fill="none" stroke={LINE} strokeWidth="30" />
+        <path d="M40 204A80 20 0 0 1 200 204" fill="none" stroke="#F6D58A" strokeWidth="22" />
+      </g>
+    ),
     over: (
       <g>
-        <ellipse cx="120" cy="204" rx="80" ry="20" fill="none" stroke={LINE} strokeWidth="30" />
-        <ellipse cx="120" cy="204" rx="80" ry="20" fill="none" stroke="#F6D58A" strokeWidth="22" />
-        <ellipse cx="120" cy="204" rx="80" ry="20" fill="none" stroke="#E8857C" strokeWidth="22" strokeDasharray="22 40" />
-        <circle cx="42" cy="180" r="15" fill="#F6D58A" {...ln} />
-        <path d="M28 180l-12 2 12 5z" fill="#F0A35E" {...ln} strokeWidth="2.5" />
-        <circle cx="38" cy="176" r="2.6" fill={LINE} />
-        <circle cx="44" cy="184" r="3" fill="#F7B7C5" />
+        <path d="M40 204A80 20 0 0 0 200 204" fill="none" stroke={LINE} strokeWidth="30" />
+        <path d="M40 204A80 20 0 0 0 200 204" fill="none" stroke="#F6D58A" strokeWidth="22" />
+        <path d="M40 204A80 20 0 0 0 200 204" fill="none" stroke="#E8857C" strokeWidth="22" strokeDasharray="22 30" strokeDashoffset="-12" />
+        <path d="M70 216q14 5 28 6" fill="none" stroke="#fff" strokeWidth="4" strokeLinecap="round" opacity=".8" />
+        <circle cx="42" cy="186" r="15" fill="#F6D58A" {...ln} />
+        <path d="M28 186l-12 2 12 5z" fill="#F0A35E" {...ln} strokeWidth="2.5" />
+        <circle cx="38" cy="182" r="2.6" fill={LINE} />
+        <circle cx="44" cy="190" r="3" fill="#F7B7C5" />
       </g>
     ),
   },
@@ -1149,7 +1158,7 @@ export function BodyClip({ id }: { id: string }) {
   )
 }
 
-const LAYER_ORDER: Layer[] = ['back', 'tail', 'feet', 'body', 'over', 'hand', 'head']
+const LAYER_ORDER: Layer[] = ['back', 'tail', 'body', 'feet', 'over', 'hand', 'head']
 
 /** A gadget on its own, for the shop shelf. Clothes and shoes sit on a pale silhouette so they read as worn. */
 export function GadgetPicture({ id, size = 96 }: { id: string; size?: number | string }) {

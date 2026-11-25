@@ -404,10 +404,12 @@ export function Smoczek({ pose = 'idle', color = 'mint', talking = false, size =
           <ellipse className="ln" cx="146" cy="240" rx="18" ry="10" fill="var(--foot)" />
           <path className="ln" d={BEAN} fill="var(--body)" />
           <ellipse cx="120" cy="184" rx="40" ry="44" fill="var(--belly)" />
-          {part.front}
-          {/* Shoes go under the clothes: a skirt or a gown falls over them, they peek out below the hem. */}
-          <OutfitLayer outfit={wearing} layer="feet" />
           <OutfitLayer outfit={wearing} layer="body" clipId={clipId} />
+          {/* Ears, mane and face patches after the clothes: the clothes redraw the body outline, which would cut through the ears. */}
+          {part.front}
+          {/* Shoes sit in front of the body and its tops and trousers, but under skirts and gowns,
+              so a hem falls over them and the toes peek out below. */}
+          <OutfitLayer outfit={wearing} layer="feet" />
           <OutfitLayer outfit={wearing} layer="over" />
         </g>
         <g className="head">
