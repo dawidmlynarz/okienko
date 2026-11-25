@@ -110,6 +110,8 @@ export const pl = {
     hint: 'Logowanie w dwóch krokach: imię mówi, kim jest, a 3 obrazki to jej tajny kod (wybiera go przy pierwszym logowaniu). Wielką literę pisze się z wciśniętym shiftem; świecący klawisz podpowiada. Kod można wyczyścić w ustawieniach rodzica.',
   },
   home: {
+    desk: 'Kolor pulpitu',
+    deskSay: (n: string) => `${n}! Ładnie tu teraz.`,
     open: (app: string) => `Otwórz: ${app}`,
     games: 'W co dziś gramy?',
     today: 'Dzisiaj',

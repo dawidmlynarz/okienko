@@ -1,5 +1,5 @@
 import { balanceOf } from '../wardrobe/items'
-import { SignOut, SpeakerHigh, SpeakerSlash, Star, Sun, SunHorizon } from '@phosphor-icons/react'
+import { SignOut, SpeakerHigh, SpeakerSlash, Star } from '@phosphor-icons/react'
 import { useEffect, useState } from 'react'
 import { pl } from '../i18n/pl'
 import { play } from '../lib/sound'
@@ -20,7 +20,7 @@ export const timeText = (d: Date) => d.toLocaleTimeString('pl-PL', { hour: '2-di
 
 export function TopBar() {
   const clock = timeText(useNow())
-  const { profile, progress, settings, toggleSound, logout, setSettings } = useDomek()
+  const { profile, progress, settings, toggleSound, logout } = useDomek()
 
   return (
     <header className="glass relative z-10 mx-4 mt-4 flex items-center gap-2 rounded-full pr-2 pl-3" style={{ height: 'var(--topbar-height)' }}>
@@ -48,11 +48,6 @@ export function TopBar() {
       <span className="px-2 font-display text-lg font-semibold tabular-nums">{clock}</span>
 
       <div className="flex items-center">
-        {(
-          <IconButton label={settings.wallpaper === 'day' ? 'Zachód słońca' : 'Dzień'} onClick={() => setSettings({ wallpaper: settings.wallpaper === 'day' ? 'sunset' : 'day' })}>
-            {settings.wallpaper === 'day' ? <SunHorizon size={26} weight="bold" /> : <Sun size={26} weight="bold" />}
-          </IconButton>
-        )}
         <IconButton
           label={settings.sound ? pl.os.soundOn : pl.os.soundOff}
           onClick={() => {

@@ -137,6 +137,34 @@ h1, h2, h3 { text-wrap: balance; letter-spacing: -0.02em; }
     radial-gradient(60% 60% at 10% 100%, var(--color-peach-50) 0%, transparent 70%),
     linear-gradient(180deg, var(--color-sky-100) 0%, var(--color-sky-50) 100%);
 }
+.sky-meadow {
+  background:
+    radial-gradient(60% 55% at 12% 18%, var(--color-mint-200) 0%, transparent 70%),
+    radial-gradient(50% 50% at 88% 14%, var(--color-butter-100) 0%, transparent 70%),
+    radial-gradient(70% 60% at 80% 95%, var(--color-sky-100) 0%, transparent 70%),
+    linear-gradient(180deg, var(--color-mint-100) 0%, var(--color-mint-50) 100%);
+}
+.sky-lavender {
+  background:
+    radial-gradient(60% 55% at 12% 18%, var(--color-lavender-200) 0%, transparent 70%),
+    radial-gradient(50% 50% at 88% 14%, var(--color-sky-100) 0%, transparent 70%),
+    radial-gradient(70% 60% at 80% 95%, var(--color-pink-100) 0%, transparent 70%),
+    linear-gradient(180deg, var(--color-lavender-100) 0%, var(--color-lavender-50) 100%);
+}
+.sky-candy {
+  background:
+    radial-gradient(60% 55% at 12% 18%, var(--color-pink-200) 0%, transparent 70%),
+    radial-gradient(50% 50% at 88% 14%, var(--color-lavender-100) 0%, transparent 70%),
+    radial-gradient(70% 60% at 80% 95%, var(--color-peach-100) 0%, transparent 70%),
+    linear-gradient(180deg, var(--color-pink-100) 0%, var(--color-pink-50) 100%);
+}
+.sky-lemon {
+  background:
+    radial-gradient(60% 55% at 12% 18%, var(--color-butter-200) 0%, transparent 70%),
+    radial-gradient(50% 50% at 88% 14%, var(--color-peach-100) 0%, transparent 70%),
+    radial-gradient(70% 60% at 80% 95%, var(--color-mint-100) 0%, transparent 70%),
+    linear-gradient(180deg, var(--color-butter-100) 0%, var(--color-butter-50) 100%);
+}
 .sky-sunset {
   background:
     radial-gradient(60% 55% at 15% 15%, var(--color-lavender-200) 0%, transparent 70%),

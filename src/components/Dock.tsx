@@ -27,7 +27,7 @@ const MAX = 120
 const REACH = 190
 
 /** macOS-style dock: icons swell as the pointer passes over them. */
-export function Dock() {
+export function Dock({ exclude = [] }: { exclude?: string[] }) {
   const mouseX = useMotionValue(Infinity)
   return (
     <nav
@@ -36,7 +36,7 @@ export function Dock() {
       onMouseLeave={() => mouseX.set(Infinity)}
       className="glass relative mx-auto flex h-[100px] items-end gap-3 rounded-[32px] px-4 pb-3"
     >
-      {apps.map((app, i) => (
+      {apps.filter((a) => !exclude.includes(a.id)).map((app, i) => (
         <DockItem key={app.id} app={app} index={i} mouseX={mouseX} />
       ))}
     </nav>

@@ -6,7 +6,7 @@ import { buy, toggleWear, wornList, type BuyResult, type Wardrobe } from '../war
 import { SCHEMA_VERSION, STORAGE_KEY, migrate, storage } from './storage'
 
 export type CompanionColor = 'mint' | 'sky' | 'lavender' | 'peach' | 'pink'
-export type Wallpaper = 'day' | 'sunset'
+export type Wallpaper = 'day' | 'sunset' | 'meadow' | 'lavender' | 'candy' | 'lemon'
 
 export interface Profile {
   childName: string
