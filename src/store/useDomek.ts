@@ -76,6 +76,7 @@ interface Actions {
   addStars: (levelId: string, stars: number) => void
   buyGadget: (id: string) => BuyResult
   toggleGadget: (id: string) => void
+  undressAll: () => void
   saveNote: (id: string | null, body: string) => string
   deleteNote: (id: string) => void
   importData: (data: unknown) => boolean
@@ -138,6 +139,7 @@ export const useDomek = create<DomekState>()(
         if (r.ok) set({ wardrobe: r.wardrobe, progress: { ...progress, spent: r.spent } })
         return r
       },
+      undressAll: () => set((s) => ({ wardrobe: { ...(s.wardrobe ?? { owned: [] }), worn: [] } })),
       toggleGadget: (id) => set((s) => ({ wardrobe: toggleWear(s.wardrobe ?? { owned: [], worn: [] }, id) })),
 
       saveNote: (id, body) => {

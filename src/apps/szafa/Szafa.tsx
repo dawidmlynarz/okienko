@@ -1,4 +1,4 @@
-import { Check, Star } from '@phosphor-icons/react'
+import { ArrowCounterClockwise, Check, Star } from '@phosphor-icons/react'
 import { AnimatePresence, motion } from 'motion/react'
 import { useMemo, useState } from 'react'
 import { ChatBubble } from '../../components/ChatBubble'
@@ -28,7 +28,7 @@ interface Line {
  * then put it on or take it off as often as she likes.
  */
 export default function Szafa(_: AppProps) {
-  const { profile, progress, wardrobe, buyGadget, toggleGadget } = useDomek()
+  const { profile, progress, wardrobe, buyGadget, toggleGadget, undressAll } = useDomek()
   const wallet = balanceOf(progress)
   const [tab, setTab] = useState<Slot>('head')
   const [picked, setPicked] = useState<string | null>(null)
@@ -83,7 +83,24 @@ export default function Szafa(_: AppProps) {
         <div className="pointer-events-none absolute inset-x-10 bottom-16 h-28 rounded-[50%] bg-white/70 blur-xl" aria-hidden />
         <div className="relative flex w-full items-start justify-between">
           <Wallet n={wallet} />
-          <ParentHint text={pl.parentHint.wardrobe} />
+          <div className="flex items-center gap-2">
+            {wearingNow.length > 0 && (
+              <button
+                type="button"
+                onClick={() => {
+                  play('click')
+                  undressAll()
+                  setPicked(null)
+                  say('Hop!', 'happy', pl.wardrobe.allOffSay)
+                }}
+                className="pressable flex h-12 items-center gap-2 rounded-full bg-white/85 px-4 font-display text-lg font-bold text-accent-deep shadow-button"
+              >
+                <ArrowCounterClockwise size={22} weight="bold" />
+                {pl.wardrobe.allOff}
+              </button>
+            )}
+            <ParentHint text={pl.parentHint.wardrobe} />
+          </div>
         </div>
 
         <div className="relative flex min-h-0 flex-1 flex-col items-center justify-end gap-2">

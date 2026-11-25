@@ -307,6 +307,8 @@ export const pl = {
     buy: 'Kup',
     wear: 'Załóż',
     takeOff: 'Zdejmij',
+    allOff: 'Zdejmij wszystko',
+    allOffSay: 'Hop! Wszystko zdjęte. Co założymy teraz?',
     missing: (n: number) => `Brakuje ${n}`,
     tryOn: (name: string) => `${name}. Jak wyglądam?`,
     tooExpensive: (name: string, n: number) => `${name}. Brakuje ${stars(n)}. Zagrajmy w coś, to zbierzemy!`,
