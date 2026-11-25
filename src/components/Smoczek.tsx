@@ -82,15 +82,49 @@ export const COMPANION_COLORS: Record<CompanionColor, [string, string, string, s
   pink: ['#F2AAC2', '#FFFDF5', '#F8D3E0', '#4F2035', '#DA86A5'],
 }
 
-/** The friends other than the dragon keep their own natural colours: body, belly, accent, dark tone, feet. */
-const FRIEND_COLORS: Record<Exclude<Species, 'smok'>, [string, string, string, string, string]> = {
-  konik: ['#E6BC8E', '#FFFDF5', '#8A5A3B', '#4E270D', '#8A5A3B'],
-  koala: ['#B9BFCB', '#F4F4F7', '#F4F4F7', '#2E3140', '#9298A6'],
-  piesek: ['#EBA672', '#FFFDF5', '#B9784A', '#4E270D', '#B9784A'],
+type Palette = [body: string, belly: string, accent: string, dark: string, feet: string]
+
+/**
+ * Five colours for every friend. The keys are colour families shared by all friends, so a saved colour
+ * keeps working when she switches friends. Each friend's natural look is one of them (see NATURAL).
+ * accent = dragon crest and wings, pony mane, puppy ears.
+ */
+export const PALETTES: Record<Species, Record<CompanionColor, Palette>> = {
+  smok: COMPANION_COLORS,
+  konik: {
+    peach: ['#E6BC8E', '#FFF6E8', '#8A5A3B', '#4E270D', '#8A5A3B'],
+    sky: ['#F2EFEA', '#FFFFFF', '#9AA0B2', '#3A3F5C', '#9AA0B2'],
+    pink: ['#F4B6CB', '#FFF3F7', '#B98AD9', '#4F2035', '#B98AD9'],
+    lavender: ['#C9BDF0', '#F6F3FF', '#F2A7C0', '#332C54', '#8E7BD0'],
+    mint: ['#A8D8B8', '#F3FBF5', '#F6D58A', '#1F4D3A', '#5E9C76'],
+  },
+  koala: {
+    sky: ['#B9BFCB', '#F4F4F7', '#F4F4F7', '#2E3140', '#9298A6'],
+    lavender: ['#C6BCE8', '#F6F3FF', '#F6F3FF', '#332C54', '#9C8FD0'],
+    pink: ['#F2B8CB', '#FFF3F7', '#FFF3F7', '#4F2035', '#D98BA6'],
+    mint: ['#A8D8B8', '#F3FBF5', '#F3FBF5', '#1F4D3A', '#6FB287'],
+    peach: ['#F5C29C', '#FFF6EE', '#FFF6EE', '#4E270D', '#DE9A68'],
+  },
+  piesek: {
+    peach: ['#EBA672', '#FFFDF5', '#B9784A', '#4E270D', '#B9784A'],
+    sky: ['#F2EFEA', '#FFFFFF', '#6B6F80', '#3A3F5C', '#6B6F80'],
+    pink: ['#F4B6CB', '#FFF3F7', '#D9789B', '#4F2035', '#D9789B'],
+    lavender: ['#C9BDF0', '#F6F3FF', '#8E7BD0', '#332C54', '#8E7BD0'],
+    mint: ['#A8D8B8', '#F3FBF5', '#5E9C76', '#1F4D3A', '#5E9C76'],
+  },
 }
 
-/** Colours for the friend she picked; the dragon follows the colour chosen in setup. */
-export const friendColors = (species: Species, color: CompanionColor) => (species === 'smok' ? COMPANION_COLORS[color] : FRIEND_COLORS[species])
+/** Each friend's own colour, picked first when she chooses that friend. */
+export const NATURAL: Record<Species, CompanionColor> = { smok: 'mint', konik: 'peach', koala: 'sky', piesek: 'peach' }
+
+/** The colour order shown when she picks a colour: the natural one first. */
+export const colorsFor = (species: Species): CompanionColor[] => {
+  const all = Object.keys(PALETTES[species]) as CompanionColor[]
+  return [NATURAL[species], ...all.filter((c) => c !== NATURAL[species])]
+}
+
+/** Colours for the friend she picked. */
+export const friendColors = (species: Species, color: CompanionColor) => PALETTES[species][color] ?? PALETTES[species][NATURAL[species]]
 
 /**
  * What makes each friend itself, drawn on the shared bean (240×260, head top at y 44, eyes at 92/148, y 98).
@@ -152,6 +186,15 @@ const PARTS: Record<Species, Parts> = {
         <path d="M92 58c6-16 22-24 36-20 10-6 26 0 28 10-8-2-14 2-16 8-6-6-14-8-22-4-6-4-16-2-26 6z" />
       </g>
     ),
+    face: (
+      // A white blaze down the face into a wide, low muzzle with slanted nostrils: the horse's nose.
+      <>
+        <path d="M116 60c4-2 6-2 8 0l3 50h-14z" fill="var(--belly)" />
+        <path className="ln" d="M120 108c20 0 33 8 33 21 0 12-14 19-33 19s-33-7-33-19c0-13 13-21 33-21z" fill="var(--belly)" />
+        <path d="M104 126c2-4 6-6 9-5-1 4-4 7-9 5zM136 126c-2-4-6-6-9-5 1 4 4 7 9 5z" fill="var(--ink)" stroke="var(--ink)" strokeWidth="2" strokeLinejoin="round" />
+      </>
+    ),
+    mouthDy: 25,
   },
   koala: {
     front: (

@@ -6,7 +6,7 @@ import { play } from '../lib/sound'
 import { stopSpeaking } from '../lib/speak'
 import { useDomek } from '../store/useDomek'
 import { IconButton } from './Button'
-import { COMPANION_COLORS } from './Smoczek'
+import { friendColors } from './Smoczek'
 
 export function useNow() {
   const [now, setNow] = useState(() => new Date())
@@ -38,7 +38,7 @@ export function TopBar() {
 
       {profile && (
         <div className="flex items-center gap-2 rounded-full py-1 pr-3 pl-1">
-          <span className="grid size-9 place-items-center rounded-full font-display text-base font-bold ring-2 ring-white" style={{ background: COMPANION_COLORS[profile.companionColor][1], color: COMPANION_COLORS[profile.companionColor][3] }}>
+          <span className="grid size-9 place-items-center rounded-full font-display text-base font-bold ring-2 ring-white" style={{ background: friendColors(profile.companion ?? 'smok', profile.companionColor)[1], color: friendColors(profile.companion ?? 'smok', profile.companionColor)[3] }}>
             {profile.childName.slice(0, 1)}
           </span>
           <span className="font-display text-lg font-semibold">{profile.childName}</span>
