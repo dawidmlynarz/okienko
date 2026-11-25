@@ -1,3 +1,4 @@
+import { Question } from '@phosphor-icons/react'
 import { afterTalk } from '../../lib/speak'
 import { AnimatePresence, motion } from 'motion/react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -42,7 +43,9 @@ function Round({ level, onDone, onBack }: RoundProps<Level>) {
   const words = useMemo(() => shuffle(level.words).slice(0, level.count), [level])
   const [wi, setWi] = useState(0)
   const [typed, setTyped] = useState(0)
-  const [hint, setHint] = useState(level.hintAfterMs === 0)
+  // Hints only on request: the (?) button shows the next letter and lights its key.
+  const [hint, setHint] = useState(false)
+  const misses = useRef(0)
   const [missed, setMissed] = useState(false)
   const [solved, setSolved] = useState(false)
   const [wrongCode, setWrongCode] = useState<string | null>(null)
@@ -62,15 +65,19 @@ function Round({ level, onDone, onBack }: RoundProps<Level>) {
     setTyped(0)
     setSolved(false)
     setMissed(false)
-    setHint(level.hintAfterMs === 0)
-    tell(current.word.toLocaleUpperCase('pl'), 'happy', pl.words.say(current.word))
-  }, [current, level.hintAfterMs, tell])
+    setHint(false)
+    misses.current = 0
+    // Never say the word: she works it out from the picture.
+    tell(pl.words.ask, 'happy', wi === 0 ? pl.words.firstSay : pl.words.askSay)
+  }, [current, wi, tell])
 
-  useEffect(() => {
-    if (hint || !target) return
-    const t = window.setTimeout(() => setHint(true), level.hintAfterMs)
-    return () => window.clearTimeout(t)
-  }, [hint, target, typed, level.hintAfterMs])
+  const askHint = () => {
+    if (!target || hint) return
+    play('pop')
+    setHint(true)
+    setMissed(true)
+    tell(keys(target), 'thinking', instruction(target))
+  }
 
   /** On screen only the keys (option + A); the full sentence is spoken. */
   const keys = (c: string) => {
@@ -90,7 +97,8 @@ function Round({ level, onDone, onBack }: RoundProps<Level>) {
     if (sameLetter(k.char, target)) {
       if (!missed) good.current += 1
       setMissed(false)
-      setHint(level.hintAfterMs === 0)
+      setHint(false)
+      misses.current = 0
       play('key')
       const next = typed + 1
       setTyped(next)
@@ -111,11 +119,13 @@ function Round({ level, onDone, onBack }: RoundProps<Level>) {
     } else {
       play('wrong')
       setMissed(true)
-      setHint(true)
       setShake((s) => s + 1)
       setWrongCode(e.code)
       window.setTimeout(() => setWrongCode(null), 350)
-      tell(keys(target), 'thinking', instruction(target))
+      misses.current += 1
+      // No answer given away: after a couple of misses she is reminded the (?) can help.
+      if (hint) tell(keys(target), 'thinking', instruction(target))
+      else tell(pl.game.almost, 'thinking', misses.current >= 2 ? pl.words.useHint : pl.words.again)
     }
   })
 
@@ -138,7 +148,7 @@ function Round({ level, onDone, onBack }: RoundProps<Level>) {
           </motion.div>
         </AnimatePresence>
 
-        <motion.div key={shake} animate={shake ? { x: [0, -10, 9, -6, 4, 0] } : {}} transition={{ duration: 0.4 }} className="flex gap-3" aria-label={current.word}>
+        <motion.div key={shake} animate={shake ? { x: [0, -10, 9, -6, 4, 0] } : {}} transition={{ duration: 0.4 }} className="flex gap-3" aria-label={pl.words.ask}>
           {letters.map((c, i) => {
             const done = i < typed
             const now = i === typed && !solved
@@ -158,6 +168,19 @@ function Round({ level, onDone, onBack }: RoundProps<Level>) {
             )
           })}
         </motion.div>
+
+        <motion.button
+          type="button"
+          onClick={askHint}
+          disabled={!target || hint}
+          aria-label={pl.words.hint}
+          title={pl.words.hint}
+          animate={misses.current >= 2 && !hint && target ? { scale: [1, 1.12, 1] } : { scale: 1 }}
+          transition={misses.current >= 2 && !hint ? { duration: 1.2, repeat: Infinity } : {}}
+          className="pressable grid size-[min(84px,11vh)] shrink-0 place-items-center rounded-full bg-butter-100 text-butter-900 shadow-button ring-2 ring-butter-300 hover:bg-butter-200 disabled:opacity-40"
+        >
+          <Question size={44} weight="bold" />
+        </motion.button>
 
         <div className="absolute bottom-2 left-6 z-10">
           <Companion text={talk.text} say={talk.say} sayKey={talk.key} pose={talk.pose} size={130} narrow />
