@@ -34,10 +34,13 @@ function useBag<T>(items: readonly T[]) {
   }, [items])
 }
 
-function greeting(name: string, h: number) {
-  const g = pl.smoczek.greet
-  const list = h >= 5 && h < 11 ? g.morning(name) : h >= 11 && h < 17 ? g.day(name) : h >= 17 && h < 21 ? g.evening(name) : g.night(name)
-  return list[Math.floor(Math.random() * list.length)]
+/** Everyday short names, so Smoczek talks like family: Helena is Hela. */
+const NICK: Record<string, string> = { helena: 'Hela', aleksandra: 'Ola', aleksander: 'Olek', katarzyna: 'Kasia', małgorzata: 'Gosia', zuzanna: 'Zuzia', magdalena: 'Madzia', joanna: 'Asia', agnieszka: 'Agnisia', barbara: 'Basia', weronika: 'Wera', wiktoria: 'Wiki', alicja: 'Ala', antonina: 'Tosia', maria: 'Marysia', zofia: 'Zosia', jakub: 'Kuba', mateusz: 'Mati', antoni: 'Antek', franciszek: 'Franek', stanisław: 'Staś', jan: 'Janek', michał: 'Michałek', szymon: 'Szymek', wojciech: 'Wojtek', tomasz: 'Tomek' }
+const nick = (name: string) => NICK[name.toLowerCase()] ?? name
+
+/** The opening line, said once when she arrives. */
+function greeting(name: string) {
+  return pl.smoczek.welcome(nick(name))
 }
 
 /** The bubble shows only the first sentence; Smoczek says the whole line. */
@@ -67,7 +70,7 @@ export function Home() {
   const nextApp = useBag(apps)
   const nextIdle = useBag(pl.smoczek.idle)
 
-  const [line, setLine] = useState<Line>(() => ({ text: greeting(name, new Date().getHours()) + (canBuy ? ` ${pl.smoczek.canBuy(wallet)}` : ''), pose: 'happy', key: 0, app: canBuy ? appById('szafa') ?? undefined : undefined }))
+  const [line, setLine] = useState<Line>(() => ({ text: greeting(name) + (canBuy ? ` ${pl.smoczek.canBuy(wallet)}` : ''), pose: 'happy', key: 0, app: canBuy ? appById('szafa') ?? undefined : undefined }))
   const say = useCallback((text: string, pose: Pose = 'happy', app?: AppDef) => setLine((l) => ({ text, pose, app, key: l.key + 1 })), [])
   const { talking, repeat } = useTalk(line.text, line.key)
   const lastPoke = useRef(Date.now())

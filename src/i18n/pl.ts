@@ -164,12 +164,8 @@ export const pl = {
     deleteConfirm: 'Wyrzucić tę notatkę?',
   },
   smoczek: {
-    greet: {
-      morning: (n: string) => [`Dzień dobry, ${n}! Zjadłaś już śniadanie?`, `Dzień dobry, ${n}! Ja już nie śpię od rana!`],
-      day: (n: string) => [`Cześć, ${n}! Super, że jesteś.`, `Hej, ${n}! Co dziś robimy?`],
-      evening: (n: string) => [`Dobry wieczór, ${n}! Zagramy w coś krótkiego?`, `Hej, ${n}! Wieczorem smoki lubią spokojne gry.`],
-      night: (n: string) => [`Ojej, ${n}, już późno! Smoki o tej porze śpią.`],
-    },
+    /** The first thing Smoczek says after she logs in. */
+    welcome: (n: string) => `Cześć, ${n}, dobrze, że jesteś!`,
     jokes: [
       'Dlaczego komputer poszedł do lekarza? Bo złapał wirusa!',
       'Co mówi myszka komputerowa do kota? Nie bój się, ja tylko klikam!',

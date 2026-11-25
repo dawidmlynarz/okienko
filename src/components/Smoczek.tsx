@@ -1,6 +1,6 @@
 import { useEffect, useId, useRef, type CSSProperties } from 'react'
 import { useDomek, type CompanionColor } from '../store/useDomek'
-import { BodyClip, OutfitLayer } from '../wardrobe/GadgetArt'
+import { BEAN, BodyClip, OutfitLayer } from '../wardrobe/GadgetArt'
 import type { Outfit } from '../wardrobe/items'
 
 /* Eyes that follow the pointer. One window listener feeds every Smoczek on screen. */
@@ -24,9 +24,9 @@ function watchPointer(fn: () => void) {
 }
 
 /** Eye centre and resting pupil position, in viewBox units. */
-const EYE = { x: 120, y: 94 }
-const REST = { x: 2, y: 4 }
-const REACH = { x: 6.5, y: 7 }
+const EYE = { x: 120, y: 98 }
+const REST = { x: 0, y: 0 }
+const REACH = { x: 3.5, y: 3.5 }
 
 /** Move the pupils toward the pointer; relax back to centre when the pointer goes quiet. */
 function useFollowEyes(svg: React.RefObject<SVGSVGElement | null>, enabled: boolean, remount?: number) {
@@ -69,13 +69,16 @@ function useFollowEyes(svg: React.RefObject<SVGSVGElement | null>, enabled: bool
 
 export type Pose = 'idle' | 'happy' | 'cheer' | 'thinking'
 
-/** body, belly, spikes, outline. Outline is each hue's darkest step, so the line reads on any pastel. */
-export const COMPANION_COLORS: Record<CompanionColor, [string, string, string, string]> = {
-  mint: ['#5ED19A', '#D3F9E3', '#91E7B9', '#1F4D3A'],
-  sky: ['#5DC4FB', '#DEF2FF', '#9EDAFE', '#04374F'],
-  lavender: ['#B6AAFE', '#EEECFF', '#D0CAFE', '#332C54'],
-  peach: ['#FB9D66', '#FEEADF', '#FEC2A0', '#4E270D'],
-  pink: ['#FE8FBC', '#FEE8EF', '#FFBAD4', '#4F2035'],
+/**
+ * body, belly, spikes (wings and crest), dark tone (text on his colour), feet.
+ * Drawn in the house style: one ink outline for every hue, flat muted pastels.
+ */
+export const COMPANION_COLORS: Record<CompanionColor, [string, string, string, string, string]> = {
+  mint: ['#8ED3A6', '#FFFDF5', '#C9EBD3', '#1F4D3A', '#62B385'],
+  sky: ['#8CC3EC', '#FFFDF5', '#CBE3F6', '#04374F', '#5F9FD3'],
+  lavender: ['#BBAEEC', '#FFFDF5', '#DFD8F7', '#332C54', '#9686D6'],
+  peach: ['#F5B386', '#FFFDF5', '#FAD6BE', '#4E270D', '#DE9160'],
+  pink: ['#F2AAC2', '#FFFDF5', '#F8D3E0', '#4F2035', '#DA86A5'],
 }
 
 interface Props {
@@ -93,6 +96,10 @@ interface Props {
   outfit?: Outfit
 }
 
+/**
+ * Smoczek: a bean-shaped little dragon. Dot eyes, pink blush, two horns and a soft crest,
+ * nub arms, small wings and a curly tail. Head and body are one shape, like a sticker.
+ */
 export function Smoczek({ pose = 'idle', color = 'mint', talking = false, size = 240, className = '', label = 'Smoczek', beat, followEyes = true, outfit }: Props) {
   const worn = useDomek((s) => s.wardrobe?.worn)
   const wearing = outfit ?? worn
@@ -100,86 +107,94 @@ export function Smoczek({ pose = 'idle', color = 'mint', talking = false, size =
   const ref = useRef<SVGSVGElement>(null)
   // Thinking looks up and away on purpose, so the eyes stop following then.
   useFollowEyes(ref, followEyes && pose !== 'thinking' && pose !== 'cheer', beat)
-  const [body, belly, spike, line] = COMPANION_COLORS[color]
-  const style = { '--body': body, '--belly': belly, '--spike': spike, '--line': line, width: size, height: 'auto' } as CSSProperties
+  const [body, belly, spike, , foot] = COMPANION_COLORS[color]
+  const style = { '--body': body, '--belly': belly, '--spike': spike, '--foot': foot, width: size, height: 'auto' } as CSSProperties
   return (
     <svg ref={ref} key={beat} className={`smok ${pose} ${talking ? 'talking' : ''} ${className}`} viewBox="0 0 240 260" role="img" aria-label={label} style={style}>
       <defs>
         <BodyClip id={clipId} />
       </defs>
-      <ellipse cx="120" cy="248" rx="70" ry="8" fill="#1B2240" opacity=".08" />
+      <ellipse cx="120" cy="250" rx="66" ry="7" fill="#2E2A33" opacity=".08" />
       <g className="whole">
         <OutfitLayer outfit={wearing} layer="back" />
-        <g className="spark" fill="#F7DEAB" stroke="#AC6B22" strokeWidth="2.5" strokeLinejoin="round">
-          <path d="M30 70l5 11 11 5-11 5-5 11-5-11-11-5 11-5z" />
-          <path d="M206 92l4 8 8 4-8 4-4 8-4-8-8-4 8-4z" />
-          <path d="M196 26l3 6 6 3-6 3-3 6-3-6-6-3 6-3z" />
+        <g className="spark ln" fill="#F6D58A">
+          <path d="M28 70l5 11 11 5-11 5-5 11-5-11-11-5 11-5z" />
+          <path d="M210 96l4 8 8 4-8 4-4 8-4-8-8-4 8-4z" />
+          <path d="M200 30l3 6 6 3-6 3-3 6-3-6-6-3 6-3z" />
         </g>
-        <g className="dots" fill="#fff" stroke="#5B6377" strokeWidth="3">
-          <circle cx="186" cy="62" r="6" />
-          <circle cx="202" cy="42" r="9" />
-          <circle cx="222" cy="18" r="12" />
+        <g className="dots ln" fill="#fff" strokeWidth="3">
+          <circle cx="190" cy="60" r="6" />
+          <circle cx="205" cy="40" r="9" />
+          <circle cx="224" cy="16" r="12" />
         </g>
         <g className="tail">
-          <path d="M160 214C192 230 216 214 214 184" fill="none" stroke="var(--line)" strokeWidth="22" strokeLinecap="round" />
-          <path d="M160 214C192 230 216 214 214 184" fill="none" stroke="var(--body)" strokeWidth="14" strokeLinecap="round" />
-          <path className="ln" d="M214 160l12 16-12 14-12-14z" fill="var(--spike)" />
+          <path d="M176 216C204 226 222 210 216 180" fill="none" stroke="var(--ink)" strokeWidth="20" strokeLinecap="round" />
+          <path d="M176 216C204 226 222 210 216 180" fill="none" stroke="var(--body)" strokeWidth="12" strokeLinecap="round" />
+          <path className="ln" d="M216 158c7 6 10 12 8 18-2 5-8 7-8 7s-6-2-8-7c-2-6 1-12 8-18z" fill="var(--spike)" />
           <OutfitLayer outfit={wearing} layer="tail" />
         </g>
-        <path className="wingL ln" d="M84 158C60 122 34 128 36 156c10-4 18 2 20 10 8-4 18 0 24 8z" fill="var(--spike)" />
-        <path className="wingR ln" d="M156 158c24-36 50-30 48-2-10-4-18 2-20 10-8-4-18 0-24 8z" fill="var(--spike)" />
+        <path className="wingL ln" d="M58 128C40 104 16 108 18 132c8-3 15 1 16 8 7-3 15 0 18 7z" fill="var(--spike)" />
+        <path className="wingR ln" d="M182 128c18-24 42-20 40 4-8-3-15 1-16 8-7-3-15 0-18 7z" fill="var(--spike)" />
+        <g className="crest ln" fill="var(--spike)">
+          <path d="M98 54c-2-12 4-20 12-18 4 1 6 6 6 12" />
+          <path d="M112 50c-1-14 6-22 14-20 6 2 7 9 6 18" />
+          <path d="M128 50c2-10 9-15 15-11 4 3 4 9 1 15" />
+        </g>
+        <g className="horns ln" fill="#F6D58A">
+          <path d="M80 70c-10-16-10-30-2-34 7-3 14 8 16 22" />
+          <path d="M160 70c10-16 10-30 2-34-7-3-14 8-16 22" />
+        </g>
         <g className="body">
-          <ellipse className="ln" cx="96" cy="236" rx="20" ry="11" fill="var(--body)" />
-          <ellipse className="ln" cx="144" cy="236" rx="20" ry="11" fill="var(--body)" />
-          <ellipse className="ln" cx="120" cy="186" rx="56" ry="52" fill="var(--body)" />
-          <ellipse cx="120" cy="196" rx="35" ry="36" fill="var(--belly)" />
-          <path d="M98 184q22 8 44 0M96 200q24 8 48 0M100 216q20 7 40 0" fill="none" stroke="var(--line)" strokeWidth="3" strokeLinecap="round" opacity=".35" />
+          <ellipse className="ln" cx="94" cy="240" rx="18" ry="10" fill="var(--foot)" />
+          <ellipse className="ln" cx="146" cy="240" rx="18" ry="10" fill="var(--foot)" />
+          <path className="ln" d={BEAN} fill="var(--body)" />
+          <ellipse cx="120" cy="184" rx="40" ry="44" fill="var(--belly)" />
           <OutfitLayer outfit={wearing} layer="body" clipId={clipId} />
           <OutfitLayer outfit={wearing} layer="over" />
           <OutfitLayer outfit={wearing} layer="feet" />
         </g>
-        <g className="armL">
-          <rect className="ln" x="63" y="168" width="18" height="34" rx="9" fill="var(--body)" transform="rotate(18 72 172)" />
-          <OutfitLayer outfit={wearing} layer="hand" />
-        </g>
-        <rect className="armR ln" x="159" y="168" width="18" height="34" rx="9" fill="var(--body)" transform="rotate(-18)" />
         <g className="head">
-          <path className="ln" d="M104 52l6-16 8 14zM116 48l7-18 8 16zM128 50l8-15 6 16z" fill="var(--spike)" />
-          <path className="ln" d="M82 66C70 36 76 26 94 40c2 8 2 14 0 22zM158 66c12-30 6-40-12-26-2 8-2 14 0 22z" fill="var(--horn)" />
-          <ellipse className="ln" cx="120" cy="104" rx="70" ry="57" fill="var(--body)" />
-          <ellipse cx="120" cy="130" rx="36" ry="21" fill="var(--belly)" />
-          <circle cx="111" cy="121" r="2.6" fill="var(--line)" />
-          <circle cx="129" cy="121" r="2.6" fill="var(--line)" />
-          <ellipse cx="70" cy="122" rx="11" ry="7" fill="var(--cheek)" opacity=".9" />
-          <ellipse cx="170" cy="122" rx="11" ry="7" fill="var(--cheek)" opacity=".9" />
+          <g className="cheeks">
+            <circle cx="72" cy="116" r="13" fill="#F7B7C5" />
+            <circle cx="168" cy="116" r="13" fill="#F7B7C5" />
+            <circle cx="67" cy="111" r="2.6" fill="#fff" />
+            <circle cx="73" cy="108" r="1.6" fill="#fff" />
+            <circle cx="163" cy="111" r="2.6" fill="#fff" />
+            <circle cx="169" cy="108" r="1.6" fill="#fff" />
+          </g>
           <g className="eyes">
             <g className="lid">
-              <ellipse className="ln" cx="92" cy="94" rx="16" ry="19" fill="#fff" />
-              <ellipse className="ln" cx="148" cy="94" rx="16" ry="19" fill="#fff" />
               <g className="pupils">
-                <circle cx="94" cy="98" r="9.5" fill="#1B2240" />
-                <circle cx="150" cy="98" r="9.5" fill="#1B2240" />
-                <circle cx="98" cy="93" r="3.6" fill="#fff" />
-                <circle cx="154" cy="93" r="3.6" fill="#fff" />
+                <ellipse cx="92" cy="98" rx="7" ry="8.5" fill="var(--ink)" />
+                <ellipse cx="148" cy="98" rx="7" ry="8.5" fill="var(--ink)" />
+                <circle cx="94.5" cy="94.5" r="2.6" fill="#fff" />
+                <circle cx="150.5" cy="94.5" r="2.6" fill="#fff" />
               </g>
             </g>
           </g>
-          <g className="eyesHappy" fill="none" stroke="var(--line)" strokeWidth="5" strokeLinecap="round">
-            <path d="M78 100q14-16 28 0" />
-            <path d="M134 100q14-16 28 0" />
+          <g className="eyesHappy" fill="none" stroke="var(--ink)" strokeWidth="4.5" strokeLinecap="round">
+            <path d="M83 101q9-11 18 0" />
+            <path d="M139 101q9-11 18 0" />
           </g>
-          <path className="m m-idle" d="M110 137q10 8 20 0" fill="none" stroke="var(--line)" strokeWidth="4" strokeLinecap="round" />
+          <path className="m m-idle" d="M111 112q4.5 5 9 0q4.5 5 9 0" fill="none" stroke="var(--ink)" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" />
           <g className="m m-happy">
-            <path className="ln" d="M104 134q16 22 32 0z" fill="var(--mouth)" />
-            <path d="M112 143q8-5 16 0q-8 7-16 0z" fill="var(--tongue)" />
+            <path className="ln" d="M109 110q11 15 22 0z" fill="var(--mouth)" strokeWidth="3.5" />
+            <path d="M114 117q6-4 12 0q-6 5-12 0z" fill="var(--tongue)" />
           </g>
           <g className="m m-cheer">
-            <path className="ln" d="M100 132q20 30 40 0z" fill="var(--mouth)" />
-            <path d="M110 145q10-7 20 0q-10 9-20 0z" fill="var(--tongue)" />
+            <path className="ln" d="M106 108q14 22 28 0z" fill="var(--mouth)" strokeWidth="3.5" />
+            <path d="M112 119q8-5 16 0q-8 7-16 0z" fill="var(--tongue)" />
           </g>
-          <path className="m m-think" d="M108 139q6-4 12 0t12-1" fill="none" stroke="var(--line)" strokeWidth="4" strokeLinecap="round" />
+          <path className="m m-think" d="M112 114q5-3 9 0t9 0" fill="none" stroke="var(--ink)" strokeWidth="3.5" strokeLinecap="round" />
           <OutfitLayer outfit={wearing} layer="head" />
         </g>
+        <g className="armL">
+          <rect className="ln" x="26" y="150" width="32" height="18" rx="9" fill="var(--body)" transform="rotate(-28 54 159)" />
+          <g transform="translate(-29 -30)">
+            <OutfitLayer outfit={wearing} layer="hand" />
+          </g>
+        </g>
+        <rect className="armR ln" x="182" y="150" width="32" height="18" rx="9" fill="var(--body)" transform="rotate(28)" />
       </g>
     </svg>
   )
