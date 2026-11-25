@@ -84,7 +84,7 @@ function Round({ level, onDone, onBack }: RoundProps<Level>) {
     play('fanfare')
     celebrate()
     const c = caughtRef.current
-    window.setTimeout(() => done.current(starsFor(c, level.count), `${c} / ${level.count}`), 700)
+    window.setTimeout(() => done.current(starsFor(c, level.count), `${c} / ${level.count}`), 1100)
   }, [level.count])
 
   // Land the next ladybug somewhere new; it flies off by itself after lifeMs.
@@ -100,12 +100,12 @@ function Round({ level, onDone, onBack }: RoundProps<Level>) {
         setBug({ id: n, x: 12 + Math.random() * 76, y: 14 + Math.random() * 62, dx: Math.cos(angle) * speed, dy: Math.sin(angle) * speed, angle: (angle * 180) / Math.PI + 90 })
         play('whoosh')
       },
-      n === 0 ? 1800 : 550,
+      n === 0 ? 1800 : 900,
     )
     const leave = window.setTimeout(() => {
       setBug(null)
       setN((v) => v + 1)
-    }, (n === 0 ? 1800 : 550) + level.lifeMs)
+    }, (n === 0 ? 1800 : 900) + level.lifeMs * 1.25)
     return () => {
       window.clearTimeout(spawn)
       window.clearTimeout(leave)

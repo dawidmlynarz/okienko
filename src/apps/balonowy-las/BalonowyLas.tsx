@@ -9,7 +9,7 @@ import { usePlatform } from '../../keyboard/usePlatform'
 import { useTypedKeys } from '../../keyboard/useKeys'
 import { burst, celebrate } from '../../lib/confetti'
 import { play } from '../../lib/sound'
-import { letterName, speak } from '../../lib/speak'
+import { PACE, letterName, speak } from '../../lib/speak'
 import type { AppProps } from '../registry'
 import { GameHud, GameShell, starsFor, type RoundProps } from '../shared/GameKit'
 import { levels, makeRound, type Level } from './levels'
@@ -103,7 +103,7 @@ function Round({ level, onDone, onBack }: { level: Level; onDone: (firstTry: num
         // Say the letter, so she hears it as well as sees it.
         if (idx > 0) speak(letterName(char))
       },
-      idx === 0 ? 1600 : 450,
+      (idx === 0 ? 1600 : 450) * PACE,
     )
     return () => window.clearTimeout(t)
   }, [idx, letters, level.hintAfterMs])
@@ -149,7 +149,7 @@ function Round({ level, onDone, onBack }: { level: Level; onDone: (firstTry: num
         if (last) {
           play('fanfare')
           celebrate()
-          window.setTimeout(() => onDone(firstTry.current, letters.length), 900)
+          window.setTimeout(() => onDone(firstTry.current, letters.length), 1300)
         }
         setIdx((i) => i + 1)
       }, 380)

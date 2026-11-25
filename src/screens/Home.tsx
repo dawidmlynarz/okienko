@@ -1,4 +1,4 @@
-import { GameController, Lightbulb, Palette, Play, Smiley, Star } from '@phosphor-icons/react'
+import { GameController, Lightbulb, Palette, PawPrint, Play, Smiley, Star } from '@phosphor-icons/react'
 import { AnimatePresence, motion } from 'motion/react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { appById, apps, type AppDef } from '../apps/registry'
@@ -7,7 +7,8 @@ import { Picture } from '../components/Picture'
 import { DESKS } from '../components/Wallpaper'
 import { ChatBubble } from '../components/ChatBubble'
 import { ParentHint } from '../components/ParentHint'
-import { Smoczek, type Pose } from '../components/Smoczek'
+import { NATURAL, Smoczek, type Pose } from '../components/Smoczek'
+import { FRIEND, SPECIES } from '../companion/species'
 import { useTalk } from '../components/Companion'
 import { useNow } from '../components/TopBar'
 import { pl } from '../i18n/pl'
@@ -69,6 +70,7 @@ export function Home() {
   const nextApp = useBag(apps)
   const nextIdle = useBag(pl.smoczek.idle)
 
+  const [menu, setMenu] = useState<'friend' | 'desk' | null>(null)
   const [line, setLine] = useState<Line>(() => ({ text: greeting(name) + (canBuy ? ` ${pl.smoczek.canBuy(wallet)}` : ''), pose: 'happy', key: 0, app: canBuy ? appById('szafa') ?? undefined : undefined }))
   const say = useCallback((text: string, pose: Pose = 'happy', app?: AppDef) => setLine((l) => ({ text, pose, app, key: l.key + 1 })), [])
   const { talking, repeat } = useTalk(line.text, line.key)
@@ -132,7 +134,8 @@ export function Home() {
       <div className="relative min-h-0 flex-1">
         <DateWidget />
         <div className="absolute top-2 right-0 z-20 flex items-start gap-2">
-          <DeskPicker onPick={(n) => say(pl.home.deskSay(n), 'happy')} />
+          <FriendPicker open={menu === 'friend'} setOpen={(o) => setMenu(o ? 'friend' : null)} onPick={(n) => say(pl.home.friendSay(n), 'cheer')} />
+          <DeskPicker open={menu === 'desk'} setOpen={(o) => setMenu(o ? 'desk' : null)} onPick={(n) => say(pl.home.deskSay(n), 'happy')} />
           <ParentHint text={pl.parentHint.home} />
         </div>
 
@@ -230,10 +233,75 @@ function DateWidget() {
 }
 
 /** Paint the desktop: a palette button that opens six colour swatches. */
-function DeskPicker({ onPick }: { onPick: (name: string) => void }) {
+interface MenuProps {
+  open: boolean
+  setOpen: (open: boolean) => void
+  onPick: (name: string) => void
+}
+
+/** Swap the friend right from the desktop: four small friends to tap, each in its own colours. */
+function FriendPicker({ onPick, open, setOpen }: MenuProps) {
+  const companion = useDomek((s) => s.profile?.companion ?? 'smok')
+  const updateProfile = useDomek((s) => s.updateProfile)
+  return (
+    <div className="relative">
+      <button
+        type="button"
+        aria-label={pl.home.friend}
+        aria-expanded={open}
+        title={pl.home.friend}
+        onClick={() => {
+          play('click')
+          setOpen(!open)
+        }}
+        className="pressable grid size-12 place-items-center rounded-full bg-white/80 text-ink-800 shadow-button hover:bg-white"
+      >
+        <PawPrint size={26} weight="bold" />
+      </button>
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0, y: -6, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -6, scale: 0.95 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+            className="absolute top-14 right-0 flex gap-2 rounded-[28px] bg-white/90 p-2 shadow-button"
+            role="radiogroup"
+            aria-label={pl.home.friend}
+          >
+            {SPECIES.map((s) => {
+              const on = s === companion
+              return (
+                <button
+                  key={s}
+                  type="button"
+                  role="radio"
+                  aria-checked={on}
+                  aria-label={FRIEND[s].name}
+                  title={FRIEND[s].name}
+                  onClick={() => {
+                    play('pop')
+                    setOpen(false)
+                    if (on) return
+                    updateProfile({ companion: s, companionName: FRIEND[s].name, companionColor: NATURAL[s] })
+                    onPick(FRIEND[s].name)
+                  }}
+                  className={`pressable grid size-[76px] place-items-center rounded-[22px] ${on ? 'bg-accent-soft ring-4 ring-accent-strong' : 'bg-ink-50 hover:bg-ink-100'}`}
+                >
+                  <Smoczek species={s} color={NATURAL[s]} size={64} followEyes={false} />
+                </button>
+              )
+            })}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  )
+}
+
+function DeskPicker({ onPick, open, setOpen }: MenuProps) {
   const wallpaper = useDomek((s) => s.settings.wallpaper)
   const setSettings = useDomek((s) => s.setSettings)
-  const [open, setOpen] = useState(false)
   return (
     <div className="relative">
       <button
@@ -243,7 +311,7 @@ function DeskPicker({ onPick }: { onPick: (name: string) => void }) {
         title={pl.home.desk}
         onClick={() => {
           play('click')
-          setOpen((o) => !o)
+          setOpen(!open)
         }}
         className="pressable grid size-12 place-items-center rounded-full bg-white/80 text-ink-800 shadow-button hover:bg-white"
       >

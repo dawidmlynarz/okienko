@@ -110,7 +110,7 @@ export function speak(text: string, opts: SpeakOptions = {}) {
     const u = new SpeechSynthesisUtterance(part)
     u.lang = 'pl-PL'
     if (v) u.voice = v
-    u.rate = natural ? 1 : 0.92
+    u.rate = natural ? 0.92 : 0.85
     u.pitch = natural ? 1.05 : 1.1
     u.volume = 1
     // Questions and exclamations get a little lift.
@@ -146,4 +146,28 @@ export function letterName(char: string): string {
   }
   const c = char.toLowerCase()
   return names[c] ?? c
+}
+
+/**
+ * A child's pace: every pause between steps in a game is stretched by this much,
+ * so nothing rushes her and the friend never talks over himself.
+ */
+export const PACE = 1.5
+
+/**
+ * Run `fn` once the friend has finished talking and at least `minMs` (times PACE) has passed.
+ * Never waits longer than a few seconds past that, in case speech hangs. Returns a cancel.
+ */
+export function afterTalk(fn: () => void, minMs: number): () => void {
+  const start = performance.now()
+  const min = minMs * PACE
+  let id = 0
+  const tick = () => {
+    const t = performance.now() - start
+    const talking = typeof speechSynthesis !== 'undefined' && (speechSynthesis.speaking || speechSynthesis.pending)
+    if (t >= min && (!talking || t >= min + 6000)) return fn()
+    id = window.setTimeout(tick, t < min ? min - t : 120)
+  }
+  id = window.setTimeout(tick, min)
+  return () => window.clearTimeout(id)
 }

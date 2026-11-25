@@ -111,6 +111,8 @@ export const pl = {
   },
   home: {
     desk: 'Kolor pulpitu',
+    friend: 'Zmień przyjaciela',
+    friendSay: (n: string) => `Hej! Teraz jestem ${n}!`,
     deskSay: (n: string) => `${n}! Ładnie tu teraz.`,
     open: (app: string) => `Otwórz: ${app}`,
     games: 'W co dziś gramy?',
@@ -172,8 +174,8 @@ export const pl = {
     resultSay: (stars: number) =>
       stars === 3 ? 'Trzy gwiazdki! Jesteś mistrzynią klawiatury!' : stars === 2 ? 'Dwie gwiazdki! Świetnie Ci idzie!' : 'Jedna gwiazdka! Każda runda to trening.',
     accuracy: (hit: number, total: number) => `${hit} z ${total} baloników za pierwszym razem`,
-    again: 'Jeszcze raz',
-    finish: 'Gotowe',
+    again: 'Spróbuj ponownie',
+    finish: 'Zakończ',
     back: 'Wróć',
     balloonsLeft: (n: number) => `Zostało: ${n}`,
   },

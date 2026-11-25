@@ -9,7 +9,7 @@ import { pl } from '../../i18n/pl'
 import { usePressedCodes, useTypedKeys } from '../../keyboard/useKeys'
 import { burst, celebrate } from '../../lib/confetti'
 import { play } from '../../lib/sound'
-import { speak } from '../../lib/speak'
+import { afterTalk, speak } from '../../lib/speak'
 import type { AppProps } from '../registry'
 import { GameHud, GameShell, starsFor, type RoundProps } from '../shared/GameKit'
 import { SPOTS, makeQuestions, type Level } from './questions'
@@ -66,11 +66,11 @@ function Round({ level, onDone, onBack }: RoundProps<Level>) {
       burst(0.5, 0.4)
       const last = qi + 1 >= questions.length
       tell(pl.counting.sayCount(n), last ? 'cheer' : 'happy', pl.counting.sayCount(n))
-      window.setTimeout(() => {
+      afterTalk(() => {
         if (last) {
           play('fanfare')
           celebrate()
-          window.setTimeout(() => onDone(starsFor(good.current, questions.length), `${good.current} / ${questions.length}`), 700)
+          window.setTimeout(() => onDone(starsFor(good.current, questions.length), `${good.current} / ${questions.length}`), 1000)
         } else setQi((i) => i + 1)
       }, 1300)
     } else {

@@ -1,3 +1,4 @@
+import { afterTalk } from '../../lib/speak'
 import { AnimatePresence, motion } from 'motion/react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { PictureId } from '../../assets/pictures'
@@ -100,11 +101,11 @@ function Round({ level, onDone, onBack }: RoundProps<Level>) {
       burst(0.5, 0.35)
       const last = wi + 1 >= words.length
       tell(pl.game.good[wi % pl.game.good.length], last ? 'cheer' : 'happy', pl.words.good(current.word))
-      window.setTimeout(() => {
+      afterTalk(() => {
         if (last) {
           play('fanfare')
           celebrate()
-          window.setTimeout(() => onDone(starsFor(good.current, total), `${good.current} / ${total}`), 700)
+          window.setTimeout(() => onDone(starsFor(good.current, total), `${good.current} / ${total}`), 1000)
         } else setWi((i) => i + 1)
       }, 1500)
     } else {

@@ -1,3 +1,4 @@
+import { afterTalk } from '../../lib/speak'
 import { AnimatePresence, motion } from 'motion/react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Companion } from '../../components/Companion'
@@ -75,7 +76,11 @@ function Round({ level, onDone, onBack }: RoundProps<Level>) {
   const moves = useRef(0)
   const timers = useRef<number[]>([])
   const later = (fn: () => void, ms: number) => timers.current.push(window.setTimeout(fn, ms))
-  useEffect(() => () => timers.current.forEach(window.clearTimeout), [])
+  const stops = useRef<(() => void)[]>([])
+  useEffect(() => () => {
+    timers.current.forEach(window.clearTimeout)
+    stops.current.forEach((f) => f())
+  }, [])
 
   const arrive = () => {
     if (goodEnough(moves.current, shortest(maze))) good.current += 1
@@ -83,7 +88,7 @@ function Round({ level, onDone, onBack }: RoundProps<Level>) {
     play('correct')
     burst(0.5, 0.45)
     tell(pickOne(pl.labirynt.home), 'cheer', pickOne(pl.labirynt.homeSay))
-    later(() => {
+    stops.current.push(afterTalk(() => {
       if (idx + 1 >= mazes.length) {
         play('fanfare')
         celebrate()
@@ -98,7 +103,7 @@ function Round({ level, onDone, onBack }: RoundProps<Level>) {
       setWon(false)
       moves.current = 0
       tell(pl.labirynt.next, 'happy', '')
-    }, 1800)
+    }, 1800))
   }
 
   const move = (dir: Dir) => {

@@ -9,7 +9,7 @@ import { pl } from '../../i18n/pl'
 import { useTypedKeys } from '../../keyboard/useKeys'
 import { burst, celebrate } from '../../lib/confetti'
 import { play } from '../../lib/sound'
-import { speak } from '../../lib/speak'
+import { afterTalk, speak } from '../../lib/speak'
 import type { AppProps } from '../registry'
 import { ARROW, ArrowPad, useArrowKeys } from '../shared/ArrowPad'
 import { GameHud, GameShell, starsFor, type LevelBase, type RoundProps } from '../shared/GameKit'
@@ -79,7 +79,11 @@ function Round({ level, onDone, onBack }: RoundProps<Level>) {
   const tries = useRef(0)
   const timers = useRef<number[]>([])
   const later = (fn: () => void, ms: number) => timers.current.push(window.setTimeout(fn, ms))
-  useEffect(() => () => timers.current.forEach(window.clearTimeout), [])
+  const stops = useRef<(() => void)[]>([])
+  useEffect(() => () => {
+    timers.current.forEach(window.clearTimeout)
+    stops.current.forEach((f) => f())
+  }, [])
 
   const reset = useCallback((b: Board) => {
     setHorse(b.horse)
@@ -108,7 +112,7 @@ function Round({ level, onDone, onBack }: RoundProps<Level>) {
     play('correct')
     burst(0.5, 0.45)
     tell(pickOne(pl.konik.home), 'cheer', pickOne(pl.konik.homeSay))
-    later(() => {
+    stops.current.push(afterTalk(() => {
       if (mapIdx + 1 >= boards.length) {
         play('fanfare')
         celebrate()
@@ -117,7 +121,7 @@ function Round({ level, onDone, onBack }: RoundProps<Level>) {
         setMapIdx(mapIdx + 1)
         reset(boards[mapIdx + 1])
       }
-    }, 1900)
+    }, 1900))
   }
 
   /* Live mode: each arrow moves the horse right away. */

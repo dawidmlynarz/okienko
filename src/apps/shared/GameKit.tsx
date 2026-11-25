@@ -192,11 +192,11 @@ export function Result({ stars, line, onAgain, onDone }: { stars: Stars; line: s
           <span className="rounded-full bg-accent-soft px-5 py-2 font-display text-3xl font-extrabold text-accent-deep tabular-nums">{line}</span>
         </div>
         <div className="relative flex gap-4">
-          <Button variant="plain" size="lg" onClick={onDone}>
-            {pl.game.finish}
-          </Button>
-          <Button variant="strong" size="lg" onClick={onAgain}>
+          <Button variant="plain" size="lg" onClick={onAgain}>
             {pl.game.again}
+          </Button>
+          <Button variant="strong" size="lg" onClick={onDone}>
+            {pl.game.finish}
           </Button>
         </div>
       </motion.div>

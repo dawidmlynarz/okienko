@@ -1,3 +1,4 @@
+import { PACE, afterTalk } from '../../lib/speak'
 import { motion } from 'motion/react'
 import { useCallback, useMemo, useRef, useState } from 'react'
 import type { PictureId } from '../../assets/pictures'
@@ -75,7 +76,7 @@ function Round({ level, onDone, onBack }: RoundProps<Level>) {
           celebrate()
           tell(pl.game.done, 'cheer')
           const stars: Stars = memoryStars(m, level.pairs)
-          window.setTimeout(() => onDone(stars, pl.memory.moves(m)), 1000)
+          afterTalk(() => onDone(stars, pl.memory.moves(m)), 1000)
         } else {
           const p = pl.memory.pair[f.size % pl.memory.pair.length]
           tell(p, 'happy', p)
@@ -87,7 +88,7 @@ function Round({ level, onDone, onBack }: RoundProps<Level>) {
         setOpen([])
         busy.current = false
         tell(pl.memory.different, 'thinking', pl.memory.different)
-      }, 1100)
+      }, 1100 * PACE)
     }
   }
 
