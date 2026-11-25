@@ -2,7 +2,7 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import type { PictureId } from '../assets/pictures'
 import { current, type Species } from '../companion/species'
-import { buy, toggleWear, type BuyResult, type Wardrobe } from '../wardrobe/items'
+import { buy, toggleWear, wornList, type BuyResult, type Wardrobe } from '../wardrobe/items'
 import { SCHEMA_VERSION, STORAGE_KEY, migrate, storage } from './storage'
 
 export type CompanionColor = 'mint' | 'sky' | 'lavender' | 'peach' | 'pink'
@@ -93,7 +93,7 @@ const initialData = (): PersistedState => ({
   profile: null,
   settings: { sound: true, voice: true, voiceName: null, wallpaper: 'day', keyboard: 'auto' },
   progress: { stars: 0, spent: 0, starsByDay: {}, levels: {}, rounds: 0 },
-  wardrobe: { owned: [], worn: {} },
+  wardrobe: { owned: [], worn: [] },
   notes: [],
 })
 
@@ -134,11 +134,11 @@ export const useDomek = create<DomekState>()(
 
       buyGadget: (id) => {
         const { wardrobe, progress } = get()
-        const r = buy(wardrobe ?? { owned: [], worn: {} }, progress, id)
+        const r = buy(wardrobe ?? { owned: [], worn: [] }, progress, id)
         if (r.ok) set({ wardrobe: r.wardrobe, progress: { ...progress, spent: r.spent } })
         return r
       },
-      toggleGadget: (id) => set((s) => ({ wardrobe: toggleWear(s.wardrobe ?? { owned: [], worn: {} }, id) })),
+      toggleGadget: (id) => set((s) => ({ wardrobe: toggleWear(s.wardrobe ?? { owned: [], worn: [] }, id) })),
 
       saveNote: (id, body) => {
         const now = Date.now()
@@ -167,7 +167,7 @@ export const useDomek = create<DomekState>()(
           ...migrated,
           settings: { ...base.settings, ...migrated.settings },
           progress: { ...base.progress, ...migrated.progress },
-          wardrobe: { ...base.wardrobe, ...migrated.wardrobe },
+          wardrobe: { ...base.wardrobe, ...migrated.wardrobe, worn: wornList(migrated.wardrobe?.worn) },
           schemaVersion: SCHEMA_VERSION,
           screen: migrated.profile ? 'login' : 'setup',
           openApp: null,
@@ -181,6 +181,11 @@ export const useDomek = create<DomekState>()(
       storage,
       version: SCHEMA_VERSION,
       migrate,
+      // Older saves wore one gadget per shelf ({ head: 'czapka' }); read them as a list.
+      merge: (persisted, current) => {
+        const p = (persisted ?? {}) as Partial<PersistedState>
+        return { ...current, ...p, wardrobe: { ...current.wardrobe, ...p.wardrobe, worn: wornList(p.wardrobe?.worn) } }
+      },
       partialize: (s): PersistedState => ({
         schemaVersion: s.schemaVersion,
         profile: s.profile,

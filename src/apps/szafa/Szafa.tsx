@@ -10,7 +10,7 @@ import { celebrate } from '../../lib/confetti'
 import { play } from '../../lib/sound'
 import { useDomek } from '../../store/useDomek'
 import { GadgetPicture } from '../../wardrobe/GadgetArt'
-import { GADGETS, SLOTS, balanceOf, gadgetById, type Outfit, type Slot } from '../../wardrobe/items'
+import { GADGETS, SLOTS, balanceOf, gadgetById, putOn, wornList, type Outfit, type Slot } from '../../wardrobe/items'
 import type { AppProps } from '../registry'
 
 /** The gadget that stands for each shelf on its tab. */
@@ -38,11 +38,12 @@ export default function Szafa(_: AppProps) {
 
   const item = gadgetById(picked)
   const owned = !!item && wardrobe.owned.includes(item.id)
-  const worn = !!item && wardrobe.worn[item.slot] === item.id
+  const wearingNow = useMemo(() => wornList(wardrobe.worn), [wardrobe.worn])
+  const worn = !!item && wearingNow.includes(item.id)
   const short = item && !owned ? Math.max(0, item.price - wallet) : 0
 
-  // Try-on: whatever is picked goes on top of what he already wears.
-  const preview: Outfit = useMemo(() => (item ? { ...wardrobe.worn, [item.slot]: item.id } : wardrobe.worn), [item, wardrobe.worn])
+  // Try-on: whatever is picked goes on with what he already wears; only things in the same spot come off.
+  const preview: Outfit = useMemo(() => (item ? putOn(wearingNow, item.id) : wearingNow), [item, wearingNow])
 
   const pick = (id: string) => {
     const g = gadgetById(id)!
@@ -143,7 +144,7 @@ export default function Szafa(_: AppProps) {
         <div className="grid min-h-0 flex-1 auto-rows-fr grid-cols-4 gap-3 overflow-y-auto p-1" role="tabpanel">
           {shelf.map((g, i) => {
             const have = wardrobe.owned.includes(g.id)
-            const on = wardrobe.worn[g.slot] === g.id
+            const on = wearingNow.includes(g.id)
             const afford = !have && g.price <= wallet
             const sel = picked === g.id
             return (

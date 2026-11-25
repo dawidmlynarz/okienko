@@ -32,7 +32,7 @@ export function ColorPicker({ species, value, onChange, size = 60 }: { species: 
             className={`pressable grid place-items-center rounded-[22px] p-2 transition-shadow ${on ? 'bg-accent-soft shadow-[inset_0_0_0_3px_var(--accent-edge)]' : 'bg-surface shadow-[inset_0_0_0_1.5px_var(--color-ink-200)] hover:bg-ink-50'}`}
             style={{ ['--swatch' as string]: friendColors(species, c)[0] }}
           >
-            <Smoczek species={species} color={c} outfit={{}} pose={on ? 'happy' : 'idle'} size={size} followEyes={false} />
+            <Smoczek species={species} color={c} outfit={[]} pose={on ? 'happy' : 'idle'} size={size} followEyes={false} />
           </button>
         )
       })}
@@ -57,7 +57,7 @@ export function FriendPicker({ value, onChange, size = 96 }: { value: Species; o
               on ? 'bg-accent-soft text-accent-deep shadow-[inset_0_0_0_3px_var(--accent-edge)]' : 'bg-surface text-ink shadow-[inset_0_0_0_1.5px_var(--color-ink-200)] hover:bg-ink-50'
             }`}
           >
-            <Smoczek species={s} color={NATURAL[s]} pose={on ? 'happy' : 'idle'} outfit={{}} size={size} followEyes={false} />
+            <Smoczek species={s} color={NATURAL[s]} pose={on ? 'happy' : 'idle'} outfit={[]} size={size} followEyes={false} />
             {FRIEND[s].name}
           </button>
         )
@@ -168,7 +168,7 @@ export function Setup() {
               <ChatBubble key={line.key} text={line.text} onRepeat={step === 'start' ? undefined : repeat} tail="bottom" />
             </AnimatePresence>
           </div>
-          <Smoczek key={`${friend}-${color}`} species={friend} color={color} pose={line.pose} beat={line.key} talking={talking && line.pose !== 'thinking'} outfit={{}} size="min(280px, 36vh)" />
+          <Smoczek key={`${friend}-${color}`} species={friend} color={color} pose={line.pose} beat={line.key} talking={talking && line.pose !== 'thinking'} outfit={[]} size="min(280px, 36vh)" />
         </div>
 
         <div className="flex min-h-[min(520px,62vh)] min-w-0 flex-1 flex-col">

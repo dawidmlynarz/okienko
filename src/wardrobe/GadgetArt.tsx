@@ -72,34 +72,47 @@ const pair = (draw: (cx: number) => ReactNode) => <>{FEET.map((cx) => <g key={cx
 /** Glasses bridge and arms, shared by most eyewear. */
 const frame = (color: string) => <path d="M114 92Q120 85 126 92M70 90L54 84M170 90L186 84" fill="none" stroke={color} strokeWidth="6" strokeLinecap="round" />
 
+/**
+ * Hats were drawn sitting on the very top of the dome and looked perched. This sits a hat lower and a touch
+ * wider, so the brim hugs the head at forehead height.
+ */
+const onHead = (node: ReactNode, dy = 8, s = 1.06) => <g transform={`translate(120 ${60 + dy}) scale(${s}) translate(-120 -60)`}>{node}</g>
+
+/** A shirt front with a round neckline (the old ones stopped in a hard flat edge). Body layer, clipped to the bean. */
+const NECK = 'M30 134Q120 154 210 134'
+const shirt = (color: string) => <path d={`${NECK}V262H30Z`} fill={color} />
+const neckline = <path d={NECK} fill="none" stroke={LINE} strokeWidth="4" />
+
 type Art = Partial<Record<Layer, ReactNode>>
 
 export const GADGET_ART: Record<string, Art> = {
   /* ── Czapki ─────────────────────────────────────────── */
   kokarda: { head: bow(146, 50, 1.25, '#EC8CAB', '#C0587E') },
   czapka: {
-    head: (
+    head: onHead(
       <g>
         <path d="M80 60C78 14 162 14 160 60Z" fill="#E8857C" {...ln} />
         <path d="M102 26v26M120 20v32M138 26v26" stroke="#F8C4BC" strokeWidth="5" strokeLinecap="round" />
         <rect x="72" y="50" width="96" height="18" rx="9" fill="#FFFDF5" {...ln} />
         <circle cx="120" cy="14" r="11" fill="#FFFDF5" {...ln} />
-      </g>
+      </g>,
+      8,
     ),
   },
   daszek: {
-    head: (
+    head: onHead(
       <g>
         <path d="M148 58Q186 54 200 64Q176 74 148 68Z" fill="#5A8FC9" {...ln} />
         <path d="M80 62C78 22 162 22 160 62Z" fill="#7DB9E8" {...ln} />
         <path d="M120 24V60M98 30Q104 46 102 60M142 30Q136 46 138 60" fill="none" stroke="#5A8FC9" strokeWidth="3" />
         <circle cx="120" cy="24" r="5" fill="#5A8FC9" {...ln} />
         <path d={star(120, 46, 8)} fill="#F6D58A" />
-      </g>
+      </g>,
+      8,
     ),
   },
   urodzinowa: {
-    head: (
+    head: onHead(
       <g transform="rotate(10 121 58)">
         <path d="M96 60L121 0L146 60Q121 68 96 60Z" fill="#BBAEEC" {...ln} />
         <circle cx="114" cy="44" r="4.5" fill="#F6D58A" />
@@ -107,7 +120,8 @@ export const GADGET_ART: Record<string, Art> = {
         <circle cx="124" cy="52" r="4" fill="#8ED3A6" />
         <circle cx="120" cy="22" r="3.5" fill="#F6D58A" />
         <circle cx="121" cy="0" r="8" fill="#F2A7C0" {...ln} />
-      </g>
+      </g>,
+      6,
     ),
   },
   wianek: {
@@ -125,17 +139,18 @@ export const GADGET_ART: Record<string, Art> = {
     ),
   },
   kowboj: {
-    head: (
+    head: onHead(
       <g>
         <path d="M90 56Q86 18 104 20Q120 30 136 20Q154 18 150 56Z" fill="#C98A5E" {...ln} />
         <path d="M90 46Q120 54 150 46" fill="none" stroke="#8A5A3B" strokeWidth="7" />
         <path d="M60 52Q66 64 120 66Q174 64 180 52Q184 66 170 70Q120 82 70 70Q56 66 60 52Z" fill="#B07A4E" {...ln} />
         <path d={star(138, 48, 5)} fill="#F6D58A" />
-      </g>
+      </g>,
+      8,
     ),
   },
   czarodziej: {
-    head: (
+    head: onHead(
       <g>
         <path d="M88 56Q102 28 108 -18Q130 6 154 54Z" fill="#6E72B8" {...ln} />
         <ellipse cx="120" cy="56" rx="58" ry="12" fill="#565A9E" {...ln} />
@@ -143,11 +158,12 @@ export const GADGET_ART: Record<string, Art> = {
         <path d={star(116, 18, 8)} fill="#F6D58A" />
         <path d={star(134, 34, 6)} fill="#F6D58A" />
         <path d={star(104, 36, 4.5)} fill="#FFFDF5" />
-      </g>
+      </g>,
+      8,
     ),
   },
   korona: {
-    head: (
+    head: onHead(
       <g>
         <path d="M84 62L78 24L102 42L120 12L138 42L162 24L156 62Z" fill="#F2C866" {...ln} />
         <path d="M86 54H154" stroke="#D9A441" strokeWidth="4" strokeLinecap="round" />
@@ -157,7 +173,8 @@ export const GADGET_ART: Record<string, Art> = {
         <circle cx="120" cy="44" r="6" fill="#E07A7A" {...ln} />
         <circle cx="100" cy="50" r="4.5" fill="#7DB9E8" />
         <circle cx="140" cy="50" r="4.5" fill="#7FC79A" />
-      </g>
+      </g>,
+      6,
     ),
   },
 
@@ -338,11 +355,12 @@ export const GADGET_ART: Record<string, Art> = {
   paski: {
     body: (
       <g>
-        <rect x="44" y="130" width="152" height="82" fill="#7DB9E8" />
-        {[146, 166, 186].map((y) => (
-          <rect key={y} x="44" y={y} width="152" height="9" fill="#FFFDF5" />
+        <path d={`${NECK}V212H30Z`} fill="#7DB9E8" />
+        {[156, 174, 192].map((y) => (
+          <rect key={y} x="30" y={y} width="180" height="9" fill="#FFFDF5" />
         ))}
-        <path d="M44 212H196" stroke={LINE} strokeWidth="4" />
+        <path d="M30 212H210" stroke={LINE} strokeWidth="4" />
+        {neckline}
       </g>
     ),
   },
@@ -369,15 +387,16 @@ export const GADGET_ART: Record<string, Art> = {
   sweter: {
     body: (
       <g>
-        <rect x="44" y="130" width="152" height="96" fill="#F2A7C0" />
-        <rect x="44" y="216" width="152" height="12" fill="#D9789B" />
-        <path d="M44 216H196" stroke={LINE} strokeWidth="3" />
+        <path d={`${NECK}V228H30Z`} fill="#F2A7C0" />
+        <path d="M30 134Q120 154 210 134" fill="none" stroke="#D9789B" strokeWidth="14" />
+        <rect x="30" y="216" width="180" height="12" fill="#D9789B" />
+        <path d="M30 216H210" stroke={LINE} strokeWidth="3" />
         <path d={heart(120, 190, 13)} fill="#FFFDF5" stroke={LINE} strokeWidth="3" />
+        {neckline}
       </g>
     ),
   },
   tutu: {
-    body: <rect x="44" y="130" width="152" height="80" fill="#F2A7C0" />,
     over: (
       <g>
         <path d="M48 206Q34 222 46 234Q64 228 76 240Q92 230 106 242Q120 230 134 242Q148 230 164 240Q176 228 194 234Q206 222 192 206Z" fill="#F8C8D8" {...ln} />
@@ -389,7 +408,8 @@ export const GADGET_ART: Record<string, Art> = {
   sukienka: {
     body: (
       <g>
-        <rect x="44" y="130" width="152" height="80" fill="#BBAEEC" />
+        <path d={`${NECK}V210H30Z`} fill="#BBAEEC" />
+        {neckline}
         <circle cx="100" cy="168" r="4" fill="#FFFDF5" />
         <circle cx="140" cy="168" r="4" fill="#FFFDF5" />
         <circle cx="120" cy="184" r="4" fill="#FFFDF5" />
@@ -428,14 +448,15 @@ export const GADGET_ART: Record<string, Art> = {
   frak: {
     body: (
       <g>
-        <rect x="44" y="130" width="152" height="120" fill="#3A3F5C" />
-        <path d="M100 136L120 214L140 136Z" fill="#FFFDF5" />
+        {shirt('#3A3F5C')}
+        <path d="M98 142L120 214L142 142Q120 148 98 142Z" fill="#FFFDF5" />
         <path d="M100 136L112 176L96 168ZM140 136L128 176L144 168Z" fill="#4A5075" />
         {[176, 192, 206].map((y) => (
           <circle key={y} cx="120" cy={y} r="2.6" fill="#3A3F5C" />
         ))}
         <circle cx="96" cy="200" r="3" fill="#F2C866" />
         <circle cx="144" cy="200" r="3" fill="#F2C866" />
+        {neckline}
       </g>
     ),
   },
@@ -570,7 +591,7 @@ export const GADGET_ART: Record<string, Art> = {
   },
   parasolka: {
     hand: (
-      <g>
+      <g transform="translate(63 200) scale(0.8) translate(-63 -200)">
         <path d={`M${HAND.x} ${HAND.y}L40 96`} stroke="#8A5A3B" strokeWidth="4" strokeLinecap="round" />
         <path d={`M${HAND.x} ${HAND.y}q6 10-2 12`} fill="none" stroke="#8A5A3B" strokeWidth="4" strokeLinecap="round" />
         <path d="M-4 104Q-2 58 40 54Q82 58 84 104Q74 94 62 104Q52 94 40 104Q28 94 18 104Q8 94 -4 104Z" fill="#BBAEEC" {...ln} />
@@ -617,14 +638,382 @@ export const GADGET_ART: Record<string, Art> = {
       </g>
     ),
   },
+  /* ── Nowe: dla dziewczynek i na wesoło ──────────────── */
+  spinki: {
+    head: (
+      <g>
+        <path d="M70 78L88 70" stroke="#C0587E" strokeWidth="4" strokeLinecap="round" />
+        <path d={heart(76, 78, 9)} fill="#EC8CAB" {...ln} strokeWidth="3" />
+        <path d="M84 64L102 58" stroke="#C0587E" strokeWidth="4" strokeLinecap="round" />
+        <path d={heart(92, 62, 8)} fill="#BBAEEC" {...ln} strokeWidth="3" />
+        <path d="M72 75q2-3 5-3M88 59q2-3 5-3" stroke="#fff" strokeWidth="2" strokeLinecap="round" fill="none" />
+      </g>
+    ),
+  },
+  kurczak: {
+    head: (
+      <g>
+        {band('M90 62Q120 72 150 62', '#C98A5E', 9)}
+        <path d="M94 58l6 8M106 61l4 8M134 61l-4 8M146 58l-6 8" stroke="#8A5A3B" strokeWidth="2.5" strokeLinecap="round" />
+        <path d="M120 58c-18 0-24-10-24-22 0-14 10-24 24-24s24 10 24 24c0 12-6 22-24 22z" fill="#F6D58A" {...ln} />
+        <path d="M118 12c-2-8 4-12 8-8-4 0-5 4-4 8" fill="#F6D58A" {...ln} strokeWidth="3" />
+        <path d="M100 38c-6 2-10 8-8 14 6 0 10-4 12-8" fill="#F2C866" {...ln} strokeWidth="3" />
+        <circle cx="112" cy="30" r="3" fill={LINE} />
+        <circle cx="128" cy="30" r="3" fill={LINE} />
+        <path d="M114 37h12l-6 7z" fill="#F0A35E" {...ln} strokeWidth="2.5" />
+        <circle cx="106" cy="38" r="3.5" fill="#F7B7C5" />
+        <circle cx="134" cy="38" r="3.5" fill="#F7B7C5" />
+      </g>
+    ),
+  },
+  jednorozec: {
+    head: (
+      <g>
+        {band('M74 74Q120 34 166 74', '#F2A7C0', 6)}
+        <path d="M108 56L121 2L134 56Q121 62 108 56Z" fill="#F6D58A" {...ln} />
+        <path d="M112 44L130 38M114 32L128 27M117 20L126 16" stroke="#D9A441" strokeWidth="3" strokeLinecap="round" />
+        {flower(98, 58, 5, '#BBAEEC', 'a')}
+        {flower(144, 58, 5, '#7DB9E8', 'b')}
+        {flower(86, 66, 4, '#FFFDF5', 'c')}
+        {flower(156, 66, 4, '#F2A7C0', 'd')}
+      </g>
+    ),
+  },
+  tiara: {
+    head: onHead(
+      <g>
+        <path d="M80 70Q120 52 160 70L156 58L142 62L136 44L128 56L120 30L112 56L104 44L98 62L84 58Z" fill="#E6E2F4" {...ln} />
+        <path d="M86 66Q120 52 154 66" fill="none" stroke="#C9C2E6" strokeWidth="3" />
+        <path d={heart(120, 46, 6)} fill="#EC8CAB" {...ln} strokeWidth="2.5" />
+        <circle cx="104" cy="54" r="3.5" fill="#7DB9E8" {...ln} strokeWidth="2" />
+        <circle cx="136" cy="54" r="3.5" fill="#7DB9E8" {...ln} strokeWidth="2" />
+        <path d={star(120, 22, 5)} fill="#F6D58A" />
+        <path d={star(150, 40, 3.5)} fill="#F6D58A" />
+      </g>,
+      4,
+      1.2,
+    ),
+  },
+  rzesy: {
+    head: (
+      <g fill="none" stroke={LINE} strokeWidth="3.2" strokeLinecap="round">
+        <path d="M85 91L78 85M89 89.5L86 82M83 95L75 92" />
+        <path d="M155 91L162 85M151 89.5L154 82M157 95L165 92" />
+      </g>
+    ),
+  },
+  kwiatki: {
+    head: (
+      <g>
+        {frame('#F2C866')}
+        {[92, 148].map((cx) => (
+          <g key={cx}>
+            {Array.from({ length: 10 }, (_, i) => {
+              const a = (Math.PI * 2 * i) / 10
+              return <ellipse key={i} cx={cx + Math.cos(a) * 23} cy={96 + Math.sin(a) * 23} rx="7" ry="5.5" transform={`rotate(${(a * 180) / Math.PI} ${cx + Math.cos(a) * 23} ${96 + Math.sin(a) * 23})`} fill="#FFFDF5" stroke={LINE} strokeWidth="2" />
+            })}
+            <circle cx={cx} cy="96" r="17" fill="#FCE9A8" fillOpacity=".35" stroke="#F2C866" strokeWidth="5" />
+          </g>
+        ))}
+      </g>
+    ),
+  },
+  kotki: {
+    head: (
+      <g>
+        {frame('#C0587E')}
+        {[0, 1].map((m) => (
+          <g key={m} transform={m ? 'translate(240 0) scale(-1 1)' : undefined}>
+            <path d="M66 80L78 88Q94 80 112 90Q114 112 92 113Q70 112 70 96Z" fill="#F2A7C0" fillOpacity=".4" stroke="#C0587E" strokeWidth="5" strokeLinejoin="round" />
+            <path d={star(64, 76, 5)} fill="#F6D58A" />
+          </g>
+        ))}
+      </g>
+    ),
+  },
+  wasy: {
+    head: (
+      <g>
+        <path d="M74 76Q92 66 108 76M132 76Q148 66 166 76" fill="none" stroke="#5B3A29" strokeWidth="8" strokeLinecap="round" />
+        {frame('#3A3F5C')}
+        <circle cx="92" cy="96" r="18" fill="#fff" fillOpacity=".2" stroke="#3A3F5C" strokeWidth="6" />
+        <circle cx="148" cy="96" r="18" fill="#fff" fillOpacity=".2" stroke="#3A3F5C" strokeWidth="6" />
+        <path d="M120 128Q108 120 94 126Q88 134 78 128Q84 142 104 138Q114 136 120 132Q126 136 136 138Q156 142 162 128Q152 134 146 126Q132 120 120 128Z" fill="#5B3A29" {...ln} strokeWidth="3" />
+        <ellipse cx="120" cy="114" rx="13" ry="11" fill="#F2A7C0" {...ln} />
+        <path d="M113 110q3-4 7-4" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" fill="none" />
+      </g>
+    ),
+  },
+  perelki: {
+    head: (
+      <g>
+        {Array.from({ length: 15 }, (_, i) => {
+          const t = i / 14
+          const x = (1 - t) ** 2 * 82 + 2 * (1 - t) * t * 120 + t ** 2 * 158
+          const y = (1 - t) ** 2 * 148 + 2 * (1 - t) * t * 190 + t ** 2 * 148
+          return <circle key={i} cx={x} cy={y} r={i === 7 ? 7 : 5} fill={i === 7 ? '#F8C8D8' : '#FFFDF5'} stroke={LINE} strokeWidth="2.2" />
+        })}
+        <circle cx="117.5" cy="166" r="1.8" fill="#fff" />
+      </g>
+    ),
+  },
+  kolnierzyk: {
+    head: (
+      <g>
+        {Array.from({ length: 9 }, (_, i) => {
+          const t = i / 8
+          const x = (1 - t) ** 2 * 66 + 2 * (1 - t) * t * 120 + t ** 2 * 174
+          const y = (1 - t) ** 2 * 142 + 2 * (1 - t) * t * 168 + t ** 2 * 142
+          return <circle key={i} cx={x} cy={y} r="11" fill="#FFFDF5" stroke={LINE} strokeWidth="3" />
+        })}
+        {bow(120, 156, 0.7, '#F2A7C0', '#D9789B')}
+      </g>
+    ),
+  },
+  boa: {
+    head: (
+      <g>
+        {(['outline', 'fill'] as const).map((pass) => (
+          <g key={pass}>
+            {[...Array.from({ length: 14 }, (_, i) => {
+              const t = i / 13
+              return [(1 - t) ** 2 * 54 + 2 * (1 - t) * t * 120 + t ** 2 * 186, (1 - t) ** 2 * 136 + 2 * (1 - t) * t * 196 + t ** 2 * 136]
+            }), [172, 160], [168, 176], [164, 192], [160, 208]].map(([x, y], i) => (
+              <circle key={i} cx={x} cy={y} r={pass === 'outline' ? 10.5 : 8} fill={pass === 'outline' ? LINE : i % 2 ? '#F8C8D8' : '#F2A7C0'} />
+            ))}
+          </g>
+        ))}
+      </g>
+    ),
+  },
+  sliniak: {
+    head: (
+      <g>
+        <path d="M84 146Q120 160 156 146Q164 204 120 206Q76 204 84 146Z" fill="#FFFDF5" {...ln} />
+        <path d="M90 156Q120 168 150 156Q154 196 120 198Q86 196 90 156Z" fill="none" stroke="#F2A7C0" strokeWidth="2.5" strokeDasharray="5 4" />
+        <ellipse cx="124" cy="188" rx="14" ry="9" fill="#F6D58A" {...ln} strokeWidth="2.5" />
+        <circle cx="112" cy="176" r="8" fill="#F6D58A" {...ln} strokeWidth="2.5" />
+        <path d="M104 176l-7 2 7 3z" fill="#F0A35E" stroke={LINE} strokeWidth="1.5" strokeLinejoin="round" />
+        <circle cx="111" cy="174" r="1.6" fill={LINE} />
+        <path d="M84 148L76 140M156 148L164 140" stroke="#F2A7C0" strokeWidth="4" strokeLinecap="round" />
+      </g>
+    ),
+  },
+  teczowa: {
+    body: (
+      <g>
+        {shirt('#E6E0FA')}
+        {['#E8857C', '#F6D58A', '#8ED3A6', '#7DB9E8'].map((c, i) => (
+          <path key={c} d={`M${96 + i * 6} 204a${24 - i * 6} ${24 - i * 6} 0 0 1 ${48 - i * 12} 0`} fill="none" stroke={c} strokeWidth="6" />
+        ))}
+        <circle cx="92" cy="204" r="7" fill="#FFFDF5" stroke={LINE} strokeWidth="2" />
+        <circle cx="100" cy="206" r="6" fill="#FFFDF5" stroke={LINE} strokeWidth="2" />
+        <circle cx="142" cy="206" r="6" fill="#FFFDF5" stroke={LINE} strokeWidth="2" />
+        <circle cx="149" cy="204" r="7" fill="#FFFDF5" stroke={LINE} strokeWidth="2" />
+        <path d="M30 230H210" stroke={LINE} strokeWidth="3" />
+        <path d="M30 230V262H210V230" fill="var(--body)" />
+        {neckline}
+      </g>
+    ),
+  },
+  fartuszek: {
+    over: (
+      <g>
+        <path d="M92 160Q120 118 148 160" fill="none" stroke="#F2A7C0" strokeWidth="4" />
+        <path d="M84 196H58M156 196H182" stroke="#F2A7C0" strokeWidth="4" strokeLinecap="round" />
+        <path d="M88 158H152L156 230H84Z" fill="#FFFDF5" {...ln} />
+        {[90, 101, 112, 123, 134, 145].map((x) => (
+          <circle key={x} cx={x + 5} cy="232" r="6" fill="#F8C8D8" stroke={LINE} strokeWidth="2.5" />
+        ))}
+        <path d="M84 230H156" stroke="#FFFDF5" strokeWidth="4" />
+        <path d="M108 198H132L128 216H112Z" fill="#F2A7C0" {...ln} strokeWidth="2.5" />
+        <path d="M106 199Q106 184 120 184Q134 184 134 199Z" fill="#FFFDF5" {...ln} strokeWidth="2.5" />
+        <circle cx="120" cy="181" r="4" fill="#E07A7A" {...ln} strokeWidth="2" />
+        <path d="M112 192h2M124 190h2M118 195h2" stroke="#7DB9E8" strokeWidth="2.5" strokeLinecap="round" />
+      </g>
+    ),
+  },
+  kolo: {
+    over: (
+      <g>
+        <ellipse cx="120" cy="204" rx="80" ry="20" fill="none" stroke={LINE} strokeWidth="30" />
+        <ellipse cx="120" cy="204" rx="80" ry="20" fill="none" stroke="#F6D58A" strokeWidth="22" />
+        <ellipse cx="120" cy="204" rx="80" ry="20" fill="none" stroke="#E8857C" strokeWidth="22" strokeDasharray="22 40" />
+        <circle cx="42" cy="180" r="15" fill="#F6D58A" {...ln} />
+        <path d="M28 180l-12 2 12 5z" fill="#F0A35E" {...ln} strokeWidth="2.5" />
+        <circle cx="38" cy="176" r="2.6" fill={LINE} />
+        <circle cx="44" cy="184" r="3" fill="#F7B7C5" />
+      </g>
+    ),
+  },
+  ksiezniczka: {
+    body: (
+      <g>
+        {shirt('#F8C8D8')}
+        <path d="M98 144Q120 160 142 144" fill="none" stroke="#FFFDF5" strokeWidth="5" />
+        <path d={star(120, 170, 6)} fill="#F6D58A" />
+        {neckline}
+      </g>
+    ),
+    over: (
+      <g>
+        <path d="M54 190H186Q214 236 214 250Q120 266 26 250Q26 236 54 190Z" fill="#F2A7C0" {...ln} />
+        <path d="M100 196Q92 226 84 256M140 196Q148 226 156 256" fill="none" stroke="#E58FB0" strokeWidth="3" />
+        <path d="M100 196H140Q150 228 156 256Q120 262 84 256Q90 228 100 196Z" fill="#FCE4EC" />
+        {[
+          [70, 230],
+          [170, 230],
+          [120, 222],
+          [104, 244],
+          [138, 244],
+        ].map(([x, y], i) => (
+          <path key={i} d={star(x, y, 4)} fill="#F6D58A" />
+        ))}
+        <rect x="52" y="184" width="136" height="12" rx="6" fill="#F6D58A" {...ln} />
+        <path d={heart(120, 190, 6)} fill="#EC8CAB" {...ln} strokeWidth="2" />
+      </g>
+    ),
+  },
+  skarpetki: {
+    feet: (
+      <g>
+        {[
+          [94, '#F2A7C0', '#FFFDF5'],
+          [146, '#7DB9E8', '#F6D58A'],
+        ].map(([x, c, d], k) => {
+          const cx = x as number
+          return (
+            <g key={k}>
+              <path d={`M${cx - 15} 242V206Q${cx - 15} 202 ${cx - 11} 202H${cx + 11}Q${cx + 15} 202 ${cx + 15} 206V234Q${cx + 23} 236 ${cx + 22} 244Q${cx} 250 ${cx - 20} 246Z`} fill={c as string} {...ln} />
+              {k === 0
+                ? [212, 222, 232].map((y) => <path key={y} d={`M${cx - 15} ${y}H${cx + 15}`} stroke={d as string} strokeWidth="4" />)
+                : [
+                    [cx - 6, 212],
+                    [cx + 6, 222],
+                    [cx - 4, 232],
+                    [cx + 12, 240],
+                  ].map(([px, py], i) => <circle key={i} cx={px} cy={py} r="3" fill={d as string} />)}
+              <rect x={cx - 17} y="200" width="34" height="8" rx="4" fill={c as string} {...ln} strokeWidth="3" />
+            </g>
+          )
+        })}
+      </g>
+    ),
+  },
+  pantofelki: {
+    feet: pair((x) => (
+      <g>
+        <path d={`M${x - 21} 240Q${x - 21} 226 ${x} 226Q${x + 22} 226 ${x + 23} 242Q${x} 250 ${x - 21} 244Z`} fill="#BBAEEC" {...ln} />
+        <path d={`M${x - 12} 230Q${x} 236 ${x + 12} 230`} fill="none" stroke={LINE} strokeWidth="3" />
+        <path d={heart(x + 2, 236, 4.5)} fill="#EC8CAB" />
+        {[
+          [-12, 240],
+          [12, 240],
+          [-4, 244],
+        ].map(([dx, y], i) => (
+          <circle key={i} cx={x + dx} cy={y} r="1.6" fill="#fff" />
+        ))}
+      </g>
+    )),
+  },
+  kozaczki: {
+    feet: pair((x) => (
+      <g>
+        <path d={`M${x - 15} 240V214H${x + 15}V234Q${x + 23} 236 ${x + 23} 244H${x - 21}Q${x - 22} 240 ${x - 15} 240Z`} fill="#E8B4A0" {...ln} />
+        {[-12, -4, 4, 12].map((dx) => (
+          <circle key={`o${dx}`} cx={x + dx} cy="212" r="7.5" fill={LINE} />
+        ))}
+        {[-12, -4, 4, 12].map((dx) => (
+          <circle key={dx} cx={x + dx} cy="212" r="5.5" fill="#FFFDF5" />
+        ))}
+        <circle cx={x + 2} cy="228" r="3" fill="#F2A7C0" />
+      </g>
+    )),
+  },
+  klaun: {
+    feet: (
+      <g>
+        {[
+          [80, -1],
+          [160, 1],
+        ].map(([cx, dir]) => (
+          <g key={cx}>
+            <path d={`M${cx - 30} 244Q${cx - 30} 226 ${cx} 226Q${cx + 30} 226 ${cx + 30} 244Q${cx} 254 ${cx - 30} 244Z`} fill="#E8857C" {...ln} />
+            <circle cx={cx + dir * 20} cy="236" r="7" fill="#F2C866" {...ln} strokeWidth="2.5" />
+            <path d={`M${cx - 8 - dir * 8} 230l8 6 8-6`} fill="none" stroke="#7DB9E8" strokeWidth="3" strokeLinecap="round" />
+          </g>
+        ))}
+      </g>
+    ),
+  },
+  lizak: {
+    hand: (
+      <g>
+        <path d={`M${HAND.x} ${HAND.y}L50 128`} stroke={LINE} strokeWidth="9" strokeLinecap="round" />
+        <path d={`M${HAND.x} ${HAND.y}L50 128`} stroke="#FFFDF5" strokeWidth="4" strokeLinecap="round" />
+        <circle cx="48" cy="108" r="24" fill="#F2A7C0" {...ln} />
+        <path d="M48 108m0-2a3 3 0 1 1-3 4a7 7 0 1 1 10-6a11 11 0 1 1-17-2a15 15 0 1 1 22 16" fill="none" stroke="#FFFDF5" strokeWidth="4" strokeLinecap="round" />
+        {bow(54, 132, 0.45, '#BBAEEC', '#9686D6')}
+      </g>
+    ),
+  },
+  lody: {
+    hand: (
+      <g>
+        <path d={`M48 170H78L${HAND.x} ${HAND.y + 6}Z`} fill="#E3B27A" {...ln} />
+        <path d="M54 178l18 10M70 176l-14 14" stroke="#C98A5E" strokeWidth="2.5" />
+        <circle cx="54" cy="162" r="12" fill="#F2A7C0" {...ln} />
+        <circle cx="72" cy="162" r="12" fill="#8ED3A6" {...ln} />
+        <circle cx="63" cy="146" r="12" fill="#FFF3D6" {...ln} />
+        <circle cx="64" cy="132" r="5" fill="#E07A7A" {...ln} strokeWidth="2.5" />
+        <path d="M58 150h2M66 154h2M62 142h2" stroke="#7DB9E8" strokeWidth="2.5" strokeLinecap="round" />
+      </g>
+    ),
+  },
+  banki: {
+    hand: (
+      <g>
+        <path d={`M${HAND.x} ${HAND.y}L54 150`} stroke="#BBAEEC" strokeWidth="5" strokeLinecap="round" />
+        <circle cx="50" cy="140" r="11" fill="none" stroke="#BBAEEC" strokeWidth="5" />
+        {[
+          [28, 108, 13],
+          [60, 98, 8],
+          [20, 74, 7],
+          [48, 66, 10],
+        ].map(([x, y, r], i) => (
+          <g key={i}>
+            <circle cx={x} cy={y} r={r} fill="#BFE3F6" fillOpacity=".35" stroke="#7DB9E8" strokeWidth="2.5" />
+            <path d={`M${x - r * 0.5} ${y - r * 0.2}q${r * 0.1}-${r * 0.4} ${r * 0.5}-${r * 0.5}`} stroke="#fff" strokeWidth="2.5" strokeLinecap="round" fill="none" />
+          </g>
+        ))}
+      </g>
+    ),
+  },
+  mis: {
+    over: (
+      <g>
+        <circle cx="104" cy="164" r="8" fill="#C98A5E" {...ln} strokeWidth="3" />
+        <circle cx="136" cy="164" r="8" fill="#C98A5E" {...ln} strokeWidth="3" />
+        <ellipse cx="120" cy="212" rx="22" ry="20" fill="#C98A5E" {...ln} strokeWidth="3" />
+        <ellipse cx="120" cy="214" rx="12" ry="11" fill="#F2D7B6" />
+        <circle cx="120" cy="180" r="19" fill="#C98A5E" {...ln} strokeWidth="3" />
+        <ellipse cx="120" cy="186" rx="8" ry="6" fill="#F2D7B6" />
+        <ellipse cx="120" cy="183" rx="3" ry="2.2" fill={LINE} />
+        <circle cx="113" cy="176" r="2.2" fill={LINE} />
+        <circle cx="127" cy="176" r="2.2" fill={LINE} />
+        <circle cx="104" cy="164" r="3.5" fill="#F2D7B6" />
+        <circle cx="136" cy="164" r="3.5" fill="#F2D7B6" />
+        {bow(120, 197, 0.5, '#E07A7A', '#C25B5B')}
+      </g>
+    ),
+  },
+
 }
 
 /** Everything worn on one layer, for Smoczek to draw. Clothes on the body are clipped to its shape. */
 export function OutfitLayer({ outfit, layer, clipId }: { outfit?: Outfit; layer: Layer; clipId?: string }) {
-  if (!outfit) return null
-  const parts = Object.values(outfit)
-    .map((id) => (id ? [id, GADGET_ART[id]?.[layer]] : null))
-    .filter((p): p is [string, ReactNode] => !!p && !!p[1])
+  if (!outfit?.length) return null
+  const parts = outfit.map((id) => [id, GADGET_ART[id]?.[layer]] as [string, ReactNode]).filter((p) => !!p[1])
   if (!parts.length) return null
   if (layer === 'body' && clipId) {
     return (
@@ -687,7 +1076,7 @@ export function GadgetPicture({ id, size = 96 }: { id: string; size?: number | s
         {ghost && g.slot === 'feet' && FEET.map((x) => <ellipse key={x} cx={x} cy="240" rx="18" ry="10" fill="#EEF0F6" />)}
         {ghost && g.slot === 'body' && <path d={BEAN} fill="#EEF0F6" />}
         {LAYER_ORDER.map((layer) =>
-          art[layer] ? <OutfitLayer key={layer} outfit={{ [g.slot]: id }} layer={layer} clipId={layer === 'body' ? clip : undefined} /> : null,
+          art[layer] ? <OutfitLayer key={layer} outfit={[id]} layer={layer} clipId={layer === 'body' ? clip : undefined} /> : null,
         )}
       </g>
     </svg>

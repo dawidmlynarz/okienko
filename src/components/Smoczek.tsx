@@ -1,10 +1,10 @@
-import { useEffect, useId, useRef, type CSSProperties, type ReactNode } from 'react'
+import { useEffect, useId, useMemo, useRef, type CSSProperties, type ReactNode } from 'react'
 import { duration, mouthPath, SHAPES, shapeAt, timeline, wordAt, type Key } from '../companion/lipsync'
 import { onSpeech } from '../lib/speak'
 import { FRIEND, type Species } from '../companion/species'
 import { useDomek, type CompanionColor } from '../store/useDomek'
 import { BEAN, BodyClip, OutfitLayer } from '../wardrobe/GadgetArt'
-import type { Outfit } from '../wardrobe/items'
+import { wornList, type Outfit } from '../wardrobe/items'
 
 /* Eyes that follow the pointer. One window listener feeds every Smoczek on screen. */
 const watchers = new Set<() => void>()
@@ -365,7 +365,8 @@ export function Smoczek({ pose = 'idle', color = 'mint', talking = false, size =
   const picked = useDomek((s) => s.profile?.companion)
   const kind: Species = species ?? picked ?? 'smok'
   const part = PARTS[kind]
-  const wearing = outfit ?? worn
+  const saved = useMemo(() => wornList(worn), [worn])
+  const wearing = outfit ?? saved
   const clipId = `smok-body-${useId().replace(/:/g, '')}`
   const ref = useRef<SVGSVGElement>(null)
   // Thinking looks up and away on purpose, so the eyes stop following then.
