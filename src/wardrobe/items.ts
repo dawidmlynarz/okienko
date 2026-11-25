@@ -3,13 +3,14 @@
  *
  * Every finished round pays 1 to 3 stars, about 10 stars for a 20-minute session.
  * Prices are set so the first gadget comes after one or two rounds, a few more after
- * a session, and the crown takes about a week of play. Six shelves of twelve.
+ * a session, and the crown takes about a week of play. Five shelves of twelve to wear,
+ * one of things to hold in the paw, one of things on the back.
  *
  * She can wear as many things as she likes, from any shelf. Only things that sit in the
  * same spot push each other off: two hats, two pairs of glasses, a dress and a skirt.
  */
 
-export type Slot = 'head' | 'eyes' | 'neck' | 'body' | 'feet' | 'extra'
+export type Slot = 'head' | 'eyes' | 'neck' | 'body' | 'feet' | 'hand' | 'back'
 
 export interface Gadget {
   id: string
@@ -23,11 +24,11 @@ export interface Gadget {
   z?: number
 }
 
-export const SLOTS: Slot[] = ['head', 'eyes', 'neck', 'body', 'feet', 'extra']
+export const SLOTS: Slot[] = ['head', 'eyes', 'neck', 'body', 'feet', 'hand', 'back']
 
 const g = (id: string, name: string, slot: Slot, price: number, spots: string[] = [slot], z = 0): Gadget => ({ id, name, slot, price, spots, z })
 
-/** Twelve per shelf, cheapest first. */
+/** Cheapest first on every shelf. */
 export const GADGETS: Gadget[] = [
   g('kokarda', 'Kokarda', 'head', 3, ['bow']),
   g('spinki', 'Spinki z serduszkami', 'head', 4, ['clips']),
@@ -75,7 +76,7 @@ export const GADGETS: Gadget[] = [
   g('fartuszek', 'Fartuszek z babeczką', 'body', 8, ['apron'], 3),
   g('sweter', 'Sweterek z serduszkiem', 'body', 8, ['top']),
   g('tutu', 'Spódniczka baletnicy', 'body', 9, ['skirt'], 1),
-  g('kolo', 'Koło z kaczuszką', 'body', 9, ['ring'], 4),
+  g('kolo', 'Koło z kaczuszką', 'body', 9, ['ring', 'apron'], 4),
   g('sukienka', 'Sukienka', 'body', 10, ['top', 'skirt']),
   g('ogrodniczki', 'Ogrodniczki', 'body', 11, ['top', 'skirt', 'vest']),
   g('frak', 'Frak', 'body', 14, ['top', 'skirt', 'vest', 'apron']),
@@ -94,18 +95,25 @@ export const GADGETS: Gadget[] = [
   g('klaun', 'Buty klauna', 'feet', 11),
   g('wrotki', 'Wrotki', 'feet', 12),
 
-  g('balonik', 'Balonik', 'extra', 4, ['hand']),
-  g('kokardka', 'Kokardka na ogon', 'extra', 5, ['tail']),
-  g('lizak', 'Lizak', 'extra', 5, ['hand']),
-  g('plecak', 'Plecak', 'extra', 6, ['back']),
-  g('lody', 'Lody', 'extra', 6, ['hand']),
-  g('torebka', 'Torebka', 'extra', 7, ['hand']),
-  g('banki', 'Bańki mydlane', 'extra', 8, ['hand']),
-  g('parasolka', 'Parasolka', 'extra', 8, ['hand']),
-  g('mis', 'Pluszowy miś', 'extra', 9, ['hug'], 5),
-  g('rozdzka', 'Różdżka', 'extra', 10, ['hand']),
-  g('skrzydla', 'Skrzydła motyla', 'extra', 12, ['back']),
-  g('peleryna', 'Peleryna bohatera', 'extra', 14, ['back']),
+  // One paw, so one thing at a time.
+  g('balonik', 'Balonik', 'hand', 4),
+  g('lizak', 'Lizak', 'hand', 5),
+  g('lody', 'Lody', 'hand', 6),
+  g('torebka', 'Torebka', 'hand', 7),
+  g('banki', 'Bańki mydlane', 'hand', 8),
+  g('parasolka', 'Parasolka', 'hand', 8),
+  g('mis', 'Pluszowy miś', 'hand', 9),
+  g('rozdzka', 'Różdżka', 'hand', 10),
+
+  // On the back. The tail bow goes with anything; wings, capes and bags take the whole back.
+  g('kokardka', 'Kokardka na ogon', 'back', 4, ['tail']),
+  g('plecak', 'Plecak', 'back', 6),
+  g('kotek', 'Plecak kotek', 'back', 7),
+  g('zolw', 'Skorupa żółwia', 'back', 9),
+  g('skrzydla', 'Skrzydła motyla', 'back', 10),
+  g('wrozka', 'Skrzydła wróżki', 'back', 12),
+  g('rakieta', 'Plecak rakieta', 'back', 13),
+  g('peleryna', 'Peleryna bohatera', 'back', 14),
 ]
 
 export const gadgetById = (id: string | null | undefined) => GADGETS.find((g) => g.id === id) ?? null

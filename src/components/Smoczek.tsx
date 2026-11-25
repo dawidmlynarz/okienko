@@ -4,7 +4,7 @@ import { onSpeech } from '../lib/speak'
 import { FRIEND, type Species } from '../companion/species'
 import { useDomek, type CompanionColor } from '../store/useDomek'
 import { BEAN, BodyClip, OutfitLayer } from '../wardrobe/GadgetArt'
-import { wornList, type Outfit } from '../wardrobe/items'
+import { gadgetById, wornList, type Outfit } from '../wardrobe/items'
 
 /* Eyes that follow the pointer. One window listener feeds every Smoczek on screen. */
 const watchers = new Set<() => void>()
@@ -367,6 +367,7 @@ export function Smoczek({ pose = 'idle', color = 'mint', talking = false, size =
   const part = PARTS[kind]
   const saved = useMemo(() => wornList(worn), [worn])
   const wearing = outfit ?? saved
+  const holding = wearing.some((id) => gadgetById(id)?.slot === 'hand')
   const clipId = `smok-body-${useId().replace(/:/g, '')}`
   const ref = useRef<SVGSVGElement>(null)
   // Thinking looks up and away on purpose, so the eyes stop following then.
@@ -404,9 +405,10 @@ export function Smoczek({ pose = 'idle', color = 'mint', talking = false, size =
           <path className="ln" d={BEAN} fill="var(--body)" />
           <ellipse cx="120" cy="184" rx="40" ry="44" fill="var(--belly)" />
           {part.front}
+          {/* Shoes go under the clothes: a skirt or a gown falls over them, they peek out below the hem. */}
+          <OutfitLayer outfit={wearing} layer="feet" />
           <OutfitLayer outfit={wearing} layer="body" clipId={clipId} />
           <OutfitLayer outfit={wearing} layer="over" />
-          <OutfitLayer outfit={wearing} layer="feet" />
         </g>
         <g className="head">
           <g className="cheeks">
@@ -455,6 +457,8 @@ export function Smoczek({ pose = 'idle', color = 'mint', talking = false, size =
           <rect className="ln" x="26" y="150" width="32" height="18" rx="9" fill="var(--body)" transform="rotate(-28 54 159)" />
           <g transform="translate(-29 -30)">
             <OutfitLayer outfit={wearing} layer="hand" />
+            {/* The paw closes over whatever it holds: the arm's round tip drawn again on top of the handle. */}
+            {holding && <circle className="ln" cx="66.2" cy="197.9" r="9" fill="var(--body)" />}
           </g>
         </g>
         <g className="armR">

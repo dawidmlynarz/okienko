@@ -227,9 +227,39 @@ function TodayCard() {
   )
 }
 
-/** Smoczek's wardrobe: what he wears now, and the next gadget she is saving up for. */
+/**
+ * A peek into the wardrobe: four things from the shelves, laid out like a shop window.
+ * The friend is already big on the hero card, so this tile shows what can be bought instead.
+ */
+const WINDOW: [id: string, x: string, y: string, size: string, tilt: number][] = [
+  ['korona', '6%', '4%', '52%', -8],
+  ['serduszka', '52%', '10%', '44%', 8],
+  ['lody', '10%', '54%', '40%', 6],
+  ['skrzydla', '50%', '54%', '46%', -6],
+]
+
+function ShopWindow() {
+  return (
+    <span className="relative block size-[min(150px,21vh)] rounded-[28px] bg-white/70 shadow-[inset_0_0_0_2px_rgb(255_255_255/0.9)]">
+      {WINDOW.map(([id, x, y, size, tilt], i) => (
+        <motion.span
+          key={id}
+          className="absolute grid place-items-center"
+          style={{ left: x, top: y, width: size, height: size }}
+          initial={{ rotate: tilt, y: 0 }}
+          animate={{ rotate: tilt, y: [0, -4, 0] }}
+          transition={{ duration: 2.6 + i * 0.4, repeat: Infinity, ease: 'easeInOut', delay: i * 0.3 }}
+        >
+          <GadgetPicture id={id} size="100%" />
+        </motion.span>
+      ))}
+    </span>
+  )
+}
+
+/** Smoczek's wardrobe: a shop window, and the next gadget she is saving up for. */
 function WardrobeCard() {
-  const { profile, progress, wardrobe, launch } = useDomek()
+  const { progress, wardrobe, launch } = useDomek()
   const wallet = balanceOf(progress)
   const canBuy = GADGETS.some((g) => !wardrobe.owned.includes(g.id) && g.price <= wallet)
   const goal = nextGoal(wardrobe)
@@ -240,8 +270,8 @@ function WardrobeCard() {
   return (
     <motion.section {...rise(0.1)} data-app="shop" className="tile relative flex flex-1 items-center gap-4 overflow-hidden rounded-[32px] p-5">
       <ParentHint text={pl.parentHint.wardrobe} className="absolute top-4 right-4 z-10" />
-      <button type="button" onClick={open} aria-label={pl.apps.wardrobe} className="shrink-0 cursor-pointer rounded-full">
-        <Smoczek pose={canBuy ? 'happy' : 'idle'} color={profile?.companionColor} size="min(150px, 21vh)" followEyes={false} />
+      <button type="button" onClick={open} aria-label={pl.apps.wardrobe} className="shrink-0 cursor-pointer rounded-[28px]">
+        <ShopWindow />
       </button>
       <div className="flex min-w-0 flex-1 flex-col gap-3">
         <p className="font-display text-[min(30px,3.8vh)] leading-tight font-extrabold text-accent-deep">{pl.apps.wardrobe}</p>

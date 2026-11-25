@@ -83,6 +83,19 @@ const NECK = 'M30 134Q120 154 210 134'
 const shirt = (color: string) => <path d={`${NECK}V262H30Z`} fill={color} />
 const neckline = <path d={NECK} fill="none" stroke={LINE} strokeWidth="4" />
 
+/**
+ * Hems and waistbands bow downward a little, the way cloth wraps a round tummy.
+ * Straight edges made clothes look like stickers laid on top.
+ */
+const curve = (y: number, x0 = 46, x1 = 194) => `M${x0} ${y}Q120 ${y + 14} ${x1} ${y}`
+/** A top from the neckline down to a curved hem. */
+const top = (color: string, hemY: number) => <path d={`${NECK}V${hemY}Q120 ${hemY + 14} 30 ${hemY}Z`} fill={color} />
+const hem = (y: number) => <path d={curve(y, 30, 210)} fill="none" stroke={LINE} strokeWidth="4" />
+const waist = (y: number, color: string) => band(curve(y, 48, 192), color, 9)
+/** A skirt from a curved waist out to a wider, curved hem. */
+const skirt = (y: number, hemY: number, flare: number) =>
+  `M50 ${y}Q120 ${y + 14} 190 ${y}L${240 - flare} ${hemY}Q120 ${hemY + 18} ${flare} ${hemY}Z`
+
 type Art = Partial<Record<Layer, ReactNode>>
 
 export const GADGET_ART: Record<string, Art> = {
@@ -355,11 +368,11 @@ export const GADGET_ART: Record<string, Art> = {
   paski: {
     body: (
       <g>
-        <path d={`${NECK}V212H30Z`} fill="#7DB9E8" />
-        {[156, 174, 192].map((y) => (
-          <rect key={y} x="30" y={y} width="180" height="9" fill="#FFFDF5" />
+        {top('#7DB9E8', 214)}
+        {[158, 176, 194].map((y) => (
+          <path key={y} d={curve(y, 30, 210)} fill="none" stroke="#FFFDF5" strokeWidth="8" />
         ))}
-        <path d="M30 212H210" stroke={LINE} strokeWidth="4" />
+        {hem(214)}
         {neckline}
       </g>
     ),
@@ -367,31 +380,33 @@ export const GADGET_ART: Record<string, Art> = {
   kamizelka: {
     body: (
       <g>
-        <path d="M44 126H104L112 220Q80 228 44 214Z" fill="#C98A5E" stroke={LINE} strokeWidth="4" />
-        <path d="M196 126H136L128 220Q160 228 196 214Z" fill="#C98A5E" stroke={LINE} strokeWidth="4" />
-        <circle cx="102" cy="176" r="3.5" fill="#8A5A3B" />
-        <circle cx="104" cy="196" r="3.5" fill="#8A5A3B" />
-        <path d="M76 190h14" stroke="#8A5A3B" strokeWidth="3" strokeLinecap="round" />
+        <path d="M30 128H102L110 220Q70 226 30 212Z" fill="#C98A5E" stroke={LINE} strokeWidth="4" strokeLinejoin="round" />
+        <path d="M210 128H138L130 220Q170 226 210 212Z" fill="#C98A5E" stroke={LINE} strokeWidth="4" strokeLinejoin="round" />
+        <path d="M100 136L106 214M140 136L134 214" stroke="#E3A87C" strokeWidth="3" strokeLinecap="round" />
+        <circle cx="98" cy="176" r="3.5" fill="#8A5A3B" />
+        <circle cx="100" cy="196" r="3.5" fill="#8A5A3B" />
+        <path d="M70 192q8 3 16 0" fill="none" stroke="#8A5A3B" strokeWidth="3" strokeLinecap="round" />
+        <path d="M154 192q8 3 16 0" fill="none" stroke="#8A5A3B" strokeWidth="3" strokeLinecap="round" />
       </g>
     ),
   },
   spodniczka: {
     over: (
       <g>
-        <path d="M50 198H190L202 238Q120 254 38 238Z" fill="#F2A7C0" {...ln} />
-        <path d="M86 204L74 246M120 204V250M154 204L166 246" stroke="#D9789B" strokeWidth="3" />
-        <rect x="48" y="192" width="144" height="12" rx="6" fill="#D9789B" {...ln} />
+        <path d={skirt(198, 240, 38)} fill="#F2A7C0" {...ln} />
+        <path d="M88 208L78 246M120 210V252M152 208L162 246" stroke="#D9789B" strokeWidth="3" strokeLinecap="round" />
+        {waist(196, '#D9789B')}
       </g>
     ),
   },
   sweter: {
     body: (
       <g>
-        <path d={`${NECK}V228H30Z`} fill="#F2A7C0" />
-        <path d="M30 134Q120 154 210 134" fill="none" stroke="#D9789B" strokeWidth="14" />
-        <rect x="30" y="216" width="180" height="12" fill="#D9789B" />
-        <path d="M30 216H210" stroke={LINE} strokeWidth="3" />
-        <path d={heart(120, 190, 13)} fill="#FFFDF5" stroke={LINE} strokeWidth="3" />
+        {top('#F2A7C0', 220)}
+        <path d={NECK} fill="none" stroke="#D9789B" strokeWidth="14" />
+        <path d={curve(214, 30, 210)} fill="none" stroke="#D9789B" strokeWidth="12" />
+        <path d={heart(120, 186, 13)} fill="#FFFDF5" stroke={LINE} strokeWidth="3" />
+        {hem(220)}
         {neckline}
       </g>
     ),
@@ -399,47 +414,55 @@ export const GADGET_ART: Record<string, Art> = {
   tutu: {
     over: (
       <g>
-        <path d="M48 206Q34 222 46 234Q64 228 76 240Q92 230 106 242Q120 230 134 242Q148 230 164 240Q176 228 194 234Q206 222 192 206Z" fill="#F8C8D8" {...ln} />
-        <path d="M58 204Q52 218 64 224Q82 218 96 228Q120 218 144 228Q158 218 176 224Q188 218 182 204Z" fill="#FCE4EC" stroke={LINE} strokeWidth="2.5" />
-        <rect x="48" y="198" width="144" height="10" rx="5" fill="#D9789B" {...ln} />
+        <path d="M46 206Q32 222 44 236Q62 230 76 242Q92 232 106 244Q120 232 134 244Q148 232 164 242Q178 230 196 236Q208 222 194 206Q120 222 46 206Z" fill="#F8C8D8" {...ln} />
+        <path d="M58 208Q52 222 64 228Q82 222 96 232Q120 222 144 232Q158 222 176 228Q188 222 182 208Q120 222 58 208Z" fill="#FCE4EC" stroke={LINE} strokeWidth="2.5" strokeLinejoin="round" />
+        {waist(200, '#D9789B')}
       </g>
     ),
   },
   sukienka: {
     body: (
       <g>
-        <path d={`${NECK}V210H30Z`} fill="#BBAEEC" />
+        {top('#BBAEEC', 214)}
         {neckline}
-        <circle cx="100" cy="168" r="4" fill="#FFFDF5" />
-        <circle cx="140" cy="168" r="4" fill="#FFFDF5" />
-        <circle cx="120" cy="184" r="4" fill="#FFFDF5" />
+        {[
+          [100, 168],
+          [140, 168],
+          [120, 184],
+          [80, 186],
+          [160, 186],
+        ].map(([x, y], i) => (
+          <circle key={i} cx={x} cy={y} r="4" fill="#FFFDF5" />
+        ))}
       </g>
     ),
     over: (
       <g>
-        <path d="M50 196H190L204 240Q120 256 36 240Z" fill="#BBAEEC" {...ln} />
+        <path d={skirt(194, 242, 36)} fill="#BBAEEC" {...ln} />
         {[
           [84, 228],
-          [108, 216],
-          [132, 230],
-          [156, 218],
-          [120, 240],
+          [108, 218],
+          [132, 232],
+          [156, 220],
+          [120, 244],
         ].map(([x, y], i) => (
           <circle key={i} cx={x} cy={y} r="4" fill="#FFFDF5" />
         ))}
-        <rect x="48" y="190" width="144" height="12" rx="6" fill="#F6D58A" {...ln} />
-        {bow(150, 198, 0.6, '#F6D58A', '#D9A441')}
+        {waist(192, '#F6D58A')}
+        {bow(150, 202, 0.6, '#F6D58A', '#D9A441')}
       </g>
     ),
   },
   ogrodniczki: {
     body: (
       <g>
-        <rect x="44" y="198" width="152" height="50" fill="#6F8FCF" />
-        <rect x="96" y="150" width="48" height="52" rx="6" fill="#6F8FCF" stroke={LINE} strokeWidth="3" />
-        <path d="M100 152L84 128M140 152L156 128" stroke="#6F8FCF" strokeWidth="10" />
-        <path d="M44 198H96M144 198H196" stroke={LINE} strokeWidth="3" />
-        <rect x="108" y="166" width="24" height="18" rx="4" fill="none" stroke="#B5CBEE" strokeWidth="2.5" />
+        <path d={`M30 198Q120 212 210 198V262H30Z`} fill="#6F8FCF" />
+        <path d={curve(198, 30, 96)} fill="none" stroke={LINE} strokeWidth="3" />
+        <path d="M144 205Q178 202 210 198" fill="none" stroke={LINE} strokeWidth="3" />
+        <path d="M120 212V250" stroke="#5878BC" strokeWidth="3" />
+        <rect x="96" y="150" width="48" height="58" rx="8" fill="#6F8FCF" stroke={LINE} strokeWidth="3" />
+        <path d="M100 152L82 128M140 152L158 128" stroke="#6F8FCF" strokeWidth="10" strokeLinecap="round" />
+        <rect x="108" y="166" width="24" height="18" rx="4" fill="none" stroke="#B5CBEE" strokeWidth="2.5" strokeDasharray="4 3" />
         <circle cx="102" cy="158" r="4" fill="#F6D58A" stroke={LINE} strokeWidth="2" />
         <circle cx="138" cy="158" r="4" fill="#F6D58A" stroke={LINE} strokeWidth="2" />
       </g>
@@ -802,16 +825,15 @@ export const GADGET_ART: Record<string, Art> = {
   teczowa: {
     body: (
       <g>
-        {shirt('#E6E0FA')}
+        {top('#E6E0FA', 222)}
         {['#E8857C', '#F6D58A', '#8ED3A6', '#7DB9E8'].map((c, i) => (
-          <path key={c} d={`M${96 + i * 6} 204a${24 - i * 6} ${24 - i * 6} 0 0 1 ${48 - i * 12} 0`} fill="none" stroke={c} strokeWidth="6" />
+          <path key={c} d={`M${96 + i * 6} 202a${24 - i * 6} ${24 - i * 6} 0 0 1 ${48 - i * 12} 0`} fill="none" stroke={c} strokeWidth="6" />
         ))}
-        <circle cx="92" cy="204" r="7" fill="#FFFDF5" stroke={LINE} strokeWidth="2" />
-        <circle cx="100" cy="206" r="6" fill="#FFFDF5" stroke={LINE} strokeWidth="2" />
-        <circle cx="142" cy="206" r="6" fill="#FFFDF5" stroke={LINE} strokeWidth="2" />
-        <circle cx="149" cy="204" r="7" fill="#FFFDF5" stroke={LINE} strokeWidth="2" />
-        <path d="M30 230H210" stroke={LINE} strokeWidth="3" />
-        <path d="M30 230V262H210V230" fill="var(--body)" />
+        <circle cx="92" cy="202" r="7" fill="#FFFDF5" stroke={LINE} strokeWidth="2" />
+        <circle cx="100" cy="204" r="6" fill="#FFFDF5" stroke={LINE} strokeWidth="2" />
+        <circle cx="142" cy="204" r="6" fill="#FFFDF5" stroke={LINE} strokeWidth="2" />
+        <circle cx="149" cy="202" r="7" fill="#FFFDF5" stroke={LINE} strokeWidth="2" />
+        {hem(222)}
         {neckline}
       </g>
     ),
@@ -857,7 +879,7 @@ export const GADGET_ART: Record<string, Art> = {
     ),
     over: (
       <g>
-        <path d="M54 190H186Q214 236 214 250Q120 266 26 250Q26 236 54 190Z" fill="#F2A7C0" {...ln} />
+        <path d="M54 188Q120 202 186 188Q214 236 214 250Q120 268 26 250Q26 236 54 188Z" fill="#F2A7C0" {...ln} />
         <path d="M100 196Q92 226 84 256M140 196Q148 226 156 256" fill="none" stroke="#E58FB0" strokeWidth="3" />
         <path d="M100 196H140Q150 228 156 256Q120 262 84 256Q90 228 100 196Z" fill="#FCE4EC" />
         {[
@@ -869,8 +891,8 @@ export const GADGET_ART: Record<string, Art> = {
         ].map(([x, y], i) => (
           <path key={i} d={star(x, y, 4)} fill="#F6D58A" />
         ))}
-        <rect x="52" y="184" width="136" height="12" rx="6" fill="#F6D58A" {...ln} />
-        <path d={heart(120, 190, 6)} fill="#EC8CAB" {...ln} strokeWidth="2" />
+        {waist(184, '#F6D58A')}
+        <path d={heart(120, 192, 6)} fill="#EC8CAB" {...ln} strokeWidth="2" />
       </g>
     ),
   },
@@ -990,24 +1012,106 @@ export const GADGET_ART: Record<string, Art> = {
     ),
   },
   mis: {
-    over: (
+    // A teddy dangling from the paw by one arm, the way a child carries one.
+    hand: (
       <g>
-        <circle cx="104" cy="164" r="8" fill="#C98A5E" {...ln} strokeWidth="3" />
-        <circle cx="136" cy="164" r="8" fill="#C98A5E" {...ln} strokeWidth="3" />
-        <ellipse cx="120" cy="212" rx="22" ry="20" fill="#C98A5E" {...ln} strokeWidth="3" />
-        <ellipse cx="120" cy="214" rx="12" ry="11" fill="#F2D7B6" />
-        <circle cx="120" cy="180" r="19" fill="#C98A5E" {...ln} strokeWidth="3" />
-        <ellipse cx="120" cy="186" rx="8" ry="6" fill="#F2D7B6" />
-        <ellipse cx="120" cy="183" rx="3" ry="2.2" fill={LINE} />
-        <circle cx="113" cy="176" r="2.2" fill={LINE} />
-        <circle cx="127" cy="176" r="2.2" fill={LINE} />
-        <circle cx="104" cy="164" r="3.5" fill="#F2D7B6" />
-        <circle cx="136" cy="164" r="3.5" fill="#F2D7B6" />
-        {bow(120, 197, 0.5, '#E07A7A', '#C25B5B')}
+        <path d={`M${HAND.x} ${HAND.y}L56 214`} stroke={LINE} strokeWidth="13" strokeLinecap="round" />
+        <path d={`M${HAND.x} ${HAND.y}L56 214`} stroke="#C98A5E" strokeWidth="6" strokeLinecap="round" />
+        <circle cx="38" cy="214" r="6.5" fill="#C98A5E" {...ln} strokeWidth="3" />
+        <circle cx="62" cy="212" r="6.5" fill="#C98A5E" {...ln} strokeWidth="3" />
+        <ellipse cx="50" cy="248" rx="15" ry="14" fill="#C98A5E" {...ln} strokeWidth="3" />
+        <ellipse cx="50" cy="250" rx="8" ry="7.5" fill="#F2D7B6" />
+        <circle cx="50" cy="226" r="15" fill="#C98A5E" {...ln} strokeWidth="3" />
+        <ellipse cx="50" cy="231" rx="6.5" ry="5" fill="#F2D7B6" />
+        <ellipse cx="50" cy="229" rx="2.6" ry="2" fill={LINE} />
+        <circle cx="44" cy="223" r="2" fill={LINE} />
+        <circle cx="56" cy="223" r="2" fill={LINE} />
+        <circle cx="38" cy="214" r="2.6" fill="#F2D7B6" />
+        <circle cx="62" cy="212" r="2.6" fill="#F2D7B6" />
+        {bow(50, 240, 0.4, '#E07A7A', '#C25B5B')}
       </g>
     ),
   },
 
+  kotek: {
+    back: (
+      <g>
+        <path d="M58 150L52 120L76 138Z" fill="#BBAEEC" {...ln} />
+        <path d="M182 150L188 120L164 138Z" fill="#BBAEEC" {...ln} />
+        <path d="M60 140L57 127L68 136Z" fill="#F7B7C5" />
+        <path d="M180 140L183 127L172 136Z" fill="#F7B7C5" />
+        <rect x="50" y="136" width="140" height="92" rx="30" fill="#BBAEEC" {...ln} />
+        <rect x="38" y="178" width="20" height="34" rx="9" fill="#9C8FD0" {...ln} />
+        <rect x="182" y="178" width="20" height="34" rx="9" fill="#9C8FD0" {...ln} />
+      </g>
+    ),
+    over: (
+      <g>
+        {band('M90 148L86 204', '#9C8FD0', 8)}
+        {band('M150 148L154 204', '#9C8FD0', 8)}
+        <circle cx="87" cy="186" r="6" fill="#F2A7C0" {...ln} strokeWidth="2.5" />
+        <circle cx="153" cy="186" r="6" fill="#F2A7C0" {...ln} strokeWidth="2.5" />
+      </g>
+    ),
+  },
+  zolw: {
+    back: (
+      <g>
+        <ellipse cx="120" cy="186" rx="84" ry="64" fill="#7FC79A" {...ln} />
+        <path d="M36 186Q120 222 204 186" fill="none" stroke="#5E9C76" strokeWidth="10" />
+        {[
+          [44, 160],
+          [196, 160],
+          [40, 206],
+          [200, 206],
+        ].map(([x, y], i) => (
+          <path key={i} d={`M${x - 7} ${y}l7-7 7 7-7 7z`} fill="#A8D8B8" stroke="#5E9C76" strokeWidth="2.5" strokeLinejoin="round" />
+        ))}
+      </g>
+    ),
+    over: (
+      <g>
+        {band('M88 146L82 204', '#5E9C76', 7)}
+        {band('M152 146L158 204', '#5E9C76', 7)}
+      </g>
+    ),
+  },
+  wrozka: {
+    back: (
+      <g>
+        {[0, 1].map((m) => (
+          <g key={m} transform={m ? 'translate(240 0) scale(-1 1)' : undefined}>
+            <path d="M104 156Q60 70 26 92Q6 116 44 146Q70 162 104 166Z" fill="#CBE3F6" fillOpacity=".85" {...ln} />
+            <path d="M104 172Q70 176 50 204Q44 226 66 224Q92 216 106 180Z" fill="#F8D3E0" fillOpacity=".85" {...ln} />
+            <path d="M96 156Q60 110 38 108M98 176Q76 196 64 212" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" />
+            <path d={star(46, 120, 5)} fill="#F6D58A" />
+            <circle cx="72" cy="206" r="3" fill="#fff" />
+          </g>
+        ))}
+      </g>
+    ),
+  },
+  rakieta: {
+    back: (
+      <g>
+        {[0, 1].map((m) => (
+          <g key={m} transform={m ? 'translate(240 0) scale(-1 1)' : undefined}>
+            <path d="M44 218Q36 238 44 252Q52 238 44 218Z" fill="#F6D58A" stroke="#F0A35E" strokeWidth="3" strokeLinejoin="round" />
+            <path d="M32 214L24 228L36 222ZM56 214L64 228L52 222Z" fill="#E8857C" {...ln} strokeWidth="3" />
+            <path d="M32 220V170Q32 146 44 136Q56 146 56 170V220Z" fill="#FFFDF5" {...ln} />
+            <path d="M32 172H56" stroke="#E8857C" strokeWidth="6" />
+            <circle cx="44" cy="190" r="6" fill="#7DB9E8" {...ln} strokeWidth="2.5" />
+          </g>
+        ))}
+      </g>
+    ),
+    over: (
+      <g>
+        {band('M88 148L84 204', '#9AA0B2', 7)}
+        {band('M152 148L156 204', '#9AA0B2', 7)}
+      </g>
+    ),
+  },
 }
 
 /** Everything worn on one layer, for Smoczek to draw. Clothes on the body are clipped to its shape. */
@@ -1045,7 +1149,7 @@ export function BodyClip({ id }: { id: string }) {
   )
 }
 
-const LAYER_ORDER: Layer[] = ['back', 'tail', 'body', 'over', 'feet', 'hand', 'head']
+const LAYER_ORDER: Layer[] = ['back', 'tail', 'feet', 'body', 'over', 'hand', 'head']
 
 /** A gadget on its own, for the shop shelf. Clothes and shoes sit on a pale silhouette so they read as worn. */
 export function GadgetPicture({ id, size = 96 }: { id: string; size?: number | string }) {

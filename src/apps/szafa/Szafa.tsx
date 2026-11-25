@@ -14,7 +14,7 @@ import { GADGETS, SLOTS, balanceOf, gadgetById, putOn, wornList, type Outfit, ty
 import type { AppProps } from '../registry'
 
 /** The gadget that stands for each shelf on its tab. */
-const TAB_ICON: Record<Slot, string> = { head: 'czapka', eyes: 'okulary', neck: 'muszka', body: 'sukienka', feet: 'trampki', extra: 'balonik' }
+const TAB_ICON: Record<Slot, string> = { head: 'czapka', eyes: 'okulary', neck: 'muszka', body: 'sukienka', feet: 'trampki', hand: 'lody', back: 'skrzydla' }
 
 interface Line {
   text: string
@@ -117,7 +117,7 @@ export default function Szafa(_: AppProps) {
 
       {/* Shelves */}
       <section className="card flex min-h-0 flex-col gap-4 rounded-[32px] p-5">
-        <div className="grid grid-cols-6 gap-2" role="tablist" aria-label={pl.apps.wardrobe}>
+        <div className="grid grid-cols-7 gap-2" role="tablist" aria-label={pl.apps.wardrobe}>
           {SLOTS.map((s) => {
             const on = s === tab
             return (

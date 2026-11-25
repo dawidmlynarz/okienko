@@ -33,8 +33,8 @@ describe('wardrobe', () => {
   })
 
   it('wears several things from one shelf when they sit in different spots', () => {
-    let w: Wardrobe = { owned: ['balonik', 'plecak', 'kokardka', 'mis', 'parasolka', 'kokarda', 'korona', 'muszka', 'korale', 'szalik'], worn: [] }
-    for (const id of ['balonik', 'plecak', 'kokardka', 'mis', 'kokarda', 'korona', 'muszka', 'korale']) w = toggleWear(w, id)
+    let w: Wardrobe = { owned: ['balonik', 'plecak', 'kokardka', 'rzesy', 'parasolka', 'kokarda', 'korona', 'muszka', 'korale', 'szalik'], worn: [] }
+    for (const id of ['balonik', 'plecak', 'kokardka', 'rzesy', 'kokarda', 'korona', 'muszka', 'korale']) w = toggleWear(w, id)
     expect(w.worn).toHaveLength(8)
     // Umbrella and balloon both go in the paw.
     w = toggleWear(w, 'parasolka')
@@ -63,8 +63,8 @@ describe('wardrobe', () => {
     expect(nextGoal({ owned: GADGETS.map((g) => g.id), worn: [] })).toBeNull()
   })
 
-  it('has twelve gadgets on every shelf, each with a drawing', () => {
-    for (const slot of SLOTS) expect(GADGETS.filter((g) => g.slot === slot)).toHaveLength(12)
+  it('has twelve gadgets on every clothes shelf, eight to hold and eight for the back, each with a drawing', () => {
+    for (const slot of SLOTS) expect(GADGETS.filter((g) => g.slot === slot)).toHaveLength(slot === 'hand' || slot === 'back' ? 8 : 12)
     for (const g of GADGETS) expect(GADGET_ART[g.id], g.id).toBeTruthy()
   })
 

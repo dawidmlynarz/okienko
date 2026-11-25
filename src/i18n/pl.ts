@@ -303,7 +303,7 @@ export const pl = {
   wardrobe: {
     lead: 'Co założymy?',
     hello: 'Witaj w mojej szafie! Kliknij coś, to przymierzę.',
-    tabs: { head: 'Czapki', eyes: 'Okulary', neck: 'Na szyję', body: 'Ubrania', feet: 'Buty', extra: 'Dodatki' },
+    tabs: { head: 'Czapki', eyes: 'Okulary', neck: 'Na szyję', body: 'Ubrania', feet: 'Buty', hand: 'W łapce', back: 'Na plecach' },
     buy: 'Kup',
     wear: 'Załóż',
     takeOff: 'Zdejmij',
