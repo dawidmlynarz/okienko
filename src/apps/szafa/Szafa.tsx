@@ -37,40 +37,42 @@ export default function Szafa(_: AppProps) {
   const { talking, repeat } = useTalk(line.say ?? line.text, line.key)
 
   const item = gadgetById(picked)
-  const owned = !!item && wardrobe.owned.includes(item.id)
   const wearingNow = useMemo(() => wornList(wardrobe.worn), [wardrobe.worn])
-  const worn = !!item && wearingNow.includes(item.id)
-  const short = item && !owned ? Math.max(0, item.price - wallet) : 0
 
   // Try-on: whatever is picked goes on with what he already wears; only things in the same spot come off.
   const preview: Outfit = useMemo(() => (item ? putOn(wearingNow, item.id) : wearingNow), [item, wearingNow])
 
+  /**
+   * One tap does the job, right where her finger is:
+   * an item she owns goes on (or comes off) at once; a new item is tried on first,
+   * and a second tap on the same card buys it.
+   */
   const pick = (id: string) => {
     const g = gadgetById(id)!
-    play('pop')
-    setPicked(id)
-    const have = wardrobe.owned.includes(id)
-    if (!have && g.price > wallet) say(g.name, 'thinking', pl.wardrobe.tooExpensive(g.name, g.price - wallet))
-    else say(g.name, 'happy', pl.wardrobe.tryOn(g.name))
-  }
-
-  const act = () => {
-    if (!item) return
-    if (!owned) {
-      const r = buyGadget(item.id)
+    if (wardrobe.owned.includes(id)) {
+      play('click')
+      const wasOn = wearingNow.includes(id)
+      toggleGadget(id)
+      setPicked(null)
+      if (wasOn) say(pl.wardrobe.offSay, 'idle')
+      else say(g.name, 'happy', pl.wardrobe.wearSay[Math.floor(Math.random() * pl.wardrobe.wearSay.length)])
+      return
+    }
+    const missing = Math.max(0, g.price - wallet)
+    if (picked === id && !missing) {
+      const r = buyGadget(id)
       if (r.ok) {
         play('fanfare')
         celebrate()
-        say(pl.wardrobe.bought(item.name).split('!')[0] + '!', 'cheer', pl.wardrobe.bought(item.name))
+        setPicked(null)
+        say(pl.wardrobe.bought(g.name).split('!')[0] + '!', 'cheer', pl.wardrobe.bought(g.name))
       }
       return
     }
-    play('click')
-    toggleGadget(item.id)
-    if (worn) {
-      setPicked(null)
-      say(pl.wardrobe.offSay, 'idle')
-    } else say(pl.wardrobe.wearSay[Math.floor(Math.random() * pl.wardrobe.wearSay.length)], 'happy')
+    play('pop')
+    setPicked(id)
+    if (missing) say(g.name, 'thinking', pl.wardrobe.tooExpensive(g.name, missing))
+    else say(g.name, 'happy', pl.wardrobe.tryOn(g.name))
   }
 
   const shelf = GADGETS.filter((g) => g.slot === tab)
@@ -112,24 +114,6 @@ export default function Szafa(_: AppProps) {
           <Smoczek pose={line.pose} beat={line.key} talking={talking && line.pose !== 'thinking'} color={profile?.companionColor} outfit={preview} size="min(300px, 40vh)" />
         </div>
 
-        <div className="relative flex h-16 items-center">
-          {item && (
-            <motion.button
-              key={`${item.id}-${owned}-${worn}`}
-              type="button"
-              initial={{ scale: 0.85, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              onClick={short ? () => say(item.name, 'thinking', pl.wardrobe.tooExpensive(item.name, short)) : act}
-              aria-disabled={short > 0}
-              className={`pressable flex h-16 items-center gap-2.5 rounded-full px-8 font-display text-2xl font-bold shadow-button ${
-                short ? 'bg-ink-100 text-ink-700' : owned && worn ? 'bg-white text-accent-deep' : 'bg-accent-strong text-white'
-              }`}
-            >
-              {!owned && <Star size={28} weight="fill" className={short ? 'text-ink-400' : 'text-butter-300'} />}
-              {short ? pl.wardrobe.missing(short) : !owned ? `${pl.wardrobe.buy} · ${item.price}` : worn ? pl.wardrobe.takeOff : pl.wardrobe.wear}
-            </motion.button>
-          )}
-        </div>
       </section>
 
       {/* Shelves */}
@@ -183,7 +167,15 @@ export default function Szafa(_: AppProps) {
                 <span className="grid min-h-0 flex-1 place-items-center">
                   <GadgetPicture id={g.id} size="min(96px, 13vh)" />
                 </span>
-                {have ? (
+                {sel && !have ? (
+                  // Tried on: the chip turns into the buy button, so the second tap lands on the same card.
+                  <span
+                    className={`flex items-center gap-1.5 rounded-full px-3.5 py-1.5 font-display text-lg font-extrabold tabular-nums ${afford ? 'bg-accent-strong text-white shadow-button' : 'bg-ink-50 text-ink-700'}`}
+                  >
+                    <Star size={20} weight="fill" className={afford ? 'text-butter-300' : 'text-ink-300'} />
+                    {afford ? `${pl.wardrobe.buy} · ${g.price}` : pl.wardrobe.missing(g.price - wallet)}
+                  </span>
+                ) : have ? (
                   <span className={`flex items-center gap-1.5 rounded-full px-3.5 py-1.5 font-display text-lg font-bold ${on ? 'bg-mint-700 text-white' : 'bg-mint-100 text-mint-900'}`}>
                     <Check size={20} weight="bold" />
                     {on ? pl.wardrobe.worn : pl.wardrobe.owned}

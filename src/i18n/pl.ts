@@ -325,7 +325,7 @@ export const pl = {
   /** Explanations for grown-ups, behind a (?) button. The child never has to read these. */
   parentHint: {
     home: 'Kliknięcie Smoczka to głaskanie. Przyciski pod dymkiem: żart, ciekawostka, propozycja gry. Smoczek mówi wszystko na głos; głośnik w dymku powtarza zdanie.',
-    wardrobe: 'Gwiazdki to kieszonkowe: każda ukończona runda daje 1–3 gwiazdki. W Szafie Smoczka można je wydać na ubrania i gadżety: 6 półek po 8 rzeczy, od 3 do 25 gwiazdek. Kupionych rzeczy nie da się stracić; można je zakładać i zdejmować do woli. Wszystkie gry i poziomy są dostępne od razu.',
+    wardrobe: 'Gwiazdki to kieszonkowe: każda ukończona runda daje 1–3 gwiazdki. W szafie można je wydać na ubrania i gadżety: 76 rzeczy na 7 półkach, od 3 do 25 gwiazdek. Pierwsze dotknięcie nowej rzeczy ją przymierza, drugie kupuje. Kupione rzeczy zakłada się i zdejmuje jednym dotknięciem; można nosić wiele naraz. Kupionych rzeczy nie da się stracić. Wszystkie gry i poziomy są dostępne od razu.',
     login: 'Logowanie w dwóch krokach: imię mówi, kim jest, a 3 obrazki to jej tajny kod. Wielką literę pisze się z wciśniętym shiftem. Kod można wyczyścić w ustawieniach rodzica.',
     games: {
       'balonowy-las': 'Uczy, gdzie są litery na klawiaturze, także polskie (option lub prawy Alt). Świecący klawisz podpowiada.',
