@@ -1,4 +1,6 @@
 import { useEffect, useId, useRef, type CSSProperties, type ReactNode } from 'react'
+import { duration, mouthPath, SHAPES, shapeAt, timeline, wordAt, type Key } from '../companion/lipsync'
+import { onSpeech } from '../lib/speak'
 import { FRIEND, type Species } from '../companion/species'
 import { useDomek, type CompanionColor } from '../store/useDomek'
 import { BEAN, BodyClip, OutfitLayer } from '../wardrobe/GadgetArt'
@@ -66,6 +68,102 @@ function useFollowEyes(svg: React.RefObject<SVGSVGElement | null>, enabled: bool
       pupils.style.transform = ''
     }
   }, [svg, enabled, remount])
+}
+
+/** Talking without a voice (sound off, or a voice that sends no events): a soft babble so the mouth still moves. */
+const BABBLE = 'mama ola, tata lubi kasze. ale fajnie!'
+
+/**
+ * Lip sync. Follows the voice word by word when the browser reports word boundaries,
+ * otherwise plays the whole phrase from its text. Each frame the mouth eases toward the
+ * target shape (fast to open, a little slower to close), and the head rides the jaw:
+ * a small dip on open vowels and a nod on each new word, so the talking comes from the body, not just the lips.
+ */
+function useLipSync(svg: React.RefObject<SVGSVGElement | null>, active: boolean, scale = 1) {
+  useEffect(() => {
+    const el = svg.current
+    const lips = el?.querySelector<SVGPathElement>('.m-talk .lips')
+    const tongue = el?.querySelector<SVGEllipseElement>('.m-talk .tongue')
+    const head = el?.querySelector<SVGGElement>('.head')
+    if (!active || !el || !lips || !tongue || !head) return
+    const still = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+    let keys: Key[] = []
+    let t0 = performance.now()
+    let phrase: { text: string; rate: number } | null = null
+    let byWord = false
+    let heard = false
+    const cur = { ...SHAPES.rest }
+    let nod = 0
+    let nodV = 0
+    let side = 1
+    const play = (text: string, rate: number) => {
+      keys = timeline(text, rate)
+      t0 = performance.now()
+    }
+    const off = onSpeech((e) => {
+      heard = true
+      if (e.type === 'phrase') {
+        phrase = { text: e.text, rate: e.rate }
+        byWord = false
+        play(e.text, e.rate)
+        nodV -= 0.9
+      } else if (e.type === 'word') {
+        byWord = true
+        const w = wordAt(e.text, e.charIndex, e.charLength)
+        play(w, e.rate)
+        if (w.length > 2) {
+          side = -side
+          nodV += 0.55 * side
+        }
+      } else {
+        phrase = null
+        keys = []
+      }
+    })
+    const quiet = window.setTimeout(() => {
+      if (heard) return
+      phrase = { text: BABBLE, rate: 1 }
+      play(BABBLE, 1)
+    }, 300)
+    let raf = 0
+    let last = performance.now()
+    const tick = (now: number) => {
+      const dt = Math.min(64, now - last)
+      last = now
+      const ms = now - t0
+      // The voice is still going but our guess ran out: keep the phrase moving.
+      if (phrase && !byWord && ms > duration(keys) + 120) play(phrase.text, phrase.rate)
+      const target = shapeAt(keys, ms)
+      const ease = (tau: number) => 1 - Math.exp(-dt / tau)
+      cur.open += (target.open - cur.open) * ease(target.open > cur.open ? 28 : 45)
+      cur.w += (target.w - cur.w) * ease(55)
+      cur.round += (target.round - cur.round) * ease(50)
+      const m = mouthPath(120, 110, { w: cur.w * scale, open: cur.open * scale, round: cur.round })
+      lips.setAttribute('d', m.d)
+      if (m.tongue) {
+        tongue.setAttribute('cx', `${m.tongue.cx}`)
+        tongue.setAttribute('cy', m.tongue.cy.toFixed(2))
+        tongue.setAttribute('rx', m.tongue.rx.toFixed(2))
+        tongue.setAttribute('ry', m.tongue.ry.toFixed(2))
+        tongue.style.display = ''
+      } else tongue.style.display = 'none'
+      if (!still) {
+        // A damped spring for the nod: kick on words, settle with one small overshoot.
+        nodV += (-nod * 0.045 - nodV * 0.18) * (dt / 16)
+        nod += nodV * (dt / 16)
+        const bob = cur.open * 0.14
+        head.setAttribute('transform', `translate(0 ${bob.toFixed(2)}) rotate(${nod.toFixed(2)} 120 150)`)
+      }
+      raf = requestAnimationFrame(tick)
+    }
+    raf = requestAnimationFrame(tick)
+    return () => {
+      cancelAnimationFrame(raf)
+      window.clearTimeout(quiet)
+      off()
+      head.removeAttribute('transform')
+    }
+  }, [svg, active, scale])
 }
 
 export type Pose = 'idle' | 'happy' | 'cheer' | 'thinking'
@@ -140,6 +238,8 @@ interface Parts {
   face?: ReactNode
   /** Mouth moved down to sit under a nose. */
   mouthDy?: number
+  /** A smaller talking mouth, where it has to fit inside a muzzle. */
+  mouthScale?: number
 }
 
 const PARTS: Record<Species, Parts> = {
@@ -169,41 +269,50 @@ const PARTS: Record<Species, Parts> = {
   },
   konik: {
     behind: (
-      <g className="ln">
-        <path d="M74 74C66 52 68 32 76 26c8 6 18 20 20 34" fill="var(--body)" />
-        <path d="M166 74c8-22 6-42-2-48-8 6-18 20-20 34" fill="var(--body)" />
-        <path d="M79 58c-3-10-2-19 1-23 4 4 8 11 9 18" fill="#F7B7C5" strokeWidth="0" />
-        <path d="M161 58c3-10 2-19-1-23-4 4-8 11-9 18" fill="#F7B7C5" strokeWidth="0" />
-      </g>
+      <>
+        <g className="ear earL ln" style={{ transformOrigin: '86px 70px' }}>
+          <path d="M74 74C66 52 68 32 76 26c8 6 18 20 20 34" fill="var(--body)" />
+          <path d="M79 58c-3-10-2-19 1-23 4 4 8 11 9 18" fill="#F7B7C5" strokeWidth="0" />
+        </g>
+        <g className="ear earR ln" style={{ transformOrigin: '154px 70px' }}>
+          <path d="M166 74c8-22 6-42-2-48-8 6-18 20-20 34" fill="var(--body)" />
+          <path d="M161 58c3-10 2-19-1-23-4 4-8 11-9 18" fill="#F7B7C5" strokeWidth="0" />
+        </g>
+      </>
     ),
     tail: (
       <path className="ln" d="M182 200c22-8 36 4 38 22 2 10-2 20-8 24 0-8-4-14-10-16 2 8 0 14-6 18-1-10-6-18-14-22z" fill="var(--spike)" />
     ),
     front: (
-      // Forelock: a brown tuft falling on the forehead, and the mane down the right side of the head.
-      <g className="ln" fill="var(--spike)">
-        <path d="M150 50c16 6 28 20 32 38 2 12 0 22-4 30-4-10-10-16-16-18 2-10-2-22-12-30z" />
+      // Forelock: a tuft falling on the forehead. It bounces a beat after the head.
+      <g className="ln forelock" fill="var(--spike)" style={{ transformOrigin: '124px 44px' }}>
         <path d="M92 58c6-16 22-24 36-20 10-6 26 0 28 10-8-2-14 2-16 8-6-6-14-8-22-4-6-4-16-2-26 6z" />
       </g>
     ),
     face: (
-      // A white blaze down the face into a wide, low muzzle with slanted nostrils: the horse's nose.
+      // A white blaze down the face into a wide, low muzzle with two round nostrils: the horse's nose.
       <>
         <path d="M116 60c4-2 6-2 8 0l3 50h-14z" fill="var(--belly)" />
         <path className="ln" d="M120 108c20 0 33 8 33 21 0 12-14 19-33 19s-33-7-33-19c0-13 13-21 33-21z" fill="var(--belly)" />
-        <path d="M104 126c2-4 6-6 9-5-1 4-4 7-9 5zM136 126c-2-4-6-6-9-5 1 4 4 7 9 5z" fill="var(--ink)" stroke="var(--ink)" strokeWidth="2" strokeLinejoin="round" />
+        <circle cx="106" cy="124" r="4" fill="var(--ink)" />
+        <circle cx="134" cy="124" r="4" fill="var(--ink)" />
       </>
     ),
     mouthDy: 25,
+    mouthScale: 0.75,
   },
   koala: {
     front: (
-      <g className="ln">
-        <circle cx="58" cy="66" r="30" fill="var(--body)" />
-        <circle cx="182" cy="66" r="30" fill="var(--body)" />
-        <circle cx="60" cy="68" r="17" fill="var(--belly)" strokeWidth="0" />
-        <circle cx="180" cy="68" r="17" fill="var(--belly)" strokeWidth="0" />
-      </g>
+      <>
+        <g className="ear earL ln" style={{ transformOrigin: '80px 84px' }}>
+          <circle cx="58" cy="66" r="30" fill="var(--body)" />
+          <circle cx="60" cy="68" r="17" fill="var(--belly)" strokeWidth="0" />
+        </g>
+        <g className="ear earR ln" style={{ transformOrigin: '160px 84px' }}>
+          <circle cx="182" cy="66" r="30" fill="var(--body)" />
+          <circle cx="180" cy="68" r="17" fill="var(--belly)" strokeWidth="0" />
+        </g>
+      </>
     ),
     face: (
       <>
@@ -220,10 +329,8 @@ const PARTS: Record<Species, Parts> = {
     front: (
       <>
         <path d="M120 64c-8 0-10 10-10 20 0 10-6 14-6 22 0 10 7 14 16 14s16-4 16-14c0-8-6-12-6-22 0-10-2-20-10-20z" fill="var(--belly)" />
-        <g className="ln" fill="var(--spike)">
-          <path d="M70 58c-20-4-32 14-30 34 1 12 6 22 14 24 6 1 10-6 12-14z" />
-          <path d="M170 58c20-4 32 14 30 34-1 12-6 22-14 24-6 1-10-6-12-14z" />
-        </g>
+        <path className="ear earL flop ln" fill="var(--spike)" style={{ transformOrigin: '68px 62px' }} d="M70 58c-20-4-32 14-30 34 1 12 6 22 14 24 6 1 10-6 12-14z" />
+        <path className="ear earR flop ln" fill="var(--spike)" style={{ transformOrigin: '172px 62px' }} d="M170 58c20-4 32 14 30 34-1 12-6 22-14 24-6 1-10-6-12-14z" />
       </>
     ),
     face: <path className="ln" d="M120 104c5 0 8 1.6 8 4.4 0 3-4 6-8 6s-8-3-8-6c0-2.8 3-4.4 8-4.4z" fill="var(--ink)" strokeWidth="2.5" />,
@@ -263,6 +370,7 @@ export function Smoczek({ pose = 'idle', color = 'mint', talking = false, size =
   const ref = useRef<SVGSVGElement>(null)
   // Thinking looks up and away on purpose, so the eyes stop following then.
   useFollowEyes(ref, followEyes && pose !== 'thinking' && pose !== 'cheer', beat)
+  useLipSync(ref, talking, part.mouthScale)
   const [body, belly, spike, , foot] = friendColors(kind, color)
   const style = { '--body': body, '--belly': belly, '--spike': spike, '--foot': foot, '--mouth-y': `${110 + (part.mouthDy ?? 0)}px`, width: size, height: 'auto' } as CSSProperties
   return (
@@ -272,6 +380,7 @@ export function Smoczek({ pose = 'idle', color = 'mint', talking = false, size =
       </defs>
       <ellipse cx="120" cy="250" rx="66" ry="7" fill="#2E2A33" opacity=".08" />
       <g className="whole">
+       <g className="lean">
         <OutfitLayer outfit={wearing} layer="back" />
         <g className="spark ln" fill="#F6D58A">
           <path d="M28 70l5 11 11 5-11 5-5 11-5-11-11-5 11-5z" />
@@ -333,6 +442,11 @@ export function Smoczek({ pose = 'idle', color = 'mint', talking = false, size =
               <path d="M112 119q8-5 16 0q-8 7-16 0z" fill="var(--tongue)" />
             </g>
             <path className="m m-think" d="M112 114q5-3 9 0t9 0" fill="none" stroke="var(--ink)" strokeWidth="3.5" strokeLinecap="round" />
+            {/* The talking mouth: one shape the lip sync reshapes every frame. */}
+            <g className="m-talk">
+              <path className="lips ln" d={mouthPath(120, 110, SHAPES.rest).d} fill="var(--mouth)" strokeWidth="3" />
+              <ellipse className="tongue" cx="120" cy="116" rx="5" ry="2" fill="var(--tongue)" />
+            </g>
           </g>
           <OutfitLayer outfit={wearing} layer="head" />
         </g>
@@ -342,7 +456,10 @@ export function Smoczek({ pose = 'idle', color = 'mint', talking = false, size =
             <OutfitLayer outfit={wearing} layer="hand" />
           </g>
         </g>
-        <rect className="armR ln" x="182" y="150" width="32" height="18" rx="9" fill="var(--body)" transform="rotate(28)" />
+        <g className="armR">
+          <rect className="ln" x="182" y="150" width="32" height="18" rx="9" fill="var(--body)" transform="rotate(28 186 159)" />
+        </g>
+       </g>
       </g>
     </svg>
   )

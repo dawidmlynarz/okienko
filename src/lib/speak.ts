@@ -66,6 +66,23 @@ export function phrases(text: string): string[] {
     .filter(Boolean)
 }
 
+/**
+ * What the voice is doing right now, so the friend's mouth can follow it.
+ * 'word' comes from the browser's boundary events; some voices (Google's online ones) never send them.
+ */
+export type SpeechEvent =
+  | { type: 'phrase'; text: string; rate: number }
+  | { type: 'word'; text: string; charIndex: number; charLength?: number; rate: number }
+  | { type: 'pause' }
+  | { type: 'end' }
+
+const listeners = new Set<(e: SpeechEvent) => void>()
+export function onSpeech(fn: (e: SpeechEvent) => void) {
+  listeners.add(fn)
+  return () => void listeners.delete(fn)
+}
+const emit = (e: SpeechEvent) => listeners.forEach((fn) => fn(e))
+
 export interface SpeakOptions {
   /** Stop anything already being said. Default true. */
   interrupt?: boolean
@@ -80,7 +97,10 @@ export function speak(text: string, opts: SpeakOptions = {}) {
     opts.onEnd?.()
     return
   }
-  if (opts.interrupt !== false) speechSynthesis.cancel()
+  if (opts.interrupt !== false) {
+    speechSynthesis.cancel()
+    emit({ type: 'end' })
+  }
   const parts = phrases(text)
   if (!parts.length) return opts.onEnd?.()
   const v = pickVoice()
@@ -95,9 +115,19 @@ export function speak(text: string, opts: SpeakOptions = {}) {
     u.volume = 1
     // Questions and exclamations get a little lift.
     if (/[!?]$/.test(part)) u.pitch += 0.05
-    if (i === parts.length - 1) {
-      u.onend = () => opts.onEnd?.()
-      u.onerror = () => opts.onEnd?.()
+    u.onstart = () => emit({ type: 'phrase', text: part, rate: u.rate })
+    u.onboundary = (e) => {
+      if (e.name && e.name !== 'word') return
+      emit({ type: 'word', text: part, charIndex: e.charIndex, charLength: e.charLength, rate: u.rate })
+    }
+    const last = i === parts.length - 1
+    u.onend = () => {
+      emit({ type: last ? 'end' : 'pause' })
+      if (last) opts.onEnd?.()
+    }
+    if (last) u.onerror = () => {
+      emit({ type: 'end' })
+      opts.onEnd?.()
     }
     speechSynthesis.speak(u)
   })
@@ -105,6 +135,7 @@ export function speak(text: string, opts: SpeakOptions = {}) {
 
 export function stopSpeaking() {
   if (typeof speechSynthesis !== 'undefined') speechSynthesis.cancel()
+  emit({ type: 'end' })
 }
 
 /** Spell a single letter the way a Polish teacher would say it. */
