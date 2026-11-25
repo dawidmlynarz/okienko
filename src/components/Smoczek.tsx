@@ -240,6 +240,10 @@ interface Parts {
   mouthDy?: number
   /** A smaller talking mouth, where it has to fit inside a muzzle. */
   mouthScale?: number
+  /** On the belly, under the clothes: the dragon's stripes. */
+  belly?: ReactNode
+  /** Big round eyes with whites (the first Smoczek), instead of sticker dot eyes. */
+  bigEyes?: boolean
 }
 
 const PARTS: Record<Species, Parts> = {
@@ -248,17 +252,23 @@ const PARTS: Record<Species, Parts> = {
       <>
         <path className="wingL ln" d="M58 128C40 104 16 108 18 132c8-3 15 1 16 8 7-3 15 0 18 7z" fill="var(--spike)" />
         <path className="wingR ln" d="M182 128c18-24 42-20 40 4-8-3-15 1-16 8-7-3-15 0-18 7z" fill="var(--spike)" />
-        <g className="ln" fill="var(--spike)">
-          <path d="M98 54c-2-12 4-20 12-18 4 1 6 6 6 12" />
-          <path d="M112 50c-1-14 6-22 14-20 6 2 7 9 6 18" />
-          <path d="M128 50c2-10 9-15 15-11 4 3 4 9 1 15" />
-        </g>
-        <g className="ln" fill="#F6D58A">
-          <path d="M80 70c-10-16-10-30-2-34 7-3 14 8 16 22" />
-          <path d="M160 70c10-16 10-30 2-34-7-3-14 8-16 22" />
-        </g>
+        {/* The first Smoczek's crest and horns: three pointed spikes and two curled horns. */}
+        <path className="ln" d="M102 50l7-17 8 15zM114 46l8-19 8 17zM127 48l9-16 6 17z" fill="var(--spike)" />
+        <path className="ln" d="M80 68C68 38 74 28 92 42c2 8 2 14 0 22zM160 68c12-30 6-40-12-26-2 8-2 14 0 22z" fill="#F6D58A" />
       </>
     ),
+    belly: <path d="M96 166q24 8 48 0M90 184q30 9 60 0M94 202q26 8 52 0" fill="none" stroke="var(--ink)" strokeWidth="3" strokeLinecap="round" opacity=".3" />,
+    face: (
+      // A soft snout with two little nostrils, like the first drawing.
+      <>
+        <ellipse className="ln" cx="120" cy="123" rx="27" ry="15" fill="var(--belly)" strokeWidth="3" />
+        <circle cx="112" cy="117" r="2.4" fill="var(--ink)" />
+        <circle cx="128" cy="117" r="2.4" fill="var(--ink)" />
+      </>
+    ),
+    mouthDy: 15,
+    mouthScale: 0.8,
+    bigEyes: true,
     tail: (
       <>
         <path d="M176 216C204 226 222 210 216 180" fill="none" stroke="var(--ink)" strokeWidth="20" strokeLinecap="round" />
@@ -404,6 +414,7 @@ export function Smoczek({ pose = 'idle', color = 'mint', talking = false, size =
           <ellipse className="ln" cx="146" cy="240" rx="18" ry="10" fill="var(--foot)" />
           <path className="ln" d={BEAN} fill="var(--body)" />
           <ellipse cx="120" cy="184" rx="40" ry="44" fill="var(--belly)" />
+          {part.belly}
           <OutfitLayer outfit={wearing} layer="body" clipId={clipId} />
           {/* Ears, mane and face patches after the clothes: the clothes redraw the body outline, which would cut through the ears. */}
           {part.front}
@@ -423,18 +434,31 @@ export function Smoczek({ pose = 'idle', color = 'mint', talking = false, size =
           </g>
           {part.face}
           <g className="eyes">
-            <g className="lid">
-              <g className="pupils">
-                <ellipse cx="92" cy="98" rx="7" ry="8.5" fill="var(--ink)" />
-                <ellipse cx="148" cy="98" rx="7" ry="8.5" fill="var(--ink)" />
-                <circle cx="94.5" cy="94.5" r="2.6" fill="#fff" />
-                <circle cx="150.5" cy="94.5" r="2.6" fill="#fff" />
+            {part.bigEyes ? (
+              <g className="lid">
+                <ellipse className="ln" cx="92" cy="94" rx="14" ry="16" fill="#fff" strokeWidth="3.5" />
+                <ellipse className="ln" cx="148" cy="94" rx="14" ry="16" fill="#fff" strokeWidth="3.5" />
+                <g className="pupils">
+                  <circle cx="93" cy="97" r="7.5" fill="var(--ink)" />
+                  <circle cx="149" cy="97" r="7.5" fill="var(--ink)" />
+                  <circle cx="96" cy="93" r="3" fill="#fff" />
+                  <circle cx="152" cy="93" r="3" fill="#fff" />
+                </g>
               </g>
-            </g>
+            ) : (
+              <g className="lid">
+                <g className="pupils">
+                  <ellipse cx="92" cy="98" rx="7" ry="8.5" fill="var(--ink)" />
+                  <ellipse cx="148" cy="98" rx="7" ry="8.5" fill="var(--ink)" />
+                  <circle cx="94.5" cy="94.5" r="2.6" fill="#fff" />
+                  <circle cx="150.5" cy="94.5" r="2.6" fill="#fff" />
+                </g>
+              </g>
+            )}
           </g>
           <g className="eyesHappy" fill="none" stroke="var(--ink)" strokeWidth="4.5" strokeLinecap="round">
-            <path d="M83 101q9-11 18 0" />
-            <path d="M139 101q9-11 18 0" />
+            <path d={part.bigEyes ? 'M80 99q12-14 24 0' : 'M83 101q9-11 18 0'} />
+            <path d={part.bigEyes ? 'M136 99q12-14 24 0' : 'M139 101q9-11 18 0'} />
           </g>
           <g transform={part.mouthDy ? `translate(0 ${part.mouthDy})` : undefined}>
             <path className="m m-idle" d="M111 112q4.5 5 9 0q4.5 5 9 0" fill="none" stroke="var(--ink)" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" />
