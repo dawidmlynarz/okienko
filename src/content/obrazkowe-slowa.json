@@ -1,5 +1,5 @@
 {
-  "$comment": "Obrazkowe Słowa levels. picture is an id from src/assets/drawn.ts. count: words per round.",
+  "$comment": "Obrazkowe Słowa levels. picture is an id from src/assets/pictures.ts. count: words per round.",
   "levels": [
     {
       "id": "slowa-krotkie",

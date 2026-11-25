@@ -317,7 +317,7 @@ function BoardView({ board, horse, facing, eaten, bumps, won }: { board: Board; 
             className="grid size-full place-items-center"
           >
             <motion.span animate={{ y: [0, -4, 0] }} transition={{ duration: 0.5, repeat: Infinity, repeatDelay: 1.6 }} className="grid size-full place-items-center">
-              {/* Mirror the pony (its mane is on one side) so it turns the way it walks. */}
+              {/* The Fluent horse faces left; mirror it to face right. */}
               <span className="grid size-full place-items-center" style={{ transform: facing === 'right' ? 'scaleX(-1)' : undefined }}>
                 <Picture id="konik" size="84%" />
               </span>
@@ -332,7 +332,7 @@ function BoardView({ board, horse, facing, eaten, bumps, won }: { board: Board; 
 function Fence() {
   return (
     <svg viewBox="0 0 100 100" className="size-[86%]" aria-hidden>
-      <g fill="#E6BC8E" stroke="#2E2A33" strokeWidth="4" strokeLinejoin="round">
+      <g fill="#E3B27A" stroke="#7A4B2A" strokeWidth="4" strokeLinejoin="round">
         <rect x="8" y="34" width="84" height="12" rx="4" />
         <rect x="8" y="60" width="84" height="12" rx="4" />
         <path d="M14 88V26l8-10 8 10v62zM46 88V26l8-10 8 10v62zM74 88V26l8-10 8 10v62z" />
@@ -356,16 +356,16 @@ function Waves() {
 function Stable({ open }: { open: boolean }) {
   return (
     <svg viewBox="0 0 100 100" className="size-[96%] overflow-visible" aria-label="Stajnia">
-      <g stroke="#2E2A33" strokeWidth="4" strokeLinejoin="round">
-        <path d="M14 46L50 14L86 46V92H14Z" fill="#E8857C" />
-        <path d="M8 50L50 10L92 50" fill="none" strokeLinecap="round" stroke="#2E2A33" strokeWidth="9" />
-        <path d="M8 50L50 10L92 50" fill="none" strokeLinecap="round" stroke="#FFFDF5" strokeWidth="4" />
-        <circle cx="50" cy="36" r="7" fill="#FFFDF5" />
-        <rect x="32" y="56" width="36" height="36" fill={open ? '#5B4A4A' : '#FFFDF5'} />
-        {!open && <path d="M32 56l36 36M68 56L32 92" stroke="#E8857C" strokeWidth="4" />}
+      <g stroke="#5A1F1B" strokeWidth="4" strokeLinejoin="round">
+        <path d="M14 46L50 14L86 46V92H14Z" fill="#E5484D" />
+        <path d="M8 50L50 10L92 50" fill="none" strokeLinecap="round" stroke="#5A1F1B" strokeWidth="9" />
+        <path d="M8 50L50 10L92 50" fill="none" strokeLinecap="round" stroke="#FFF6EC" strokeWidth="4" />
+        <circle cx="50" cy="36" r="7" fill="#FFF6EC" />
+        <rect x="32" y="56" width="36" height="36" fill={open ? '#5A1F1B' : '#FFF6EC'} />
+        {!open && <path d="M32 56l36 36M68 56L32 92" stroke="#E5484D" strokeWidth="4" />}
       </g>
       {open && (
-        <g stroke="#2E2A33" strokeWidth="3" fill="#FFFDF5">
+        <g stroke="#5A1F1B" strokeWidth="3" fill="#FFF6EC">
           <path d="M32 56l-12 4v36l12-4z" />
           <path d="M68 56l12 4v36l-12-4z" />
         </g>

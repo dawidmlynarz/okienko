@@ -56,7 +56,7 @@ Every push gets a preview URL on either host.
 | Smoczek | `src/components/Smoczek.tsx`, `src/styles/smoczek.css` | PoC drawing. His eyes follow the mouse. Each body part is a layer with a fixed class name; one class per pose (`idle`, `happy`, `cheer`, `thinking`, plus `talking`). The final art replaces the shapes and keeps the class names. |
 | Voice | `src/lib/speak.ts` | One `speak()` on Web Speech. Ranks installed Polish voices (Premium/Enhanced on macOS, Google polski in Chrome) and speaks sentence by sentence for natural pauses. Swap for recorded lines later. |
 | Sound | `src/lib/sound.ts` | Small synthesised kit (Web Audio), no audio files. |
-| Pictures | `src/assets/drawn.ts` | The app's own drawings in one house style: dark ink outline, muted pastels, dot eyes and blush. Smoczek is `src/components/Smoczek.tsx`, his clothes `src/wardrobe/GadgetArt.tsx`. |
+| Pictures | `src/assets/pictures.ts` | Fluent Emoji Flat (MIT, Microsoft), extracted by `scripts/extract-pictures.mjs`. |
 
 Dashboard chatter (jokes, facts, petting, game tips) lives in `pl.smoczek` in `src/i18n/pl.ts`.
 
