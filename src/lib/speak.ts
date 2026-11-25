@@ -110,7 +110,7 @@ export function speak(text: string, opts: SpeakOptions = {}) {
     const u = new SpeechSynthesisUtterance(part)
     u.lang = 'pl-PL'
     if (v) u.voice = v
-    u.rate = natural ? 0.92 : 0.85
+    u.rate = natural ? 1 : 0.92
     u.pitch = natural ? 1.05 : 1.1
     u.volume = 1
     // Questions and exclamations get a little lift.
