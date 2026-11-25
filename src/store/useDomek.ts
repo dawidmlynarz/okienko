@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import type { PictureId } from '../assets/pictures'
+import { current, type Species } from '../companion/species'
 import { buy, toggleWear, type BuyResult, type Wardrobe } from '../wardrobe/items'
 import { SCHEMA_VERSION, STORAGE_KEY, migrate, storage } from './storage'
 
@@ -11,6 +12,8 @@ export interface Profile {
   childName: string
   companionName: string
   companionColor: CompanionColor
+  /** Which friend she picked: the dragon, the pony, the koala or the puppy. Older saves have none: the dragon. */
+  companion?: Species
   /** Picture-PIN, 3 pictures in order. Null until she picks one on first login. */
   pin: PictureId[] | null
 }
@@ -82,8 +85,6 @@ interface Actions {
 
 export type DomekState = PersistedState & SessionState & Actions
 
-/** The companion's name. Not asked any more: everyone knows him as Smoczek. */
-export const COMPANION_NAME = 'Smoczek'
 
 export const today = () => new Date().toISOString().slice(0, 10)
 
@@ -191,6 +192,11 @@ export const useDomek = create<DomekState>()(
     },
   ),
 )
+
+// Keep the shared "current friend" in step with the profile, so plain strings can name the friend.
+const syncFriend = (s: DomekState) => (current.species = s.profile?.companion ?? 'smok')
+syncFriend(useDomek.getState())
+useDomek.subscribe(syncFriend)
 
 /** Where a fresh page load starts: setup until a parent has set it up, then login. */
 export function startScreen() {

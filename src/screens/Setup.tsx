@@ -5,7 +5,8 @@ import { Button } from '../components/Button'
 import { pl } from '../i18n/pl'
 import { unlockAudio } from '../lib/sound'
 import { requestPersistentStorage } from '../store/storage'
-import { COMPANION_NAME, useDomek, type CompanionColor } from '../store/useDomek'
+import { FRIEND, SPECIES, type Species } from '../companion/species'
+import { useDomek, type CompanionColor } from '../store/useDomek'
 import { BackupButtons } from './Parent'
 
 export function ColorPicker({ value, onChange }: { value: CompanionColor; onChange: (c: CompanionColor) => void }) {
@@ -24,6 +25,32 @@ export function ColorPicker({ value, onChange }: { value: CompanionColor; onChan
           style={{ background: COMPANION_COLORS[c][0] }}
         />
       ))}
+    </div>
+  )
+}
+
+/** Four friends to choose from, drawn as they will look. Big cards, so a child can pick. */
+export function FriendPicker({ value, color, onChange }: { value: Species; color: CompanionColor; onChange: (s: Species) => void }) {
+  return (
+    <div role="radiogroup" aria-label={pl.setup.friend} className="grid grid-cols-4 gap-3">
+      {SPECIES.map((s) => {
+        const on = value === s
+        return (
+          <button
+            key={s}
+            type="button"
+            role="radio"
+            aria-checked={on}
+            onClick={() => onChange(s)}
+            className={`pressable flex flex-col items-center gap-1 rounded-[22px] px-2 pt-2 pb-3 font-display text-lg font-bold transition-shadow ${
+              on ? 'bg-accent-soft text-accent-deep shadow-[inset_0_0_0_3px_var(--accent-edge)]' : 'bg-surface text-ink shadow-[inset_0_0_0_1.5px_var(--color-ink-200)] hover:bg-ink-50'
+            }`}
+          >
+            <Smoczek species={s} color={color} pose={on ? 'happy' : 'idle'} outfit={{}} size={96} followEyes={false} />
+            {FRIEND[s].name}
+          </button>
+        )
+      })}
     </div>
   )
 }
@@ -50,6 +77,7 @@ export function Setup() {
   const completeSetup = useDomek((s) => s.completeSetup)
   const [childName, setChildName] = useState('')
   const [color, setColor] = useState<CompanionColor>('mint')
+  const [friend, setFriend] = useState<Species>('smok')
   // Names are typed letter by letter on login, so keep letters only.
   const clean = (s: string) => s.replace(/[^\p{L}]/gu, '')
   const ok = clean(childName).length >= 2
@@ -62,8 +90,8 @@ export function Setup() {
         className="glass-strong flex w-full max-w-4xl gap-10 rounded-[32px] p-10"
       >
         <div className="flex w-64 flex-col items-center justify-center">
-          <Smoczek pose="happy" color={color} size={240} />
-          <p className="mt-3 font-display text-2xl font-extrabold text-ink">{pl.setup.meet}</p>
+          <Smoczek key={friend} species={friend} pose="happy" color={color} size={240} outfit={{}} />
+          <p className="mt-3 font-display text-2xl font-extrabold text-ink">{pl.setup.meet(FRIEND[friend].name)}</p>
         </div>
         <form
           className="flex min-w-0 flex-1 flex-col gap-6"
@@ -73,7 +101,7 @@ export function Setup() {
             unlockAudio()
             void requestPersistentStorage()
             const n = clean(childName)
-            completeSetup({ childName: n[0].toLocaleUpperCase('pl') + n.slice(1), companionName: COMPANION_NAME, companionColor: color })
+            completeSetup({ childName: n[0].toLocaleUpperCase('pl') + n.slice(1), companionName: FRIEND[friend].name, companionColor: color, companion: friend })
           }}
         >
           <div>
@@ -82,9 +110,16 @@ export function Setup() {
           </div>
           <Field id="child" label={pl.setup.childName} hint={pl.setup.childNameHint} value={childName} onChange={setChildName} />
           <div className="flex flex-col gap-3">
-            <span className="font-display text-lg font-semibold">{pl.setup.companionColor}</span>
-            <ColorPicker value={color} onChange={setColor} />
+            <span className="font-display text-lg font-semibold">{pl.setup.friend}</span>
+            <FriendPicker value={friend} color={color} onChange={setFriend} />
+            <span className="text-base text-muted">{pl.setup.friendHint}</span>
           </div>
+          {friend === 'smok' && (
+            <div className="flex flex-col gap-3">
+              <span className="font-display text-lg font-semibold">{pl.setup.companionColor}</span>
+              <ColorPicker value={color} onChange={setColor} />
+            </div>
+          )}
           <div className="mt-2 flex flex-col gap-3">
             <Button type="submit" variant="strong" size="lg" disabled={!ok} className="w-full">
               {pl.setup.start}

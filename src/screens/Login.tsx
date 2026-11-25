@@ -15,7 +15,7 @@ import { useTypedKeys } from '../keyboard/useKeys'
 import { burst } from '../lib/confetti'
 import { play, unlockAudio } from '../lib/sound'
 import { letterName } from '../lib/speak'
-import { COMPANION_NAME, useDomek } from '../store/useDomek'
+import { useDomek } from '../store/useDomek'
 
 type Step = 'name' | 'pin'
 const PIN_PICTURES: PictureId[] = ['kot', 'pies', 'slonce', 'gwiazda', 'jablko', 'rybka', 'kwiatek', 'rakieta', 'tecza']
@@ -37,7 +37,7 @@ export function Login() {
       <div className="relative flex flex-col items-center">
         {/* Smoczek as the account picture, overlapping the card like a real login screen */}
         <div className="relative z-10 -mb-20 grid size-44 place-items-center rounded-full bg-white shadow-float ring-8 ring-white/60">
-          <Smoczek pose={line.pose} talking={talking && line.pose !== 'thinking'} color={profile.companionColor} size={150} label={COMPANION_NAME} className="translate-y-2" />
+          <Smoczek pose={line.pose} talking={talking && line.pose !== 'thinking'} color={profile.companionColor} size={150} className="translate-y-2" />
         </div>
         <motion.div layout className="glass-strong relative flex w-[860px] flex-col items-center gap-[min(20px,1.6vh)] rounded-[32px] px-10 pt-[min(96px,11vh)] pb-[min(32px,3vh)]">
           <div className="flex min-h-[64px] items-center">

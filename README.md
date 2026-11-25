@@ -28,7 +28,7 @@ npm test         # keyboard module + game content tests
 npm run build    # static site in dist/
 ```
 
-The first screen is a one-minute setup for the parent (her name and Smoczek's colour).
+The first screen is a one-minute setup for the parent: her name, and the friend she picks (Smoczek the dragon, a pony, a koala or a puppy, all in one sticker style and all able to wear the whole wardrobe; see `src/companion/species.ts`).
 Parent settings later: **Dla rodzica** on the login screen (behind a small times-table question).
 
 ## Deploy

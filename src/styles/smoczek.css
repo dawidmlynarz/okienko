@@ -14,7 +14,7 @@
 .smok .m, .smok .eyesHappy, .smok .dots, .smok .spark { display: none; }
 .smok.idle .m-idle, .smok.happy .m-happy, .smok.cheer .m-cheer, .smok.thinking .m-think { display: inline; }
 .smok.talking .m { display: none; }
-.smok.talking .m-happy { display: inline; transform-origin: 120px 110px; }
+.smok.talking .m-happy { display: inline; transform-origin: 120px var(--mouth-y, 110px); }
 .smok.cheer .eyes { display: none; }
 .smok.cheer .eyesHappy { display: inline; }
 .smok.thinking .dots, .smok.cheer .spark { display: inline; }

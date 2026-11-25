@@ -5,7 +5,8 @@ import { Button, IconButton } from '../components/Button'
 import { pl } from '../i18n/pl'
 import { polishVoices, speak, voiceQuality } from '../lib/speak'
 import { backupFile, useDomek } from '../store/useDomek'
-import { ColorPicker, Field } from './Setup'
+import { FRIEND } from '../companion/species'
+import { ColorPicker, Field, FriendPicker } from './Setup'
 
 export function BackupButtons({ importOnly = false }: { importOnly?: boolean }) {
   const importData = useDomek((s) => s.importData)
@@ -102,9 +103,15 @@ function Panel() {
         <Field id="p-child" label={pl.setup.childName} value={profile.childName} onChange={(v) => updateProfile({ childName: v.replace(/[^\p{L}]/gu, '') })} />
       </div>
       <div className="flex flex-col gap-3">
-        <span className="font-display text-lg font-semibold">{pl.setup.companionColor}</span>
-        <ColorPicker value={profile.companionColor} onChange={(c) => updateProfile({ companionColor: c })} />
+        <span className="font-display text-lg font-semibold">{pl.setup.friend}</span>
+        <FriendPicker value={profile.companion ?? 'smok'} color={profile.companionColor} onChange={(s) => updateProfile({ companion: s, companionName: FRIEND[s].name })} />
       </div>
+      {(profile.companion ?? 'smok') === 'smok' && (
+        <div className="flex flex-col gap-3">
+          <span className="font-display text-lg font-semibold">{pl.setup.companionColor}</span>
+          <ColorPicker value={profile.companionColor} onChange={(c) => updateProfile({ companionColor: c })} />
+        </div>
+      )}
       <div className="flex flex-col gap-3">
         <span className="font-display text-lg font-semibold">{pl.setup.voice}</span>
         {voices.length ? (

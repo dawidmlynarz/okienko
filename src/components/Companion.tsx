@@ -60,7 +60,7 @@ export function Companion({ text, say, sayKey, pose = 'idle', size = 220, bubble
   const dir = bubbleSide === 'top' ? 'flex-col-reverse items-center' : bubbleSide === 'left' ? 'flex-row-reverse items-end' : 'flex-row items-end'
   return (
     <div className={`flex gap-4 ${dir} ${className}`}>
-      <Smoczek pose={pose} talking={talking && pose !== 'thinking'} color={profile?.companionColor} size={size} label="Smoczek" />
+      <Smoczek pose={pose} talking={talking && pose !== 'thinking'} color={profile?.companionColor} size={size} />
       <div className={`${narrow ? 'max-w-[300px]' : 'max-w-md'} ${bubbleSide === 'top' || variant === 'plain' ? 'self-center' : 'self-start pt-4'}`}>{bubble}</div>
     </div>
   )

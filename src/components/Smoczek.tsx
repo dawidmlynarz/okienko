@@ -1,4 +1,5 @@
-import { useEffect, useId, useRef, type CSSProperties } from 'react'
+import { useEffect, useId, useRef, type CSSProperties, type ReactNode } from 'react'
+import { FRIEND, type Species } from '../companion/species'
 import { useDomek, type CompanionColor } from '../store/useDomek'
 import { BEAN, BodyClip, OutfitLayer } from '../wardrobe/GadgetArt'
 import type { Outfit } from '../wardrobe/items'
@@ -81,6 +82,112 @@ export const COMPANION_COLORS: Record<CompanionColor, [string, string, string, s
   pink: ['#F2AAC2', '#FFFDF5', '#F8D3E0', '#4F2035', '#DA86A5'],
 }
 
+/** The friends other than the dragon keep their own natural colours: body, belly, accent, dark tone, feet. */
+const FRIEND_COLORS: Record<Exclude<Species, 'smok'>, [string, string, string, string, string]> = {
+  konik: ['#E6BC8E', '#FFFDF5', '#8A5A3B', '#4E270D', '#8A5A3B'],
+  koala: ['#B9BFCB', '#F4F4F7', '#F4F4F7', '#2E3140', '#9298A6'],
+  piesek: ['#EBA672', '#FFFDF5', '#B9784A', '#4E270D', '#B9784A'],
+}
+
+/** Colours for the friend she picked; the dragon follows the colour chosen in setup. */
+export const friendColors = (species: Species, color: CompanionColor) => (species === 'smok' ? COMPANION_COLORS[color] : FRIEND_COLORS[species])
+
+/**
+ * What makes each friend itself, drawn on the shared bean (240×260, head top at y 44, eyes at 92/148, y 98).
+ *   behind  before the body: wings, horns, ears that stick up
+ *   tail    swings with the tail animation
+ *   front   on the body, under clothes and hats: floppy ears, mane, face patches
+ *   face    over the cheeks: noses
+ */
+interface Parts {
+  behind?: ReactNode
+  tail?: ReactNode
+  front?: ReactNode
+  face?: ReactNode
+  /** Mouth moved down to sit under a nose. */
+  mouthDy?: number
+}
+
+const PARTS: Record<Species, Parts> = {
+  smok: {
+    behind: (
+      <>
+        <path className="wingL ln" d="M58 128C40 104 16 108 18 132c8-3 15 1 16 8 7-3 15 0 18 7z" fill="var(--spike)" />
+        <path className="wingR ln" d="M182 128c18-24 42-20 40 4-8-3-15 1-16 8-7-3-15 0-18 7z" fill="var(--spike)" />
+        <g className="ln" fill="var(--spike)">
+          <path d="M98 54c-2-12 4-20 12-18 4 1 6 6 6 12" />
+          <path d="M112 50c-1-14 6-22 14-20 6 2 7 9 6 18" />
+          <path d="M128 50c2-10 9-15 15-11 4 3 4 9 1 15" />
+        </g>
+        <g className="ln" fill="#F6D58A">
+          <path d="M80 70c-10-16-10-30-2-34 7-3 14 8 16 22" />
+          <path d="M160 70c10-16 10-30 2-34-7-3-14 8-16 22" />
+        </g>
+      </>
+    ),
+    tail: (
+      <>
+        <path d="M176 216C204 226 222 210 216 180" fill="none" stroke="var(--ink)" strokeWidth="20" strokeLinecap="round" />
+        <path d="M176 216C204 226 222 210 216 180" fill="none" stroke="var(--body)" strokeWidth="12" strokeLinecap="round" />
+        <path className="ln" d="M216 158c7 6 10 12 8 18-2 5-8 7-8 7s-6-2-8-7c-2-6 1-12 8-18z" fill="var(--spike)" />
+      </>
+    ),
+  },
+  konik: {
+    behind: (
+      <g className="ln">
+        <path d="M74 74C66 52 68 32 76 26c8 6 18 20 20 34" fill="var(--body)" />
+        <path d="M166 74c8-22 6-42-2-48-8 6-18 20-20 34" fill="var(--body)" />
+        <path d="M79 58c-3-10-2-19 1-23 4 4 8 11 9 18" fill="#F7B7C5" strokeWidth="0" />
+        <path d="M161 58c3-10 2-19-1-23-4 4-8 11-9 18" fill="#F7B7C5" strokeWidth="0" />
+      </g>
+    ),
+    tail: (
+      <path className="ln" d="M182 200c22-8 36 4 38 22 2 10-2 20-8 24 0-8-4-14-10-16 2 8 0 14-6 18-1-10-6-18-14-22z" fill="var(--spike)" />
+    ),
+    front: (
+      // Forelock: a brown tuft falling on the forehead, and the mane down the right side of the head.
+      <g className="ln" fill="var(--spike)">
+        <path d="M150 50c16 6 28 20 32 38 2 12 0 22-4 30-4-10-10-16-16-18 2-10-2-22-12-30z" />
+        <path d="M92 58c6-16 22-24 36-20 10-6 26 0 28 10-8-2-14 2-16 8-6-6-14-8-22-4-6-4-16-2-26 6z" />
+      </g>
+    ),
+  },
+  koala: {
+    front: (
+      <g className="ln">
+        <circle cx="58" cy="66" r="30" fill="var(--body)" />
+        <circle cx="182" cy="66" r="30" fill="var(--body)" />
+        <circle cx="60" cy="68" r="17" fill="var(--belly)" strokeWidth="0" />
+        <circle cx="180" cy="68" r="17" fill="var(--belly)" strokeWidth="0" />
+      </g>
+    ),
+    face: (
+      <>
+        <path className="ln" d="M120 96c9 0 13 6 13 14 0 9-6 15-13 15s-13-6-13-15c0-8 4-14 13-14z" fill="#5B5F75" />
+        <path d="M114 103c1-2 3-3 5-3" stroke="#fff" strokeWidth="2.6" strokeLinecap="round" fill="none" opacity=".8" />
+      </>
+    ),
+    mouthDy: 20,
+  },
+  piesek: {
+    tail: (
+      <path className="ln" d="M184 206c14-2 24-10 26-24 1-6 8-6 9 0 1 18-12 32-32 34z" fill="var(--body)" />
+    ),
+    front: (
+      <>
+        <path d="M120 64c-8 0-10 10-10 20 0 10-6 14-6 22 0 10 7 14 16 14s16-4 16-14c0-8-6-12-6-22 0-10-2-20-10-20z" fill="var(--belly)" />
+        <g className="ln" fill="var(--spike)">
+          <path d="M70 58c-20-4-32 14-30 34 1 12 6 22 14 24 6 1 10-6 12-14z" />
+          <path d="M170 58c20-4 32 14 30 34-1 12-6 22-14 24-6 1-10-6-12-14z" />
+        </g>
+      </>
+    ),
+    face: <path className="ln" d="M120 104c5 0 8 1.6 8 4.4 0 3-4 6-8 6s-8-3-8-6c0-2.8 3-4.4 8-4.4z" fill="var(--ink)" strokeWidth="2.5" />,
+    mouthDy: 8,
+  },
+}
+
 interface Props {
   pose?: Pose
   color?: CompanionColor
@@ -94,23 +201,29 @@ interface Props {
   followEyes?: boolean
   /** Gadgets to wear. Defaults to what he has on in the wardrobe; pass {} for none. */
   outfit?: Outfit
+  /** Which friend to draw. Defaults to the one she picked. */
+  species?: Species
 }
 
 /**
- * Smoczek: a bean-shaped little dragon. Dot eyes, pink blush, two horns and a soft crest,
- * nub arms, small wings and a curly tail. Head and body are one shape, like a sticker.
+ * Her friend: a bean-shaped little character with dot eyes and pink blush, like a sticker.
+ * By default Smoczek the dragon (horns, crest, wings, curly tail); also a pony, a koala or a puppy.
+ * Head and body are one shape, so every wardrobe item fits every friend.
  */
-export function Smoczek({ pose = 'idle', color = 'mint', talking = false, size = 240, className = '', label = 'Smoczek', beat, followEyes = true, outfit }: Props) {
+export function Smoczek({ pose = 'idle', color = 'mint', talking = false, size = 240, className = '', label, beat, followEyes = true, outfit, species }: Props) {
   const worn = useDomek((s) => s.wardrobe?.worn)
+  const picked = useDomek((s) => s.profile?.companion)
+  const kind: Species = species ?? picked ?? 'smok'
+  const part = PARTS[kind]
   const wearing = outfit ?? worn
   const clipId = `smok-body-${useId().replace(/:/g, '')}`
   const ref = useRef<SVGSVGElement>(null)
   // Thinking looks up and away on purpose, so the eyes stop following then.
   useFollowEyes(ref, followEyes && pose !== 'thinking' && pose !== 'cheer', beat)
-  const [body, belly, spike, , foot] = COMPANION_COLORS[color]
-  const style = { '--body': body, '--belly': belly, '--spike': spike, '--foot': foot, width: size, height: 'auto' } as CSSProperties
+  const [body, belly, spike, , foot] = friendColors(kind, color)
+  const style = { '--body': body, '--belly': belly, '--spike': spike, '--foot': foot, '--mouth-y': `${110 + (part.mouthDy ?? 0)}px`, width: size, height: 'auto' } as CSSProperties
   return (
-    <svg ref={ref} key={beat} className={`smok ${pose} ${talking ? 'talking' : ''} ${className}`} viewBox="0 0 240 260" role="img" aria-label={label} style={style}>
+    <svg ref={ref} key={beat} className={`smok ${pose} ${talking ? 'talking' : ''} ${className}`} viewBox="0 0 240 260" role="img" aria-label={label ?? FRIEND[kind].name} style={style}>
       <defs>
         <BodyClip id={clipId} />
       </defs>
@@ -128,27 +241,16 @@ export function Smoczek({ pose = 'idle', color = 'mint', talking = false, size =
           <circle cx="224" cy="16" r="12" />
         </g>
         <g className="tail">
-          <path d="M176 216C204 226 222 210 216 180" fill="none" stroke="var(--ink)" strokeWidth="20" strokeLinecap="round" />
-          <path d="M176 216C204 226 222 210 216 180" fill="none" stroke="var(--body)" strokeWidth="12" strokeLinecap="round" />
-          <path className="ln" d="M216 158c7 6 10 12 8 18-2 5-8 7-8 7s-6-2-8-7c-2-6 1-12 8-18z" fill="var(--spike)" />
+          {part.tail}
           <OutfitLayer outfit={wearing} layer="tail" />
         </g>
-        <path className="wingL ln" d="M58 128C40 104 16 108 18 132c8-3 15 1 16 8 7-3 15 0 18 7z" fill="var(--spike)" />
-        <path className="wingR ln" d="M182 128c18-24 42-20 40 4-8-3-15 1-16 8-7-3-15 0-18 7z" fill="var(--spike)" />
-        <g className="crest ln" fill="var(--spike)">
-          <path d="M98 54c-2-12 4-20 12-18 4 1 6 6 6 12" />
-          <path d="M112 50c-1-14 6-22 14-20 6 2 7 9 6 18" />
-          <path d="M128 50c2-10 9-15 15-11 4 3 4 9 1 15" />
-        </g>
-        <g className="horns ln" fill="#F6D58A">
-          <path d="M80 70c-10-16-10-30-2-34 7-3 14 8 16 22" />
-          <path d="M160 70c10-16 10-30 2-34-7-3-14 8-16 22" />
-        </g>
+        {part.behind}
         <g className="body">
           <ellipse className="ln" cx="94" cy="240" rx="18" ry="10" fill="var(--foot)" />
           <ellipse className="ln" cx="146" cy="240" rx="18" ry="10" fill="var(--foot)" />
           <path className="ln" d={BEAN} fill="var(--body)" />
           <ellipse cx="120" cy="184" rx="40" ry="44" fill="var(--belly)" />
+          {part.front}
           <OutfitLayer outfit={wearing} layer="body" clipId={clipId} />
           <OutfitLayer outfit={wearing} layer="over" />
           <OutfitLayer outfit={wearing} layer="feet" />
@@ -162,6 +264,7 @@ export function Smoczek({ pose = 'idle', color = 'mint', talking = false, size =
             <circle cx="163" cy="111" r="2.6" fill="#fff" />
             <circle cx="169" cy="108" r="1.6" fill="#fff" />
           </g>
+          {part.face}
           <g className="eyes">
             <g className="lid">
               <g className="pupils">
@@ -176,16 +279,18 @@ export function Smoczek({ pose = 'idle', color = 'mint', talking = false, size =
             <path d="M83 101q9-11 18 0" />
             <path d="M139 101q9-11 18 0" />
           </g>
-          <path className="m m-idle" d="M111 112q4.5 5 9 0q4.5 5 9 0" fill="none" stroke="var(--ink)" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" />
-          <g className="m m-happy">
-            <path className="ln" d="M109 110q11 15 22 0z" fill="var(--mouth)" strokeWidth="3.5" />
-            <path d="M114 117q6-4 12 0q-6 5-12 0z" fill="var(--tongue)" />
+          <g transform={part.mouthDy ? `translate(0 ${part.mouthDy})` : undefined}>
+            <path className="m m-idle" d="M111 112q4.5 5 9 0q4.5 5 9 0" fill="none" stroke="var(--ink)" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" />
+            <g className="m m-happy">
+              <path className="ln" d="M109 110q11 15 22 0z" fill="var(--mouth)" strokeWidth="3.5" />
+              <path d="M114 117q6-4 12 0q-6 5-12 0z" fill="var(--tongue)" />
+            </g>
+            <g className="m m-cheer">
+              <path className="ln" d="M106 108q14 22 28 0z" fill="var(--mouth)" strokeWidth="3.5" />
+              <path d="M112 119q8-5 16 0q-8 7-16 0z" fill="var(--tongue)" />
+            </g>
+            <path className="m m-think" d="M112 114q5-3 9 0t9 0" fill="none" stroke="var(--ink)" strokeWidth="3.5" strokeLinecap="round" />
           </g>
-          <g className="m m-cheer">
-            <path className="ln" d="M106 108q14 22 28 0z" fill="var(--mouth)" strokeWidth="3.5" />
-            <path d="M112 119q8-5 16 0q-8 7-16 0z" fill="var(--tongue)" />
-          </g>
-          <path className="m m-think" d="M112 114q5-3 9 0t9 0" fill="none" stroke="var(--ink)" strokeWidth="3.5" strokeLinecap="round" />
           <OutfitLayer outfit={wearing} layer="head" />
         </g>
         <g className="armL">

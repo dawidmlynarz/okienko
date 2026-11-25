@@ -1,3 +1,5 @@
+import { friendGen } from '../companion/species'
+
 /** Every word Smoczy Domek shows or says lives here. An English UI later is a second file of the same shape. */
 /** Polish plural: 1 gwiazdka, 2–4 gwiazdki, 5+ gwiazdek (and 12–14 gwiazdek). */
 export function plural(n: number, one: string, few: string, many: string) {
@@ -25,7 +27,9 @@ export const pl = {
     childName: 'Imię dziecka',
     childNameHint: 'Tak, jak będzie je wpisywać, np. Zosia',
     companionColor: 'Kolor smoczka',
-    meet: 'To jest Smoczek!',
+    friend: 'Kto będzie przyjacielem?',
+    friendHint: 'Niech dziecko wybierze. Można to potem zmienić w ustawieniach.',
+    meet: (name: string) => `To jest ${name}!`,
     start: 'Gotowe, zaczynamy',
     backup: 'Kopia zapasowa',
     export: 'Zapisz kopię do pliku',
@@ -98,7 +102,9 @@ export const pl = {
     chipPlay: 'Graj',
     chipPet: 'Pogłaszcz',
     playThis: (app: string) => `Graj: ${app}`,
-    petHint: 'Kliknij Smoczka',
+    get petHint() {
+      return `Kliknij ${friendGen()}`
+    },
   },
   apps: {
     typing: 'Balonowy Las',
@@ -107,7 +113,9 @@ export const pl = {
     memory: 'Smocze Memory',
     counting: 'Liczymy Jabłka',
     notes: 'Notatnik',
-    wardrobe: 'Szafa Smoczka',
+    get wardrobe() {
+      return `Szafa ${friendGen()}`
+    },
     konik: 'Konik wraca do stajni',
     maze: 'Labirynt',
   },
@@ -118,7 +126,9 @@ export const pl = {
     memory: 'Znajdź pary',
     counting: 'Cyfry na klawiaturze',
     notes: 'Pisz, co chcesz',
-    wardrobe: 'Przebierz Smoczka',
+    get wardrobe() {
+      return `Przebierz ${friendGen()}`
+    },
     konik: 'Zaprowadź konika do domu',
     maze: 'Znajdź drogę do sera',
   },
@@ -200,7 +210,7 @@ export const pl = {
     } as Record<string, string>,
     canBuy: (n: number) => `Masz ${stars(n)}! Kupisz mi coś w szafie?`,
     saving: (n: number, thing: string) => `Jeszcze ${stars(n)} i kupimy: ${thing}!`,
-    idle: ['Lalala… smoki też lubią śpiewać.', 'Zobacz, moje oczy patrzą na myszkę!', 'Nudzi mi się trochę. Pogramy?', 'Kliknij mnie, to coś powiem!'],
+    idle: ['Lalala… lubię sobie pośpiewać.', 'Zobacz, moje oczy patrzą na myszkę!', 'Nudzi mi się trochę. Pogramy?', 'Kliknij mnie, to coś powiem!'],
   },
   words: {
     lead: 'Popatrz na obrazek i napisz słowo',
