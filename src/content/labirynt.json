@@ -1,0 +1,10 @@
+{
+  "$comment": "Labirynt: lead the mouse to the cheese. w and h are cells; key adds a key and a locked door; mazes is how many per round.",
+  "levels": [
+    { "id": "labirynt-malutki", "title": "Malutki", "subtitle": "", "w": 4, "h": 3, "key": false, "mazes": 3 },
+    { "id": "labirynt-maly", "title": "Mały", "subtitle": "", "w": 6, "h": 4, "key": false, "mazes": 3 },
+    { "id": "labirynt-duzy", "title": "Duży", "subtitle": "", "w": 8, "h": 5, "key": false, "mazes": 3 },
+    { "id": "labirynt-klucz", "title": "Z kluczem", "subtitle": "", "w": 7, "h": 5, "key": true, "mazes": 2 },
+    { "id": "labirynt-mistrz", "title": "Mistrz", "subtitle": "", "w": 10, "h": 6, "key": true, "mazes": 2 }
+  ]
+}

@@ -1,6 +1,6 @@
-import { useEffect, useRef, type CSSProperties } from 'react'
+import { useEffect, useId, useRef, type CSSProperties } from 'react'
 import { useDomek, type CompanionColor } from '../store/useDomek'
-import { OutfitLayer } from '../wardrobe/GadgetArt'
+import { BodyClip, OutfitLayer } from '../wardrobe/GadgetArt'
 import type { Outfit } from '../wardrobe/items'
 
 /* Eyes that follow the pointer. One window listener feeds every Smoczek on screen. */
@@ -96,6 +96,7 @@ interface Props {
 export function Smoczek({ pose = 'idle', color = 'mint', talking = false, size = 240, className = '', label = 'Smoczek', beat, followEyes = true, outfit }: Props) {
   const worn = useDomek((s) => s.wardrobe?.worn)
   const wearing = outfit ?? worn
+  const clipId = `smok-body-${useId().replace(/:/g, '')}`
   const ref = useRef<SVGSVGElement>(null)
   // Thinking looks up and away on purpose, so the eyes stop following then.
   useFollowEyes(ref, followEyes && pose !== 'thinking' && pose !== 'cheer', beat)
@@ -103,6 +104,9 @@ export function Smoczek({ pose = 'idle', color = 'mint', talking = false, size =
   const style = { '--body': body, '--belly': belly, '--spike': spike, '--line': line, width: size, height: 'auto' } as CSSProperties
   return (
     <svg ref={ref} key={beat} className={`smok ${pose} ${talking ? 'talking' : ''} ${className}`} viewBox="0 0 240 260" role="img" aria-label={label} style={style}>
+      <defs>
+        <BodyClip id={clipId} />
+      </defs>
       <ellipse cx="120" cy="248" rx="70" ry="8" fill="#1B2240" opacity=".08" />
       <g className="whole">
         <OutfitLayer outfit={wearing} layer="back" />
@@ -130,8 +134,14 @@ export function Smoczek({ pose = 'idle', color = 'mint', talking = false, size =
           <ellipse className="ln" cx="120" cy="186" rx="56" ry="52" fill="var(--body)" />
           <ellipse cx="120" cy="196" rx="35" ry="36" fill="var(--belly)" />
           <path d="M98 184q22 8 44 0M96 200q24 8 48 0M100 216q20 7 40 0" fill="none" stroke="var(--line)" strokeWidth="3" strokeLinecap="round" opacity=".35" />
+          <OutfitLayer outfit={wearing} layer="body" clipId={clipId} />
+          <OutfitLayer outfit={wearing} layer="over" />
+          <OutfitLayer outfit={wearing} layer="feet" />
         </g>
-        <rect className="armL ln" x="63" y="168" width="18" height="34" rx="9" fill="var(--body)" transform="rotate(18)" />
+        <g className="armL">
+          <rect className="ln" x="63" y="168" width="18" height="34" rx="9" fill="var(--body)" transform="rotate(18 72 172)" />
+          <OutfitLayer outfit={wearing} layer="hand" />
+        </g>
         <rect className="armR ln" x="159" y="168" width="18" height="34" rx="9" fill="var(--body)" transform="rotate(-18)" />
         <g className="head">
           <path className="ln" d="M104 52l6-16 8 14zM116 48l7-18 8 16zM128 50l8-15 6 16z" fill="var(--spike)" />
@@ -170,7 +180,6 @@ export function Smoczek({ pose = 'idle', color = 'mint', talking = false, size =
           <path className="m m-think" d="M108 139q6-4 12 0t12-1" fill="none" stroke="var(--line)" strokeWidth="4" strokeLinecap="round" />
           <OutfitLayer outfit={wearing} layer="head" />
         </g>
-        <OutfitLayer outfit={wearing} layer="front" />
       </g>
     </svg>
   )

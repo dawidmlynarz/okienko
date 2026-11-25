@@ -2,26 +2,185 @@
   "$comment": "Obrazkowe Słowa levels. picture is an id from src/assets/pictures.ts. count: words per round.",
   "levels": [
     {
-      "id": "slowa-krotkie", "title": "Krótkie słowa", "subtitle": "kot, dom, lis", "count": 5, "hintAfterMs": 0, "unlockStars": 0,
+      "id": "slowa-krotkie",
+      "title": "Krótkie słowa",
+      "subtitle": "kot, dom, lis",
+      "count": 5,
+      "hintAfterMs": 0,
+      "unlockStars": 0,
       "words": [
-        { "word": "kot", "picture": "kot" }, { "word": "dom", "picture": "dom" }, { "word": "lis", "picture": "lis" },
-        { "word": "ser", "picture": "ser" }, { "word": "nos", "picture": "nos" }, { "word": "oko", "picture": "oko" },
-        { "word": "lew", "picture": "lew" }
+        {
+          "word": "kot",
+          "picture": "kot"
+        },
+        {
+          "word": "dom",
+          "picture": "dom"
+        },
+        {
+          "word": "lis",
+          "picture": "lis"
+        },
+        {
+          "word": "ser",
+          "picture": "ser"
+        },
+        {
+          "word": "nos",
+          "picture": "nos"
+        },
+        {
+          "word": "oko",
+          "picture": "oko"
+        },
+        {
+          "word": "lew",
+          "picture": "lew"
+        }
       ]
     },
     {
-      "id": "slowa-dluzsze", "title": "Dłuższe słowa", "subtitle": "pies, ryba, sowa", "count": 5, "hintAfterMs": 2500, "unlockStars": 2,
+      "id": "slowa-dluzsze",
+      "title": "Dłuższe słowa",
+      "subtitle": "pies, ryba, sowa",
+      "count": 5,
+      "hintAfterMs": 2500,
+      "unlockStars": 2,
       "words": [
-        { "word": "pies", "picture": "pies" }, { "word": "ryba", "picture": "ryba" }, { "word": "sowa", "picture": "sowa" },
-        { "word": "mysz", "picture": "mysz" }, { "word": "auto", "picture": "auto" }, { "word": "lody", "picture": "lody" },
-        { "word": "tort", "picture": "tort" }
+        {
+          "word": "pies",
+          "picture": "pies"
+        },
+        {
+          "word": "ryba",
+          "picture": "ryba"
+        },
+        {
+          "word": "sowa",
+          "picture": "sowa"
+        },
+        {
+          "word": "mysz",
+          "picture": "mysz"
+        },
+        {
+          "word": "auto",
+          "picture": "auto"
+        },
+        {
+          "word": "lody",
+          "picture": "lody"
+        },
+        {
+          "word": "tort",
+          "picture": "tort"
+        }
       ]
     },
     {
-      "id": "slowa-polskie", "title": "Polskie litery", "subtitle": "żaba, jeż, miś", "count": 5, "hintAfterMs": 0, "unlockStars": 4,
+      "id": "slowa-polskie",
+      "title": "Polskie litery",
+      "subtitle": "żaba, jeż, miś",
+      "count": 5,
+      "hintAfterMs": 0,
+      "unlockStars": 4,
       "words": [
-        { "word": "żaba", "picture": "zaba" }, { "word": "jeż", "picture": "jez" }, { "word": "miś", "picture": "mis" },
-        { "word": "koń", "picture": "kon" }, { "word": "słoń", "picture": "slon" }
+        {
+          "word": "żaba",
+          "picture": "zaba"
+        },
+        {
+          "word": "jeż",
+          "picture": "jez"
+        },
+        {
+          "word": "miś",
+          "picture": "mis"
+        },
+        {
+          "word": "koń",
+          "picture": "kon"
+        },
+        {
+          "word": "słoń",
+          "picture": "slon"
+        }
+      ]
+    },
+    {
+      "id": "slowa-dlugie",
+      "title": "Długie słowa",
+      "subtitle": "banan, balon, lizak",
+      "count": 5,
+      "hintAfterMs": 3500,
+      "unlockStars": 0,
+      "words": [
+        {
+          "word": "banan",
+          "picture": "banan"
+        },
+        {
+          "word": "balon",
+          "picture": "balon"
+        },
+        {
+          "word": "rybka",
+          "picture": "rybka"
+        },
+        {
+          "word": "lizak",
+          "picture": "lizak"
+        },
+        {
+          "word": "rakieta",
+          "picture": "rakieta"
+        },
+        {
+          "word": "prezent",
+          "picture": "prezent"
+        },
+        {
+          "word": "choinka",
+          "picture": "choinka"
+        }
+      ]
+    },
+    {
+      "id": "slowa-mistrz",
+      "title": "Mistrz",
+      "subtitle": "jabłko, tęcza, słońce",
+      "count": 5,
+      "hintAfterMs": 5000,
+      "unlockStars": 0,
+      "words": [
+        {
+          "word": "jabłko",
+          "picture": "jablko"
+        },
+        {
+          "word": "tęcza",
+          "picture": "tecza"
+        },
+        {
+          "word": "słońce",
+          "picture": "slonce"
+        },
+        {
+          "word": "gwiazda",
+          "picture": "gwiazda"
+        },
+        {
+          "word": "kwiatek",
+          "picture": "kwiatek"
+        },
+        {
+          "word": "wiśnie",
+          "picture": "wisnie"
+        },
+        {
+          "word": "marchewka",
+          "picture": "marchewka"
+        }
       ]
     }
   ]

@@ -54,6 +54,8 @@ const pictures = {
   koniczyna: 'four-leaf-clover',
   iskry: 'sparkles',
   cegla: 'brick',
+  klucz: 'old-key',
+  klodka: 'locked',
   korona: 'crown',
 }
 

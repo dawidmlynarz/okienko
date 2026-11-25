@@ -27,3 +27,14 @@ describe('makeQuestions', () => {
     for (let n = 1; n <= 9; n++) expect(SPOTS[n]).toHaveLength(n)
   })
 })
+
+describe('three plates', () => {
+  it('adds three small plates and stays a single digit', () => {
+    for (const q of makeQuestions(level('add3', 9))) {
+      expect(q.plates).toHaveLength(3)
+      expect(q.answer).toBe(q.plates.reduce((a, b) => a + b, 0))
+      expect(q.answer).toBeLessThanOrEqual(9)
+      expect(Math.min(...q.plates)).toBeGreaterThanOrEqual(1)
+    }
+  })
+})

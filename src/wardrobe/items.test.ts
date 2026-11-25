@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { GADGETS, balanceOf, buy, nextGoal, toggleWear, type Wardrobe } from './items'
+import { GADGET_ART } from './GadgetArt'
+import { GADGETS, SLOTS, balanceOf, buy, nextGoal, toggleWear, type Wardrobe } from './items'
 
 const empty: Wardrobe = { owned: [], worn: {} }
 
@@ -34,6 +35,11 @@ describe('wardrobe', () => {
   it('aims at the cheapest gadget not owned yet', () => {
     expect(nextGoal(empty)?.price).toBe(3)
     expect(nextGoal({ owned: GADGETS.map((g) => g.id), worn: {} })).toBeNull()
+  })
+
+  it('has eight gadgets on every shelf, each with a drawing', () => {
+    for (const slot of SLOTS) expect(GADGETS.filter((g) => g.slot === slot)).toHaveLength(8)
+    for (const g of GADGETS) expect(GADGET_ART[g.id], g.id).toBeTruthy()
   })
 
   it('has unique ids and prices a kid can reach', () => {

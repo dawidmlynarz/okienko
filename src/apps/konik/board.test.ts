@@ -27,12 +27,12 @@ describe('Konik board', () => {
     expect(runProgram(map, ['right', 'right', 'down'])).toMatchObject({ bumpAt: 1, home: false })
   })
 
-  it('every level map can be solved, in at most 10 cards', () => {
+  it('every level map can be solved, in at most 12 cards', () => {
     for (const level of data.levels) {
       for (const rows of level.maps) {
         const d = shortest(parseMap(rows))
         expect(d, rows.join('/')).toBeGreaterThan(0)
-        expect(d).toBeLessThanOrEqual(10)
+        expect(d).toBeLessThanOrEqual(12)
       }
     }
   })

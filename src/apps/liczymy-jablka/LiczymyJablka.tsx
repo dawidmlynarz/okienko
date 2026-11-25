@@ -41,7 +41,7 @@ function Round({ level, onDone, onBack }: RoundProps<Level>) {
   const good = useRef(0)
   const tell = useCallback((text: string | null, pose: Pose, say?: string) => setTalk((c) => ({ text, pose, say: say ?? '', key: c.key + 1 })), [])
   const q = questions[qi]
-  const ask = level.mode === 'add' ? pl.counting.howManySum : pl.counting.howMany
+  const ask = level.mode !== 'count' ? pl.counting.howManySum : pl.counting.howMany
 
   useEffect(() => {
     setMissed(false)
@@ -111,7 +111,7 @@ function Round({ level, onDone, onBack }: RoundProps<Level>) {
                       <Plus size={34} weight="bold" />
                     </span>
                   )}
-                  <Plate count={count} start={start} counting={counting} solved={solved} />
+                  <Plate count={count} start={start} counting={counting} solved={solved} small={q.plates.length > 2} />
                 </div>
               )
             })}
@@ -136,9 +136,10 @@ function Round({ level, onDone, onBack }: RoundProps<Level>) {
 }
 
 /** A plate of apples laid out like dice spots; when counting together, each apple gets its number. */
-function Plate({ count, start, counting, solved }: { count: number; start: number; counting: boolean; solved: boolean }) {
+function Plate({ count, start, counting, solved, small }: { count: number; start: number; counting: boolean; solved: boolean; small?: boolean }) {
   const spots = SPOTS[count]
-  const cell = 'min(84px, 9.5vh)'
+  // Three plates side by side need smaller ones, so Smoczek and his bubble still fit beside them.
+  const cell = small ? 'min(64px, 7.5vh)' : 'min(84px, 9.5vh)'
   return (
     <motion.div animate={solved ? { scale: [1, 1.05, 1] } : {}} className="grid grid-cols-3 gap-2 rounded-[36px] bg-surface p-5 shadow-float ring-1 ring-ink-900/5">
       {Array.from({ length: 9 }, (_, cellIdx) => {

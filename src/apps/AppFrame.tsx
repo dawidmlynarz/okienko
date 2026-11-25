@@ -1,4 +1,4 @@
-import { House } from '@phosphor-icons/react'
+import { X } from '@phosphor-icons/react'
 import { motion } from 'motion/react'
 import { Suspense, createContext, useCallback, useContext, useRef, useState } from 'react'
 import { AppIcon, launchOrigin } from '../components/Dock'
@@ -59,9 +59,11 @@ export function AppFrame({ app }: { app: AppDef }) {
             play('click')
             close()
           }}
-          className="pressable flex h-12 items-center gap-2 rounded-full bg-accent-soft px-5 font-display text-lg font-semibold text-accent-deep hover:bg-accent-pastel"
+          aria-label={pl.os.close}
+          title={pl.os.close}
+          className="pressable grid size-12 place-items-center rounded-full bg-accent-soft text-accent-deep hover:bg-coral-100 hover:text-coral-900"
         >
-          <House size={24} weight="bold" /> {pl.os.home}
+          <X size={26} weight="bold" />
         </button>
       </header>
       <div className="relative min-h-0 flex-1">

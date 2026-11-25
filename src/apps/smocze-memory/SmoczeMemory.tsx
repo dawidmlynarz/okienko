@@ -92,8 +92,8 @@ function Round({ level, onDone, onBack }: RoundProps<Level>) {
   }
 
   const rows = Math.ceil(cards.length / level.columns)
-  // Size cards from the height we have, so 12 cards still fit on a short laptop screen.
-  const h = `min(196px, calc((100vh - 300px) / ${rows} - 16px))`
+  // Size cards from the room we have (height, and width beside Smoczek), so 16 cards still fit on a short laptop screen.
+  const h = `min(196px, calc((100vh - 300px) / ${rows} - 16px), calc(((100vw - 600px) / ${level.columns} - 16px) * 1.2))`
   return (
     <div className="flex h-full flex-col">
       <GameHud onBack={onBack} done={found.size} total={level.pairs} title={level.title} label={pl.memory.moves(moves)} />

@@ -86,6 +86,7 @@ const LEVEL_TINTS = [
   { bg: 'var(--color-sky-100)', chip: 'var(--color-sky-200)', ink: 'var(--color-sky-900)' },
   { bg: 'var(--color-lavender-100)', chip: 'var(--color-lavender-200)', ink: 'var(--color-lavender-900)' },
   { bg: 'var(--color-peach-100)', chip: 'var(--color-peach-200)', ink: 'var(--color-peach-900)' },
+  { bg: 'var(--color-pink-100)', chip: 'var(--color-pink-200)', ink: 'var(--color-pink-900)' },
 ]
 
 export function LevelPicker<L extends LevelBase>({ levels, heading, lead, hint, onPick }: { levels: L[]; heading: string; lead: string; hint?: string; onPick: (l: L) => void }) {
@@ -112,7 +113,7 @@ export function LevelPicker<L extends LevelBase>({ levels, heading, lead, hint, 
                 play('pop')
                 onPick(l)
               }}
-              className="flex h-[min(300px,42vh)] w-60 flex-col items-center justify-between rounded-[32px] p-6 text-center shadow-card ring-1 ring-ink-900/5"
+              className="flex h-[min(300px,42vh)] w-[min(240px,16.5vw)] flex-col items-center justify-between rounded-[32px] p-6 text-center shadow-card ring-1 ring-ink-900/5"
               style={{ background: tint.bg }}
             >
               <span

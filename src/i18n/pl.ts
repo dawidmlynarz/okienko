@@ -11,6 +11,7 @@ export const pl = {
   os: {
     name: 'Smoczy Domek',
     home: 'Domek',
+    close: 'Zamknij',
     logout: 'Wyloguj',
     soundOn: 'Dźwięk włączony',
     soundOff: 'Dźwięk wyłączony',
@@ -108,6 +109,7 @@ export const pl = {
     notes: 'Notatnik',
     wardrobe: 'Szafa Smoczka',
     konik: 'Konik wraca do stajni',
+    maze: 'Labirynt',
   },
   appBlurb: {
     typing: 'Litery na balonikach',
@@ -118,6 +120,7 @@ export const pl = {
     notes: 'Pisz, co chcesz',
     wardrobe: 'Przebierz Smoczka',
     konik: 'Zaprowadź konika do domu',
+    maze: 'Znajdź drogę do sera',
   },
   game: {
     pickLevel: 'Wybierz poziom',
@@ -197,6 +200,7 @@ export const pl = {
       notatnik: 'Może napiszesz dla mnie jakąś historyjkę?',
       szafa: 'Zajrzymy do mojej szafy? Lubię się przebierać!',
       konik: 'Konik się zgubił! Pomożesz mu wrócić do stajni?',
+      labirynt: 'Myszka jest w labiryncie. Pomożesz jej znaleźć ser?',
     } as Record<string, string>,
     canBuy: (n: number) => `Masz ${stars(n)}! Kupisz mi coś w szafie?`,
     saving: (n: number, thing: string) => `Jeszcze ${stars(n)} i kupimy: ${thing}!`,
@@ -255,10 +259,27 @@ export const pl = {
     carrot: 'Mniam!',
     resultLine: (n: number, total: number) => `${n} z ${total} za pierwszym razem`,
   },
+  labirynt: {
+    lead: 'Pomóż myszce dojść do sera',
+    show: 'Do sera!',
+    say: 'Myszka jest głodna! Naciskaj strzałki i zaprowadź ją do sera.',
+    showKey: 'Najpierw klucz!',
+    sayKey: 'Drzwi są zamknięte na kłódkę. Znajdź klucz, a potem idź do sera.',
+    next: 'Nowy labirynt!',
+    wall: 'Ściana!',
+    wallSay: ['Tu jest ściana. Spróbuj w inną stronę.', 'Tędy nie przejdziemy. Poszukaj innej drogi.'],
+    locked: 'Zamknięte!',
+    lockedSay: 'Drzwi są zamknięte. Poszukaj klucza!',
+    gotKey: 'Mam klucz!',
+    gotKeySay: 'Jest klucz! Teraz drzwi się otworzą. Idziemy do sera!',
+    home: ['Mniam!', 'Hura!', 'Brawo!'],
+    homeSay: ['Mniam! Myszka zjadła ser!', 'Hura! Myszka znalazła ser!', 'Brawo! Myszka dziękuje!'],
+    resultLine: (n: number, total: number) => `${n} z ${total} bez błądzenia`,
+  },
   wardrobe: {
     lead: 'Co założymy?',
     hello: 'Witaj w mojej szafie! Kliknij coś, to przymierzę.',
-    tabs: { head: 'Czapki', eyes: 'Okulary', neck: 'Na szyję', extra: 'Dodatki' },
+    tabs: { head: 'Czapki', eyes: 'Okulary', neck: 'Na szyję', body: 'Ubrania', feet: 'Buty', extra: 'Dodatki' },
     buy: 'Kup',
     wear: 'Załóż',
     takeOff: 'Zdejmij',
@@ -278,7 +299,7 @@ export const pl = {
   /** Explanations for grown-ups, behind a (?) button. The child never has to read these. */
   parentHint: {
     home: 'Kliknięcie Smoczka to głaskanie. Przyciski pod dymkiem: żart, ciekawostka, propozycja gry. Smoczek mówi wszystko na głos; głośnik w dymku powtarza zdanie.',
-    wardrobe: 'Gwiazdki to kieszonkowe: każda ukończona runda daje 1–3 gwiazdki. W Szafie Smoczka można je wydać na gadżety (od 3 do 25 gwiazdek). Kupionych rzeczy nie da się stracić; można je zakładać i zdejmować do woli. Wszystkie gry i poziomy są dostępne od razu.',
+    wardrobe: 'Gwiazdki to kieszonkowe: każda ukończona runda daje 1–3 gwiazdki. W Szafie Smoczka można je wydać na ubrania i gadżety: 6 półek po 8 rzeczy, od 3 do 25 gwiazdek. Kupionych rzeczy nie da się stracić; można je zakładać i zdejmować do woli. Wszystkie gry i poziomy są dostępne od razu.',
     login: 'Logowanie w dwóch krokach: imię mówi, kim jest, a 3 obrazki to jej tajny kod. Wielką literę pisze się z wciśniętym shiftem. Kod można wyczyścić w ustawieniach rodzica.',
     games: {
       'balonowy-las': 'Uczy, gdzie są litery na klawiaturze, także polskie (option lub prawy Alt). Świecący klawisz podpowiada.',
@@ -287,6 +308,7 @@ export const pl = {
       'smocze-memory': 'Ćwiczy pamięć i klikanie. Mniej ruchów to więcej gwiazdek.',
       konik: 'Uczy strzałek na klawiaturze, kierunków (lewo, prawo, góra, dół) i planowania kroków, czyli podstaw programowania. Na poziomie „Strzałki” konik idzie od razu. Na poziomach „Plan” i „Przeszkody” dziecko najpierw układa strzałki, a potem sprawdza plan przyciskiem Start (albo Enter); Backspace usuwa ostatnią strzałkę. Gwiazdki są za mapy rozwiązane za pierwszym razem, a na poziomie „Strzałki” za drogę bez wielu zbędnych kroków.',
       'liczymy-jablka': 'Ćwiczy liczenie i cyfry w górnym rzędzie klawiatury (działa też klikanie). Po pomyłce Smoczek liczy razem z nią.',
+      labirynt: 'Gra logiczna: szukanie drogi, patrzenie kilka kroków do przodu i wracanie ze ślepych uliczek. Myszka idzie strzałkami (na klawiaturze albo na ekranie), a kropki pokazują, gdzie już była. Na poziomach „Z kluczem” i „Mistrz” drzwi z kłódką otwiera dopiero klucz schowany w bocznej uliczce. Każdy labirynt jest za każdym razem inny. Gwiazdki są za dojście bez dużego błądzenia.',
     } as Record<string, string>,
   },
   pictures: {

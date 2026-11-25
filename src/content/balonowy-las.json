@@ -1,9 +1,55 @@
 {
   "$comment": "Balonowy Las levels. Tune difficulty here, no code changes needed. riseMs: how long a balloon takes to float up. hintAfterMs: when the key starts glowing (0 = always).",
   "levels": [
-    { "id": "domowy", "title": "Rząd domowy", "subtitle": "a s d f j k l", "letters": "asdfjkl", "balloons": 10, "riseMs": 4200, "hintAfterMs": 0, "unlockStars": 0 },
-    { "id": "gorny", "title": "Górny rząd", "subtitle": "q w e r t y u i o p", "letters": "qwertyuiopasdfjkl", "balloons": 10, "riseMs": 3800, "hintAfterMs": 2500, "unlockStars": 2 },
-    { "id": "alfabet", "title": "Cały alfabet", "subtitle": "a b c … z", "letters": "abcdefghijklmnoprstuwyz", "balloons": 12, "riseMs": 3400, "hintAfterMs": 3000, "unlockStars": 3 },
-    { "id": "polskie", "title": "Polskie litery", "subtitle": "ą ć ę ł ń ó ś ź ż", "letters": "ąćęłńóśźż", "balloons": 10, "riseMs": 4500, "hintAfterMs": 0, "unlockStars": 4 }
+    {
+      "id": "domowy",
+      "title": "Rząd domowy",
+      "subtitle": "a s d f j k l",
+      "letters": "asdfjkl",
+      "balloons": 10,
+      "riseMs": 4200,
+      "hintAfterMs": 0,
+      "unlockStars": 0
+    },
+    {
+      "id": "gorny",
+      "title": "Górny rząd",
+      "subtitle": "q w e r t y u i o p",
+      "letters": "qwertyuiopasdfjkl",
+      "balloons": 10,
+      "riseMs": 3800,
+      "hintAfterMs": 2500,
+      "unlockStars": 2
+    },
+    {
+      "id": "dolny",
+      "title": "Dolny rząd",
+      "subtitle": "z x c v b n m",
+      "letters": "zxcvbnmasdfjkl",
+      "balloons": 10,
+      "riseMs": 3800,
+      "hintAfterMs": 2500,
+      "unlockStars": 0
+    },
+    {
+      "id": "alfabet",
+      "title": "Cały alfabet",
+      "subtitle": "a b c … z",
+      "letters": "abcdefghijklmnoprstuwyz",
+      "balloons": 12,
+      "riseMs": 3400,
+      "hintAfterMs": 3000,
+      "unlockStars": 3
+    },
+    {
+      "id": "polskie",
+      "title": "Polskie litery",
+      "subtitle": "ą ć ę ł ń ó ś ź ż",
+      "letters": "ąćęłńóśźż",
+      "balloons": 10,
+      "riseMs": 4500,
+      "hintAfterMs": 0,
+      "unlockStars": 4
+    }
   ]
 }

@@ -14,7 +14,7 @@ import { GADGETS, SLOTS, balanceOf, gadgetById, type Outfit, type Slot } from '.
 import type { AppProps } from '../registry'
 
 /** The gadget that stands for each shelf on its tab. */
-const TAB_ICON: Record<Slot, string> = { head: 'czapka', eyes: 'okulary', neck: 'muszka', extra: 'balonik' }
+const TAB_ICON: Record<Slot, string> = { head: 'czapka', eyes: 'okulary', neck: 'muszka', body: 'sukienka', feet: 'trampki', extra: 'balonik' }
 
 interface Line {
   text: string
@@ -116,7 +116,7 @@ export default function Szafa(_: AppProps) {
 
       {/* Shelves */}
       <section className="card flex min-h-0 flex-col gap-4 rounded-[32px] p-5">
-        <div className="grid grid-cols-4 gap-2" role="tablist" aria-label={pl.apps.wardrobe}>
+        <div className="grid grid-cols-6 gap-2" role="tablist" aria-label={pl.apps.wardrobe}>
           {SLOTS.map((s) => {
             const on = s === tab
             return (
@@ -129,18 +129,18 @@ export default function Szafa(_: AppProps) {
                   play('click')
                   setTab(s)
                 }}
-                className={`pressable flex h-[min(76px,10vh)] items-center justify-center gap-2 rounded-[22px] px-2 font-display text-lg font-bold ${
+                className={`pressable flex h-[min(84px,11vh)] flex-col items-center justify-center gap-0.5 rounded-[20px] px-1 font-display text-base leading-tight font-bold ${
                   on ? 'bg-accent-soft text-accent-deep shadow-[inset_0_0_0_3px_var(--accent-edge)]' : 'bg-ink-50 text-ink-700 hover:bg-ink-100'
                 }`}
               >
-                <GadgetPicture id={TAB_ICON[s]} size="min(44px, 6vh)" />
+                <GadgetPicture id={TAB_ICON[s]} size="min(40px, 5vh)" />
                 <span className="truncate">{pl.wardrobe.tabs[s]}</span>
               </button>
             )
           })}
         </div>
 
-        <div className="grid min-h-0 flex-1 auto-rows-fr grid-cols-2 gap-4 overflow-y-auto p-1" role="tabpanel">
+        <div className="grid min-h-0 flex-1 auto-rows-fr grid-cols-4 gap-3 overflow-y-auto p-1" role="tabpanel">
           {shelf.map((g, i) => {
             const have = wardrobe.owned.includes(g.id)
             const on = wardrobe.worn[g.slot] === g.id
@@ -158,12 +158,12 @@ export default function Szafa(_: AppProps) {
                 onClick={() => pick(g.id)}
                 aria-label={g.name}
                 aria-pressed={sel}
-                className={`relative flex min-h-[150px] flex-col items-center justify-between gap-2 rounded-[26px] p-4 transition-shadow ${
+                className={`relative flex min-h-[120px] flex-col items-center justify-between gap-1.5 rounded-[24px] p-3 transition-shadow ${
                   sel ? 'bg-accent-soft shadow-[inset_0_0_0_4px_var(--accent-edge)]' : 'bg-surface shadow-[inset_0_0_0_1.5px_var(--color-ink-100),0_2px_6px_rgb(27_34_64/0.06)]'
                 }`}
               >
                 <span className="grid min-h-0 flex-1 place-items-center">
-                  <GadgetPicture id={g.id} size="min(130px, 16vh)" />
+                  <GadgetPicture id={g.id} size="min(96px, 13vh)" />
                 </span>
                 {have ? (
                   <span className={`flex items-center gap-1.5 rounded-full px-3.5 py-1.5 font-display text-lg font-bold ${on ? 'bg-mint-700 text-white' : 'bg-mint-100 text-mint-900'}`}>

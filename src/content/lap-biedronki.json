@@ -30,6 +30,26 @@
       "count": 12,
       "moving": true,
       "unlockStars": 4
+    },
+    {
+      "id": "biedronki-szybkie",
+      "title": "Szybkie",
+      "subtitle": "",
+      "size": 100,
+      "lifeMs": 2400,
+      "count": 12,
+      "moving": false,
+      "unlockStars": 0
+    },
+    {
+      "id": "biedronki-malutkie",
+      "title": "Malutkie",
+      "subtitle": "",
+      "size": 70,
+      "lifeMs": 3200,
+      "count": 14,
+      "moving": true,
+      "unlockStars": 0
     }
   ]
 }

@@ -1,6 +1,6 @@
-import { ArrowCounterClockwise, ArrowFatDown, ArrowFatLeft, ArrowFatRight, ArrowFatUp, Play } from '@phosphor-icons/react'
+import { ArrowCounterClockwise, Play } from '@phosphor-icons/react'
 import { AnimatePresence, motion } from 'motion/react'
-import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Companion } from '../../components/Companion'
 import { Picture } from '../../components/Picture'
 import type { Pose } from '../../components/Smoczek'
@@ -11,6 +11,7 @@ import { burst, celebrate } from '../../lib/confetti'
 import { play } from '../../lib/sound'
 import { speak } from '../../lib/speak'
 import type { AppProps } from '../registry'
+import { ARROW, ArrowPad, useArrowKeys } from '../shared/ArrowPad'
 import { GameHud, GameShell, starsFor, type LevelBase, type RoundProps } from '../shared/GameKit'
 import { parseMap, runProgram, samePos, shortest, step, type Board, type Dir, type Pos } from './board'
 
@@ -20,17 +21,10 @@ interface Level extends LevelBase {
 }
 const levels = data.levels as Level[]
 
-/** Most arrow cards that fit under the board. The longest map needs 7. */
-const MAX_CARDS = 10
+/** Most arrow cards that fit under the board. The longest map needs 10. */
+const MAX_CARDS = 12
 const STEP_MS = 420
 
-const ARROW: Record<Dir, (p: { size: number; weight?: 'fill' | 'bold' }) => ReactNode> = {
-  up: (p) => <ArrowFatUp {...p} />,
-  down: (p) => <ArrowFatDown {...p} />,
-  left: (p) => <ArrowFatLeft {...p} />,
-  right: (p) => <ArrowFatRight {...p} />,
-}
-const KEY_DIR: Record<string, Dir> = { ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right' }
 const pickOne = <T,>(xs: readonly T[]) => xs[Math.floor(Math.random() * xs.length)]
 
 export default function Konik(_: AppProps) {
@@ -225,19 +219,7 @@ function Round({ level, onDone, onBack }: RoundProps<Level>) {
 
   const onArrow = (dir: Dir) => (plan ? addCard(dir) : move(dir))
 
-  // Arrow keys are named keys, so they need their own listener.
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      const dir = KEY_DIR[e.key]
-      if (!dir || e.repeat) return
-      e.preventDefault()
-      onArrowRef.current(dir)
-    }
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [])
-  const onArrowRef = useRef(onArrow)
-  onArrowRef.current = onArrow
+  useArrowKeys(onArrow)
 
   useTypedKeys((k) => {
     if (k.kind === 'escape') onBack()
@@ -389,31 +371,6 @@ function Stable({ open }: { open: boolean }) {
         </g>
       )}
     </svg>
-  )
-}
-
-/** Four big arrow keys in the same layout as on the keyboard. */
-function ArrowPad({ onArrow, disabled }: { onArrow: (d: Dir) => void; disabled: boolean }) {
-  const key = (d: Dir) => (
-    <button
-      type="button"
-      aria-label={pl.konik.dirs[d]}
-      onClick={() => onArrow(d)}
-      disabled={disabled}
-      className="pressable grid size-[min(64px,8vh)] place-items-center rounded-[16px] bg-surface text-accent-strong shadow-[inset_0_0_0_1.5px_var(--color-ink-200),0_3px_0_var(--color-ink-200)] hover:bg-accent-soft disabled:opacity-60"
-    >
-      {ARROW[d]({ size: 30, weight: 'fill' })}
-    </button>
-  )
-  return (
-    <div className="glass-strong flex flex-col items-center gap-2 rounded-[24px] p-3">
-      {key('up')}
-      <div className="flex gap-2">
-        {key('left')}
-        {key('down')}
-        {key('right')}
-      </div>
-    </div>
   )
 }
 

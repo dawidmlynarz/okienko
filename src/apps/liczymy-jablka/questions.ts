@@ -1,7 +1,7 @@
 import type { LevelBase } from '../shared/scoring'
 
 export interface Level extends LevelBase {
-  mode: 'count' | 'add'
+  mode: 'count' | 'add' | 'add3'
   max: number
   questions: number
   hintAfterMs: number
@@ -19,7 +19,13 @@ export function makeQuestions(level: Level, rand = Math.random): Question[] {
   const max = Math.max(2, Math.min(9, level.max))
   while (out.length < level.questions) {
     let q: Question
-    if (level.mode === 'add') {
+    if (level.mode === 'add3') {
+      // Three small plates, sum at most max: 1-3 apples each.
+      const a = 1 + Math.floor(rand() * 3)
+      const b = 1 + Math.floor(rand() * 3)
+      const c = 1 + Math.floor(rand() * Math.min(3, max - a - b))
+      q = { plates: [a, b, c], answer: a + b + c }
+    } else if (level.mode === 'add') {
       const a = 1 + Math.floor(rand() * (max - 1))
       const b = 1 + Math.floor(rand() * (max - a))
       q = { plates: [a, b], answer: a + b }

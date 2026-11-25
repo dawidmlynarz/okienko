@@ -31,6 +31,7 @@ export const apps: AppDef[] = [
   { id: 'smocze-memory', name: pl.apps.memory, blurb: pl.appBlurb.memory, icon: 'karty', accent: 'system', kind: 'game', host: 'smoczek', component: lazy(() => import('./smocze-memory/SmoczeMemory')) },
   { id: 'liczymy-jablka', name: pl.apps.counting, blurb: pl.appBlurb.counting, icon: 'jablko', accent: 'maths', kind: 'game', host: 'smoczek', component: lazy(() => import('./liczymy-jablka/LiczymyJablka')) },
   { id: 'konik', name: pl.apps.konik, blurb: pl.appBlurb.konik, icon: 'konik', accent: 'typing', kind: 'game', host: 'smoczek', component: lazy(() => import('./konik/Konik')) },
+  { id: 'labirynt', name: pl.apps.maze, blurb: pl.appBlurb.maze, icon: 'ser', accent: 'maths', kind: 'game', host: 'smoczek', component: lazy(() => import('./labirynt/Labirynt')) },
   { id: 'szafa', name: pl.apps.wardrobe, blurb: pl.appBlurb.wardrobe, icon: 'korona', accent: 'shop', kind: 'tool', host: 'smoczek', component: lazy(() => import('./szafa/Szafa')) },
   { id: 'notatnik', name: pl.apps.notes, blurb: pl.appBlurb.notes, icon: 'notes', accent: 'notes', kind: 'tool', host: 'smoczek', component: lazy(() => import('./notatnik/Notatnik')) },
 ]
