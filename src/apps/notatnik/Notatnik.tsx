@@ -1,4 +1,5 @@
 import { FloppyDisk, Plus, SpeakerHigh, Trash } from '@phosphor-icons/react'
+import { fresh } from '../../lib/bag'
 import { AnimatePresence, motion } from 'motion/react'
 import { useEffect, useRef, useState } from 'react'
 import { Button } from '../../components/Button'
@@ -48,7 +49,7 @@ export default function Notatnik(_: AppProps) {
     setCurrentId(id)
     play('save')
     setToast((t) => t + 1)
-    speak(pl.notes.savedSay)
+    speak(fresh(pl.notes.savedSay))
   }
 
   /** Switch notes, asking first if there is unsaved work. */

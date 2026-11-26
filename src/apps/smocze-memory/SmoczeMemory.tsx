@@ -1,5 +1,5 @@
 import { PACE, afterTalk } from '../../lib/speak'
-import { fresh } from '../../lib/bag'
+import { firstThen, fresh } from '../../lib/bag'
 import { motion } from 'motion/react'
 import { useCallback, useMemo, useRef, useState } from 'react'
 import type { PictureId } from '../../assets/pictures'
@@ -48,7 +48,7 @@ function Round({ level, onDone, onBack }: RoundProps<Level>) {
   const [open, setOpen] = useState<number[]>([])
   const [found, setFound] = useState<Set<PictureId>>(() => new Set())
   const [moves, setMoves] = useState(0)
-  const [talk, setTalk] = useState<{ text: string | null; say?: string; pose: Pose; key: number }>({ text: pl.memory.show, say: pl.memory.startSay, pose: 'happy', key: 0 })
+  const [talk, setTalk] = useState<{ text: string | null; say?: string; pose: Pose; key: number }>(() => ({ text: pl.memory.show, say: firstThen('smocze-memory', pl.memory.startSay, pl.memory.startAgain), pose: 'happy', key: 0 }))
   const busy = useRef(false)
   const misses = useRef(0)
   const tell = useCallback((text: string | null, pose: Pose, say?: string) => setTalk((c) => ({ text, pose, say: say ?? '', key: c.key + 1 })), [])

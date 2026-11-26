@@ -1,4 +1,5 @@
 import { Plus } from '@phosphor-icons/react'
+import { fresh, firstThen } from '../../lib/bag'
 import { AnimatePresence, motion } from 'motion/react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Companion } from '../../components/Companion'
@@ -48,7 +49,8 @@ function Round({ level, onDone, onBack }: RoundProps<Level>) {
     setSolved(false)
     setHint(false)
     setCounting(false)
-    tell(ask, 'happy', qi === 0 ? pl.counting.startSay : ask)
+    // The full how-to once a session; after that a short, changing question (or none: the bubble asks).
+    tell(ask, 'happy', qi === 0 ? firstThen('liczymy-jablka', pl.counting.startSay, level.mode !== 'count' ? pl.counting.askSumAgain : pl.counting.askAgain) : fresh(level.mode !== 'count' ? pl.counting.askSumAgain : pl.counting.askAgain))
   }, [qi, ask, tell])
 
   useEffect(() => {
@@ -83,7 +85,7 @@ function Round({ level, onDone, onBack }: RoundProps<Level>) {
       setCounting(true)
       tell(pl.counting.hint(q.answer), 'thinking', '')
       const words = Array.from({ length: q.answer }, (_, i) => `${i + 1}`).join(', ')
-      speak(`Policzmy razem. ${words}. Naciśnij ${q.answer}.`)
+      speak(`${fresh(pl.counting.together)} ${words}. Naciśnij ${q.answer}.`)
     }
   }
 

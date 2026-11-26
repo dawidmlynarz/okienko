@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from 'motion/react'
-import { fresh } from '../../lib/bag'
+import { firstThen, fresh } from '../../lib/bag'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Companion } from '../../components/Companion'
 import { OnScreenKeyboard } from '../../components/OnScreenKeyboard'
@@ -81,7 +81,7 @@ function Round({ level, onDone, onBack }: { level: Level; onDone: (firstTry: num
   const [hint, setHint] = useState(level.hintAfterMs === 0)
   const [wrongCode, setWrongCode] = useState<string | null>(null)
   const [wobble, setWobble] = useState(0)
-  const [companion, setCompanion] = useState<{ text: string | null; say?: string; pose: Pose; key: number }>({ text: pl.game.startShow, say: pl.game.startSay, pose: 'happy', key: 0 })
+  const [companion, setCompanion] = useState<{ text: string | null; say?: string; pose: Pose; key: number }>(() => ({ text: pl.game.startShow, say: firstThen('balonowy-las', pl.game.startSay, pl.game.startAgain), pose: 'happy', key: 0 }))
   const firstTry = useRef(0)
   const misses = useRef(0)
   const scene = useRef<HTMLDivElement>(null)

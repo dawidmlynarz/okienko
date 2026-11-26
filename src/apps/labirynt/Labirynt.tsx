@@ -1,5 +1,5 @@
 import { afterTalk } from '../../lib/speak'
-import { fresh } from '../../lib/bag'
+import { firstThen, fresh } from '../../lib/bag'
 import { AnimatePresence, motion } from 'motion/react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Companion } from '../../components/Companion'
@@ -69,8 +69,8 @@ function Round({ level, onDone, onBack }: RoundProps<Level>) {
   const [hasKey, setHasKey] = useState(false)
   const [bumps, setBumps] = useState(0)
   const [won, setWon] = useState(false)
-  const intro = () => (level.key ? { text: pl.labirynt.showKey, say: pl.labirynt.sayKey } : { text: pl.labirynt.show, say: pl.labirynt.say })
-  const [talk, setTalk] = useState<Talk>({ ...intro(), pose: 'happy', key: 0 })
+  const intro = () => (level.key ? { text: pl.labirynt.showKey, say: firstThen('labirynt-key', pl.labirynt.sayKey, pl.labirynt.keyAgain) } : { text: pl.labirynt.show, say: firstThen('labirynt', pl.labirynt.say, pl.labirynt.again) })
+  const [talk, setTalk] = useState<Talk>(() => ({ ...intro(), pose: 'happy', key: 0 }))
   const tell = useCallback((text: string | null, pose: Pose, say?: string) => setTalk((c) => ({ text, pose, say: say ?? '', key: c.key + 1 })), [])
 
   const good = useRef(0)
@@ -113,7 +113,7 @@ function Round({ level, onDone, onBack }: RoundProps<Level>) {
     if ('blocked' in r) {
       setBumps((b) => b + 1)
       play('tick')
-      if (r.blocked === 'door') tell(pl.labirynt.locked, 'thinking', pl.labirynt.lockedSay)
+      if (r.blocked === 'door') tell(pl.labirynt.locked, 'thinking', fresh(pl.labirynt.lockedSay))
       else if (bumps % 4 === 0) tell(pl.labirynt.wall, 'thinking', pickOne(pl.labirynt.wallSay))
       return
     }

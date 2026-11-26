@@ -21,3 +21,17 @@ export function fresh<T>(list: readonly T[]): T {
   b.last = b.left.shift()!
   return list[b.last]
 }
+
+const heard = new Set<string>()
+
+/**
+ * The full explanation the first time in a session, then a short, varied line.
+ * Instructions she has already heard turn into noise when repeated every round.
+ */
+export function firstThen(key: string, full: string, after: readonly string[]): string {
+  if (!heard.has(key)) {
+    heard.add(key)
+    return full
+  }
+  return fresh(after)
+}

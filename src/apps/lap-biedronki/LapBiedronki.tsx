@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from 'motion/react'
-import { fresh } from '../../lib/bag'
+import { firstThen, fresh } from '../../lib/bag'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Companion } from '../../components/Companion'
 import { Picture } from '../../components/Picture'
@@ -70,7 +70,7 @@ function Round({ level, onDone, onBack }: RoundProps<Level>) {
   const [bug, setBug] = useState<Bug | null>(null)
   const [caughtId, setCaughtId] = useState<number | null>(null)
   const [caught, setCaught] = useState(0)
-  const [talk, setTalk] = useState<{ text: string | null; say?: string; pose: Pose; key: number }>({ text: pl.ladybugs.show, say: pl.ladybugs.startSay, pose: 'happy', key: 0 })
+  const [talk, setTalk] = useState<{ text: string | null; say?: string; pose: Pose; key: number }>(() => ({ text: pl.ladybugs.show, say: firstThen('lap-biedronki', pl.ladybugs.startSay, pl.ladybugs.startAgain), pose: 'happy', key: 0 }))
   const field = useRef<HTMLDivElement>(null)
   const caughtRef = useRef(0)
   const tell = useCallback((text: string | null, pose: Pose, say?: string) => setTalk((c) => ({ text, pose, say: say ?? '', key: c.key + 1 })), [])

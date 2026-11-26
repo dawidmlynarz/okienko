@@ -17,3 +17,13 @@ describe('fresh', () => {
     }
   })
 })
+
+describe('firstThen', () => {
+  it('gives the full line once, then short ones', async () => {
+    const { firstThen } = await import('./bag')
+    const after = ['x', 'y'] as const
+    expect(firstThen('k', 'FULL', after)).toBe('FULL')
+    expect(after).toContain(firstThen('k', 'FULL', after))
+    expect(after).toContain(firstThen('k', 'FULL', after))
+  })
+})

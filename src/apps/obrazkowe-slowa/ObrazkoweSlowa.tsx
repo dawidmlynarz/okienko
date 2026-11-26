@@ -1,5 +1,5 @@
 import { Question } from '@phosphor-icons/react'
-import { fresh } from '../../lib/bag'
+import { firstThen, fresh } from '../../lib/bag'
 import { afterTalk } from '../../lib/speak'
 import { AnimatePresence, motion } from 'motion/react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -69,7 +69,7 @@ function Round({ level, onDone, onBack }: RoundProps<Level>) {
     setHint(false)
     misses.current = 0
     // Never say the word: she works it out from the picture.
-    tell(pl.words.ask, 'happy', wi === 0 ? pl.words.firstSay : pl.words.askSay)
+    tell(pl.words.ask, 'happy', wi === 0 ? firstThen('obrazkowe-slowa', pl.words.firstSay, pl.words.askSay) : fresh(pl.words.askSay))
   }, [current, wi, tell])
 
   const askHint = () => {
@@ -126,7 +126,8 @@ function Round({ level, onDone, onBack }: RoundProps<Level>) {
       misses.current += 1
       // No answer given away: after a couple of misses she is reminded the (?) can help.
       if (hint) tell(keys(target), 'thinking', instruction(target))
-      else tell(pl.game.almost, 'thinking', misses.current >= 2 ? pl.words.useHint : pl.words.again)
+      // The (?) reminder once per letter; otherwise a short, changing nudge, and silence after a few misses.
+      else tell(pl.game.almost, 'thinking', misses.current === 2 ? pl.words.useHint : misses.current < 4 ? fresh(pl.words.again) : '')
     }
   })
 

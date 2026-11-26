@@ -1,5 +1,5 @@
 import { ArrowCounterClockwise, Play } from '@phosphor-icons/react'
-import { fresh } from '../../lib/bag'
+import { firstThen, fresh } from '../../lib/bag'
 import { AnimatePresence, motion } from 'motion/react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Companion } from '../../components/Companion'
@@ -73,7 +73,7 @@ function Round({ level, onDone, onBack }: RoundProps<Level>) {
   const [busy, setBusy] = useState(false)
   const [won, setWon] = useState(false)
   const plan = level.mode === 'plan'
-  const [talk, setTalk] = useState<Talk>({ text: plan ? pl.konik.showPlan : pl.konik.showLive, say: plan ? pl.konik.sayPlan : pl.konik.sayLive, pose: 'happy', key: 0 })
+  const [talk, setTalk] = useState<Talk>(() => ({ text: plan ? pl.konik.showPlan : pl.konik.showLive, say: plan ? firstThen('konik-plan', pl.konik.sayPlan, pl.konik.planAgain) : firstThen('konik-live', pl.konik.sayLive, pl.konik.liveAgain), pose: 'happy', key: 0 }))
   const tell = useCallback((text: string | null, pose: Pose, say?: string) => setTalk((c) => ({ text, pose, say: say ?? '', key: c.key + 1 })), [])
 
   // Scoring: a map is "good" if solved on the first Start (plan) or without many extra steps (live).

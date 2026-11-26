@@ -1,4 +1,5 @@
 import { ArrowLeft, Star } from '@phosphor-icons/react'
+import { firstThen } from '../../lib/bag'
 import { AnimatePresence, motion } from 'motion/react'
 import { useEffect, useState, type ReactNode } from 'react'
 import { Button } from '../../components/Button'
@@ -91,7 +92,8 @@ const LEVEL_TINTS = [
 
 export function LevelPicker<L extends LevelBase>({ levels, heading, lead, hint, onPick }: { levels: L[]; heading: string; lead: string; hint?: string; onPick: (l: L) => void }) {
   const progress = useDomek((s) => s.progress)
-  useEffect(() => speak(`${lead}. ${heading}.`), [lead, heading])
+  // The game's how-to the first time; when she comes back to the levels, just a short nudge.
+  useEffect(() => speak(firstThen(`pick:${lead}`, `${lead}. ${heading}.`, pl.game.pickAgain)), [lead, heading])
   return (
     <div className="relative flex h-full flex-col items-center justify-center gap-8 p-8">
       {hint && <ParentHint text={hint} className="absolute top-5 right-6" />}
