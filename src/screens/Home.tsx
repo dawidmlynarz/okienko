@@ -1,4 +1,5 @@
 import { GameController, Lightbulb, Palette, PawPrint, Play, Smiley, Star } from '@phosphor-icons/react'
+import { fresh } from '../lib/bag'
 import { AnimatePresence, motion } from 'motion/react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { appById, apps, type AppDef } from '../apps/registry'
@@ -27,11 +28,7 @@ const rise = (delay: number) => ({
 
 /** Hands out lines from a list in a shuffled order, so nothing repeats until the list is used up. */
 function useBag<T>(items: readonly T[]) {
-  const bag = useRef<T[]>([])
-  return useCallback(() => {
-    if (!bag.current.length) bag.current = [...items].sort(() => Math.random() - 0.5)
-    return bag.current.shift()!
-  }, [items])
+  return useCallback(() => fresh(items), [items])
 }
 
 /** Everyday short names, so Smoczek talks like family: Helena is Hela. */
@@ -92,7 +89,7 @@ export function Home() {
       const pick = idleCount.current % 3
       if (pick === 1) {
         const app = nextApp()
-        say(pl.smoczek.play[app.id] ?? pl.smoczek.idle[0], 'happy', app)
+        say(fresh(pl.smoczek.play[app.id] ?? pl.smoczek.idle), 'happy', app)
       } else if (pick === 2 && canBuy) say(pl.smoczek.canBuy(wallet), 'happy', appById('szafa') ?? undefined)
       else if (pick === 2 && goal) say(pl.smoczek.saving(goal.price - wallet, goal.name), 'idle')
       else say(nextIdle(), 'idle')
@@ -122,7 +119,7 @@ export function Home() {
       icon: <GameController size={24} weight="bold" />,
       run: () => {
         const app = nextApp()
-        say(pl.smoczek.play[app.id] ?? '', 'happy', app)
+        say(fresh(pl.smoczek.play[app.id] ?? ['']), 'happy', app)
       },
     },
   ]

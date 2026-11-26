@@ -1,4 +1,5 @@
 import { afterTalk } from '../../lib/speak'
+import { fresh } from '../../lib/bag'
 import { AnimatePresence, motion } from 'motion/react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Companion } from '../../components/Companion'
@@ -21,7 +22,7 @@ interface Level extends LevelBase {
   mazes: number
 }
 const levels = data.levels as Level[]
-const pickOne = <T,>(xs: readonly T[]) => xs[Math.floor(Math.random() * xs.length)]
+const pickOne = fresh
 const cellId = (p: Pos) => `${p.x},${p.y}`
 
 /** A maze counts as "good" when she got there without much wandering. */

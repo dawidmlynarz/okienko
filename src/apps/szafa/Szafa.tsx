@@ -1,6 +1,7 @@
 import { ArrowCounterClockwise, Check, Star } from '@phosphor-icons/react'
+import { fresh } from '../../lib/bag'
 import { AnimatePresence, motion } from 'motion/react'
-import { useMemo, useRef, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { ChatBubble } from '../../components/ChatBubble'
 import { ParentHint } from '../../components/ParentHint'
 import { Smoczek, type Pose } from '../../components/Smoczek'
@@ -36,21 +37,6 @@ export default function Szafa(_: AppProps) {
   const say = (text: string, pose: Pose = 'happy', spoken?: string) => setLine((l) => ({ text, say: spoken, pose, key: l.key + 1 }))
   const { talking, repeat } = useTalk(line.say ?? line.text, line.key)
 
-  // Lines come from a shuffled bag, so the same one never comes twice in a row.
-  const bags = useRef<Record<string, number[]>>({})
-  const fresh = <T,>(key: string, list: readonly T[]): T => {
-    let bag = bags.current[key]
-    if (!bag?.length) {
-      const last = bags.current[key + ':last']?.[0]
-      bag = list.map((_, i) => i).sort(() => Math.random() - 0.5)
-      if (bag.length > 1 && bag[bag.length - 1] === last) bag.unshift(bag.pop()!)
-      bags.current[key] = bag
-    }
-    const i = bag.pop()!
-    bags.current[key + ':last'] = [i]
-    return list[i]
-  }
-
   const item = gadgetById(picked)
   const wearingNow = useMemo(() => wornList(wardrobe.worn), [wardrobe.worn])
 
@@ -70,7 +56,7 @@ export default function Szafa(_: AppProps) {
       toggleGadget(id)
       setPicked(null)
       if (wasOn) say(pl.wardrobe.offSay, 'idle')
-      else say(g.name, 'happy', fresh('wear', pl.wardrobe.wearSay))
+      else say(g.name, 'happy', fresh(pl.wardrobe.wearSay))
       return
     }
     const missing = Math.max(0, g.price - wallet)
@@ -87,7 +73,7 @@ export default function Szafa(_: AppProps) {
     play('pop')
     setPicked(id)
     if (missing) say(g.name, 'thinking', pl.wardrobe.tooExpensive(g.name, missing))
-    else say(g.name, 'happy', fresh('try', pl.wardrobe.tryOn)(g.name))
+    else say(g.name, 'happy', fresh(pl.wardrobe.tryOn)(g.name))
   }
 
   const shelf = GADGETS.filter((g) => g.slot === tab)

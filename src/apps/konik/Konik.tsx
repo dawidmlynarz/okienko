@@ -1,4 +1,5 @@
 import { ArrowCounterClockwise, Play } from '@phosphor-icons/react'
+import { fresh } from '../../lib/bag'
 import { AnimatePresence, motion } from 'motion/react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Companion } from '../../components/Companion'
@@ -24,8 +25,10 @@ const levels = data.levels as Level[]
 /** Most arrow cards that fit under the board. The longest map needs 10. */
 const MAX_CARDS = 12
 const STEP_MS = 420
+/** How many steps per map the friend names out loud ("w lewo", "w prawo"). */
+const SAY_DIRS = 3
 
-const pickOne = <T,>(xs: readonly T[]) => xs[Math.floor(Math.random() * xs.length)]
+const pickOne = fresh
 
 export default function Konik(_: AppProps) {
   return <GameShell levels={levels} lead={pl.konik.lead} hint={pl.parentHint.games.konik} backdrop={<Meadow />} className="bg-mint-50" Round={Round} />
@@ -77,6 +80,13 @@ function Round({ level, onDone, onBack }: RoundProps<Level>) {
   const good = useRef(0)
   const moves = useRef(0)
   const tries = useRef(0)
+  // Directions are named aloud only for the first few steps of a map, so she learns the words without hearing them on every key.
+  const named = useRef(0)
+  const nameDir = (dir: Dir) => {
+    if (named.current >= SAY_DIRS) return
+    named.current += 1
+    speak(pl.konik.dirs[dir])
+  }
   const timers = useRef<number[]>([])
   const later = (fn: () => void, ms: number) => timers.current.push(window.setTimeout(fn, ms))
   const stops = useRef<(() => void)[]>([])
@@ -95,6 +105,7 @@ function Round({ level, onDone, onBack }: RoundProps<Level>) {
     setWon(false)
     moves.current = 0
     tries.current = 0
+    named.current = 0
   }, [])
 
   const eat = (p: Pos) => {
@@ -137,7 +148,7 @@ function Round({ level, onDone, onBack }: RoundProps<Level>) {
       return
     }
     play('click')
-    speak(pl.konik.dirs[dir])
+    nameDir(dir)
     setHorse(next)
     eat(next)
     if (samePos(next, board.stable)) arrive()
@@ -152,7 +163,7 @@ function Round({ level, onDone, onBack }: RoundProps<Level>) {
       return
     }
     play('click')
-    speak(pl.konik.dirs[dir])
+    nameDir(dir)
     setBadCard(null)
     setCards((c) => [...c, dir])
   }

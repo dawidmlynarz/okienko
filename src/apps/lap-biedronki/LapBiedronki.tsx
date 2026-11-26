@@ -1,4 +1,5 @@
 import { AnimatePresence, motion } from 'motion/react'
+import { fresh } from '../../lib/bag'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Companion } from '../../components/Companion'
 import { Picture } from '../../components/Picture'
@@ -120,7 +121,7 @@ function Round({ level, onDone, onBack }: RoundProps<Level>) {
     play('pop')
     window.setTimeout(() => play('correct'), 80)
     burst(e.clientX / window.innerWidth, e.clientY / window.innerHeight)
-    const praise = pl.game.correct[Math.floor(Math.random() * pl.game.correct.length)]
+    const praise = fresh(pl.game.correct)
     tell(praise, 'happy', caughtRef.current % 3 === 0 ? praise : '')
     window.setTimeout(() => {
       setBug(null)

@@ -1,4 +1,5 @@
 import { PACE, afterTalk } from '../../lib/speak'
+import { fresh } from '../../lib/bag'
 import { motion } from 'motion/react'
 import { useCallback, useMemo, useRef, useState } from 'react'
 import type { PictureId } from '../../assets/pictures'
@@ -49,6 +50,7 @@ function Round({ level, onDone, onBack }: RoundProps<Level>) {
   const [moves, setMoves] = useState(0)
   const [talk, setTalk] = useState<{ text: string | null; say?: string; pose: Pose; key: number }>({ text: pl.memory.show, say: pl.memory.startSay, pose: 'happy', key: 0 })
   const busy = useRef(false)
+  const misses = useRef(0)
   const tell = useCallback((text: string | null, pose: Pose, say?: string) => setTalk((c) => ({ text, pose, say: say ?? '', key: c.key + 1 })), [])
 
   useTypedKeys((k) => {
@@ -78,7 +80,7 @@ function Round({ level, onDone, onBack }: RoundProps<Level>) {
           const stars: Stars = memoryStars(m, level.pairs)
           afterTalk(() => onDone(stars, pl.memory.moves(m)), 1000)
         } else {
-          const p = pl.memory.pair[f.size % pl.memory.pair.length]
+          const p = fresh(pl.memory.pair)
           tell(p, 'happy', p)
         }
       }, 450)
@@ -87,7 +89,9 @@ function Round({ level, onDone, onBack }: RoundProps<Level>) {
       window.setTimeout(() => {
         setOpen([])
         busy.current = false
-        tell(pl.memory.different, 'thinking', pl.memory.different)
+        // Say it out loud only now and then: hearing it after every miss gets tiring.
+        misses.current += 1
+        tell(pl.memory.different, 'thinking', misses.current % 3 === 1 ? pl.memory.differentSay : '')
       }, 1100 * PACE)
     }
   }

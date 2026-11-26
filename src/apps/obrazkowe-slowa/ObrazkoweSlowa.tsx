@@ -1,4 +1,5 @@
 import { Question } from '@phosphor-icons/react'
+import { fresh } from '../../lib/bag'
 import { afterTalk } from '../../lib/speak'
 import { AnimatePresence, motion } from 'motion/react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -108,7 +109,7 @@ function Round({ level, onDone, onBack }: RoundProps<Level>) {
       play('correct')
       burst(0.5, 0.35)
       const last = wi + 1 >= words.length
-      tell(pl.game.good[wi % pl.game.good.length], last ? 'cheer' : 'happy', pl.words.good(current.word))
+      tell(fresh(pl.game.good), last ? 'cheer' : 'happy', pl.words.good(current.word))
       afterTalk(() => {
         if (last) {
           play('fanfare')

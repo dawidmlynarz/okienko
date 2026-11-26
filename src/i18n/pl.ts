@@ -1,4 +1,5 @@
 import { friendGen } from '../companion/species'
+import { fresh } from '../lib/bag'
 
 /** Every word Smoczy Domek shows or says lives here. An English UI later is a second file of the same shape. */
 /** Polish plural: 1 gwiazdka, 2–4 gwiazdki, 5+ gwiazdek (and 12–14 gwiazdek). */
@@ -8,6 +9,53 @@ export function plural(n: number, one: string, few: string, many: string) {
   return d >= 2 && d <= 4 && (t < 12 || t > 14) ? few : many
 }
 export const stars = (n: number) => `${n} ${plural(n, 'gwiazdka', 'gwiazdki', 'gwiazdek')}`
+
+/* Word banks. The friend draws from these with fresh(), so a line comes back only after all the others. */
+const WELCOME = [
+  (n: string) => `Cześć, ${n}, dobrze, że jesteś!`,
+  (n: string) => `Hej, ${n}! Czekałem na ciebie!`,
+  (n: string) => `${n}! Jak fajnie cię widzieć!`,
+  (n: string) => `Dzień dobry, ${n}! Co dziś robimy?`,
+  (n: string) => `O, ${n}! Właśnie o tobie myślałem!`,
+  (n: string) => `Witaj, ${n}! Stęskniłem się!`,
+  (n: string) => `${n}, hurra! Jesteś!`,
+]
+const CAN_BUY = [
+  (n: number) => `Masz ${stars(n)}! Kupisz mi coś w szafie?`,
+  (n: number) => `Uzbierałaś ${stars(n)}! Zajrzymy do szafy?`,
+  (n: number) => `${stars(n)} w kieszeni! W szafie czeka coś ładnego.`,
+]
+const PET_LOTS = [
+  (n: string) => `${n}, jesteś moją najlepszą przyjaciółką!`,
+  (n: string) => `${n}, ale się wygłaskałem! Dziękuję!`,
+  (n: string) => `Mrrr… ${n}, mogę tak cały dzień!`,
+]
+const GO = ['Hop, hop!', 'Idziemy!', 'Patataj!', 'Ruszamy!', 'No to w drogę!']
+const BUMP = ['Ups!', 'Bęc!', 'Ojej!', 'Ała, płotek!']
+const BUMP_SAY = ['Ups! Tędy konik nie przejdzie.', 'Bęc! Tam jest płotek.', 'Ojej, tędy nie da rady.', 'Ups! Spróbuj w inną stronę.']
+const BUMP_PLAN_SAY = [
+  'Ups! Tędy konik nie przejdzie. Popraw strzałki i spróbuj jeszcze raz.',
+  'Bęc! Konik wpadł na płotek. Zobacz, która strzałka jest czerwona.',
+  'Ojej! Ta strzałka prowadzi w płotek. Zmień ją i jeszcze raz!',
+]
+const NOT_HOME = ['Jeszcze nie!', 'Prawie!', 'Daleko?']
+const NOT_HOME_SAY = ['Konik jeszcze nie jest w stajni. Dołóż strzałki!', 'Prawie! Brakuje jeszcze kilku kroków.', 'Konik się zatrzymał przed stajnią. Dodaj strzałki!']
+const DIFFERENT = ['Inne!', 'Nie pasują', 'Hmm, różne', 'Nie tym razem', 'Ojej, inne']
+const DIFFERENT_SAY = [
+  'Inne obrazki. Zapamiętaj, gdzie były!',
+  'Te są różne. Ale już wiesz, gdzie leżą!',
+  'Hmm, to nie para. Szukaj dalej!',
+  'Zapamiętaj te dwie karty, jeszcze się przydadzą.',
+  'Nie pasują. Spróbuj inną kartę!',
+]
+const ALMOST = ['Prawie!', 'Ojej!', 'Jeszcze raz!', 'Hmm…', 'Blisko!']
+const TRY_AGAIN = ['Prawie! Szukaj świecącego klawisza.', 'Ojej, to inny klawisz. Spróbuj jeszcze raz!', 'Blisko! Popatrz na świecący klawisz.', 'Nic nie szkodzi. Jeszcze raz!']
+const RESULT = {
+  3: ['Trzy gwiazdki! Jesteś mistrzynią!', 'Trzy gwiazdki! Ale ci poszło!', 'Wow, trzy gwiazdki! Piątka!'],
+  2: ['Dwie gwiazdki! Świetnie ci idzie!', 'Dwie gwiazdki! Coraz lepiej!', 'Dwie gwiazdki! Jestem z ciebie dumny!'],
+  1: ['Jedna gwiazdka! Każda runda to trening.', 'Jest gwiazdka! Następnym razem będzie więcej.', 'Gwiazdka zdobyta! Ćwiczymy dalej?'],
+} as Record<number, string[]>
+const COUNT_YES = [(n: number) => `Tak! ${n}!`, (n: number) => `Dokładnie ${n}!`, (n: number) => `${n}! Zgadza się!`, (n: number) => `Brawo, ${n}!`, (n: number) => `Super, to ${n}!`]
 
 export const pl = {
   os: {
@@ -157,22 +205,25 @@ export const pl = {
   game: {
     pickLevel: 'Wybierz poziom',
     level: (n: number) => `Poziom ${n}`,
-    good: ['Brawo!', 'Super!', 'Dobrze!'],
+    good: ['Brawo!', 'Super!', 'Dobrze!', 'Pięknie!', 'Tak jest!', 'Wspaniale!', 'Ekstra!', 'Mistrzostwo!'],
     start: 'Start',
     startSay: 'Wpisz literę z balonika, żeby go przebić!',
     startShow: 'Przebij balonik!',
     /** On screen: the keys only. Spoken: the full sentence (pressKey and friends). */
     keysAlt: (alt: string, letter: string) => `${alt} + ${letter}`,
     keysShift: (letter: string) => `⇧ + ${letter}`,
-    almost: 'Prawie!',
+    get almost() {
+      return fresh(ALMOST)
+    },
     pressKey: (letter: string) => `Naciśnij ${letter}`,
     pressAlt: (alt: string, letter: string) => `Przytrzymaj ${alt} i naciśnij ${letter}`,
     pressShift: (letter: string) => `Przytrzymaj shift i naciśnij ${letter}`,
-    correct: ['Brawo!', 'Super!', 'Pięknie!', 'Tak jest!', 'Ekstra!'],
-    tryAgain: 'Prawie! Szukaj świecącego klawisza.',
+    correct: ['Brawo!', 'Super!', 'Pięknie!', 'Tak jest!', 'Ekstra!', 'Bum!', 'Trafione!', 'Wow!', 'Świetnie!', 'Ale szybko!', 'Celnie!', 'Hura!'],
+    get tryAgain() {
+      return fresh(TRY_AGAIN)
+    },
     done: 'Koniec rundy!',
-    resultSay: (stars: number) =>
-      stars === 3 ? 'Trzy gwiazdki! Jesteś mistrzynią klawiatury!' : stars === 2 ? 'Dwie gwiazdki! Świetnie Ci idzie!' : 'Jedna gwiazdka! Każda runda to trening.',
+    resultSay: (n: number) => fresh(RESULT[Math.max(1, Math.min(3, n))]),
     accuracy: (hit: number, total: number) => `${hit} z ${total} baloników za pierwszym razem`,
     again: 'Spróbuj ponownie',
     finish: 'Zakończ',
@@ -197,15 +248,50 @@ export const pl = {
   },
   smoczek: {
     /** The first thing Smoczek says after she logs in. */
-    welcome: (n: string) => `Cześć, ${n}, dobrze, że jesteś!`,
+    welcome: (n: string) => fresh(WELCOME)(n),
     jokes: [
       'Dlaczego komputer poszedł do lekarza? Bo złapał wirusa!',
       'Co mówi myszka komputerowa do kota? Nie bój się, ja tylko klikam!',
       'Jak nazywa się smok, który dużo czyta? Smok Książkożerca!',
-      'Puk, puk! Kto tam? Smoczek! Jaki Smoczek? Ten, który bardzo Cię lubi!',
+      'Puk, puk! Kto tam? Smoczek! Jaki Smoczek? Ten, który bardzo cię lubi!',
       'Dlaczego klawiatura jest zawsze spokojna? Bo ma spację na odpoczynek!',
       'Co robi smok w deszczowy dzień? Zieje ciepłym powietrzem i suszy kałuże!',
       'Jaki owoc lubią smoki? Smoczy owoc! Naprawdę taki jest!',
+      'Kto skacze wyżej niż dom? Każdy! Bo domy w ogóle nie skaczą!',
+      'Co ma zęby, a nie gryzie? Grzebień!',
+      'Co ma oczka, a nic nie widzi? Ziemniak!',
+      'Co ma szyję, a nie ma głowy? Butelka!',
+      'Co ma nogi, a nigdzie nie chodzi? Stół!',
+      'Czego nie można zjeść na śniadanie? Obiadu i kolacji!',
+      'Ile jajek można zjeść na pusty brzuszek? Tylko jedno! Potem brzuszek już nie jest pusty!',
+      'Co rośnie do góry nogami? Sopel lodu!',
+      'Co je konik na obiad? Kopytka!',
+      'Co robi krowa w kosmosie? Robi Drogę Mleczną!',
+      'Dlaczego ryby nie grają w siatkówkę? Bo boją się siatki!',
+      'Dlaczego banan poszedł do lekarza? Bo źle się obierał!',
+      'Jakie litery są najzimniejsze? B i R. Brrr!',
+      'Jak się nazywa dinozaur, który dużo śpi? Dinochrapuś!',
+      'Jak smok gasi świeczki na torcie? Nie gasi! Zapala je jeszcze raz!',
+      'Jaki przedmiot w szkole lubi duch? Bu-ologię!',
+      'Co mówi morze do plaży? Nic. Tylko macha!',
+      'Dlaczego słońce nie chodzi do szkoły? Bo i tak wszystko jest dla niego jasne!',
+      'Co mówi mama-wąż do dzieci? Ssssiadajcie do ssstołu!',
+      'Co robi bałwan latem? Szuka cienia… i lodówki!',
+      'Puk, puk! Kto tam? Krowa. Jaka krowa? Muuusisz otworzyć!',
+      'Puk, puk! Kto tam? Ala. Jaka Ala? Alarm! Czas na zabawę!',
+      'Co powiedziała jedna gwiazdka do drugiej? Świecisz dziś jak nigdy!',
+      'Dlaczego ślimak nigdy się nie spóźnia do domu? Bo nosi go ze sobą!',
+      'Co mówi jedna ściana do drugiej? Spotkamy się na rogu!',
+      'Dlaczego jeżyk nie gra w piłkę? Bo ciągle ją przebija!',
+      'Dlaczego żyrafa ma taką długą szyję? Bo jej stopy bardzo brzydko pachną!',
+      'Dlaczego kura przeszła przez ulicę? Żeby dojść na drugą stronę!',
+      'Co jest zawsze przed tobą, a nie możesz tego zobaczyć? Jutro!',
+      'Dlaczego książka do matematyki jest smutna? Bo ma tyle zadań!',
+      'Co mówi zegar, kiedy jest głodny? Tik-tak, czas na podwieczorek!',
+      'Co jest najbardziej zmęczone w łóżku? Poduszka! Ciągle leży pod głową!',
+      'Jaki jest ulubiony taniec pszczoły? Bzzz-ka!',
+      'Dlaczego smoki nie lubią zupy? Bo zawsze im za gorąca!',
+      'Co robi kotek przy komputerze? Pilnuje myszki!',
     ],
     facts: [
       'Wiesz, że ośmiornica ma trzy serca?',
@@ -213,26 +299,80 @@ export const pl = {
       'Wiesz, że w polskim alfabecie są trzydzieści dwie litery?',
       'Wiesz, że Ż ma kropkę, a Ź kreseczkę? To dwie różne litery!',
       'Wiesz, że koty potrafią przespać pół dnia?',
-      'Wiesz, że miód może leżeć w słoiku bardzo, bardzo długo i się nie psuje?',
+      'Wiesz, że miód może stać w słoiku bardzo, bardzo długo i się nie psuje?',
       'Wiesz, że biedronki zjadają mszyce i pomagają roślinom?',
-      'Wiesz, że słoń to jedyne zwierzę z trąbą?',
+      'Wiesz, że słoń podnosi trąbą nawet malutki orzeszek?',
+      'Wiesz, że żyrafa ma taki długi język, że może nim wyczyścić sobie ucho?',
+      'Wiesz, że motyle czują smak nóżkami?',
+      'Wiesz, że pszczoły tańczą, żeby pokazać koleżankom, gdzie rosną kwiaty?',
+      'Wiesz, że koala śpi prawie cały dzień i całą noc?',
+      'Wiesz, że delfiny śpią z jednym okiem otwartym?',
+      'Wiesz, że kot ma w każdym uchu ponad trzydzieści mięśni? Dlatego tak nimi kręci!',
+      'Wiesz, że ślimak ma tysiące malutkich ząbków?',
+      'Wiesz, że pingwiny nie umieją latać, ale za to świetnie pływają?',
+      'Wiesz, że malutki kangur po urodzeniu jest wielkości fasolki?',
+      'Wiesz, że sowa potrafi obrócić głowę prawie dookoła?',
+      'Wiesz, że krokodyl nie umie wystawić języka?',
+      'Wiesz, że każda zebra ma inne paski? Nie ma dwóch takich samych!',
+      'Wiesz, że flamingi są różowe, bo jedzą różowe skorupiaki?',
+      'Wiesz, że serce płetwala błękitnego jest wielkie jak mały samochód?',
+      'Wiesz, że mrówka potrafi unieść coś dużo cięższego od siebie?',
+      'Wiesz, że pająk to nie owad? Owady mają sześć nóg, a pająk osiem!',
+      'Wiesz, że rekiny pływały w morzach, zanim pojawiły się dinozaury?',
+      'Wiesz, że kolibry potrafią latać do tyłu?',
+      'Wiesz, że jeż ma na plecach kilka tysięcy kolców?',
+      'Wiesz, że wielbłąd trzyma w garbie tłuszcz, a nie wodę?',
+      'Wiesz, że świnki tarzają się w błocie, żeby się ochłodzić?',
+      'Wiesz, że konie potrafią spać na stojąco?',
+      'Wiesz, że każdy pies ma inny wzorek na nosie, jak odcisk palca?',
+      'Wiesz, że żaby piją wodę skórą?',
+      'Wiesz, że wiewiórki zapominają, gdzie schowały orzechy, i z nich wyrastają nowe drzewa?',
+      'Wiesz, że kameleon ma język dłuższy niż całe ciało?',
+      'Wiesz, że wieloryby śpiewają sobie piosenki?',
+      'Wiesz, że ośmiornica potrafi zmieniać kolor?',
+      'Wiesz, że Słońce to gwiazda? Najbliższa gwiazda, jaką mamy!',
+      'Wiesz, że Księżyc sam nie świeci? Odbija światło Słońca jak lusterko.',
+      'Wiesz, że na Księżycu wciąż są ślady butów astronautów? Nie ma tam wiatru, który by je zdmuchnął.',
+      'Wiesz, że Ziemia cały czas się kręci? Dlatego mamy dzień i noc.',
+      'Wiesz, że Jowisz jest tak wielki, że zmieściłoby się w nim ponad tysiąc Ziem?',
+      'Wiesz, że każdy płatek śniegu ma sześć ramion?',
+      'Wiesz, że piorun jest gorętszy niż Słońce?',
+      'Wiesz, że lód pływa po wodzie, bo jest od niej lżejszy?',
+      'Wiesz, że twoje serce bije około stu tysięcy razy dziennie?',
+      'Wiesz, że małe dzieci mają więcej kości niż dorośli? Potem niektóre się zrastają.',
+      'Wiesz, że prawie nikt nie umie kichnąć z otwartymi oczami?',
+      'Wiesz, że najdłuższa rzeka w Polsce to Wisła?',
+      'Wiesz, że najwyższa góra w Polsce to Rysy?',
+      'Wiesz, że w herbie Warszawy jest syrenka z mieczem?',
+      'Wiesz, że w Krakowie pod Wawelem stoi smok, który naprawdę zieje ogniem? To pomnik!',
+      'Wiesz, że banany rosną wygięte do góry, do słońca?',
+      'Wiesz, że truskawka ma pestki na zewnątrz? Około dwustu!',
+      'Wiesz, że dawno temu marchewki były fioletowe?',
+      'Wiesz, że pomidor to tak naprawdę owoc?',
+      'Wiesz, że dziury w serze robią malutkie bąbelki gazu?',
+      'Wiesz, że niektóre drzewa żyją ponad tysiąc lat?',
+      'Wiesz, że młode słoneczniki obracają się za słońcem?',
+      'Wiesz, że rośliny robią sobie jedzenie ze światła słońca?',
+      'Wiesz, że litery na klawiaturze nie są po kolei, bo tak było wygodniej na starych maszynach do pisania?',
+      'Wiesz, że pierwsze komputery były wielkie jak cały pokój?',
+      'Wiesz, że najmniejszy ptak na świecie jest mniejszy niż twój kciuk? To koliber!',
     ],
-    pet: ['Hihi, to łaskocze!', 'Mrrr, jak miło!', 'Jeszcze! Jeszcze!', 'Apsik! Prawie kichnąłem iskierkami!', 'Lubię, jak mnie głaszczesz.'],
-    petLots: (n: string) => `${n}, jesteś moją najlepszą przyjaciółką!`,
+    pet: ['Hihi, to łaskocze!', 'Mrrr, jak miło!', 'Jeszcze! Jeszcze!', 'Apsik! Prawie kichnąłem iskierkami!', 'Lubię, jak mnie głaszczesz.', 'Oj, tam mam łaskotki!', 'Ale masz delikatną rączkę!', 'Mmm, jak ciepło.', 'Hihihi! Przestań! Nie, nie przestawaj!', 'Zrobiło mi się wesoło!', 'Głaskanie to moja ulubiona rzecz!', 'Mruczę jak kotek. Mrrr!'],
+    petLots: (n: string) => fresh(PET_LOTS)(n),
     play: {
-      'balonowy-las': 'Przebijemy kilka baloników?',
-      'obrazkowe-slowa': 'Zgadniesz, co jest na obrazku? Napiszemy to razem!',
-      'lap-biedronki': 'Biedronki czekają na liściach. Złapiesz je myszką?',
-      'smocze-memory': 'Zagramy w memory? Mam świetną pamięć… chyba.',
-      'liczymy-jablka': 'Policzymy razem jabłka?',
-      notatnik: 'Może napiszesz dla mnie jakąś historyjkę?',
-      szafa: 'Zajrzymy do mojej szafy? Lubię się przebierać!',
-      konik: 'Konik się zgubił! Pomożesz mu wrócić do stajni?',
-      labirynt: 'Myszka jest w labiryncie. Pomożesz jej znaleźć ser?',
-    } as Record<string, string>,
-    canBuy: (n: number) => `Masz ${stars(n)}! Kupisz mi coś w szafie?`,
+      'balonowy-las': ['Przebijemy kilka baloników?', 'Baloniki z literkami już lecą! Przebijemy je?', 'Pyk, pyk! Pobawimy się w baloniki?'],
+      'obrazkowe-slowa': ['Zgadniesz, co jest na obrazku? Napiszemy to razem!', 'Mam kilka obrazków. Napiszesz, co na nich jest?', 'Pobawimy się w pisanie słówek?'],
+      'lap-biedronki': ['Biedronki czekają na liściach. Złapiesz je myszką?', 'Biedronki przyleciały! Złapiesz wszystkie?', 'Ćwiczymy celowanie? Biedronki już siedzą.'],
+      'smocze-memory': ['Zagramy w memory? Mam świetną pamięć… chyba.', 'Memory! Sprawdzimy, kto ma lepszą pamięć?', 'Poszukamy par obrazków?'],
+      'liczymy-jablka': ['Policzymy razem jabłka?', 'W sadzie jest pełno jabłek. Policzymy je?', 'Lubisz liczyć? Mam dla ciebie jabłka!'],
+      notatnik: ['Może napiszesz dla mnie jakąś historyjkę?', 'Napiszesz coś w notatniku? Chętnie przeczytam!', 'Napiszemy list? Do kogo chcesz?'],
+      szafa: ['Zajrzymy do mojej szafy? Lubię się przebierać!', 'Przebierzesz mnie? Mam pełną szafę!', 'Pokaz mody? Wybierzesz mi strój?'],
+      konik: ['Konik się zgubił! Pomożesz mu wrócić do stajni?', 'Konik chce do domu. Pokażesz mu drogę strzałkami?', 'Patataj! Pomożemy konikowi?'],
+      labirynt: ['Myszka jest w labiryncie. Pomożesz jej znaleźć ser?', 'Myszka jest głodna. Znajdziesz jej drogę do sera?', 'Labirynt! Lubisz szukać drogi?'],
+    } as Record<string, string[]>,
+    canBuy: (n: number) => fresh(CAN_BUY)(n),
     saving: (n: number, thing: string) => `Jeszcze ${stars(n)} i kupimy: ${thing}!`,
-    idle: ['Lalala… lubię sobie pośpiewać.', 'Zobacz, moje oczy patrzą na myszkę!', 'Nudzi mi się trochę. Pogramy?', 'Kliknij mnie, to coś powiem!'],
+    idle: ['Lalala… lubię sobie pośpiewać.', 'Zobacz, moje oczy patrzą na myszkę!', 'Nudzi mi się trochę. Pogramy?', 'Kliknij mnie, to coś powiem!', 'Ziew… Chyba zaraz zasnę. Obudzisz mnie?', 'Hmm, o czym by tu pomyśleć…', 'Ciekawe, co dziś zrobimy?', 'Znam super żart! Chcesz posłuchać?', 'Pst! Mam dla ciebie ciekawostkę.', 'Tra-la-la, hop-sa-sa!', 'Ale tu przytulnie.', 'Może zmienimy kolor pulpitu?'],
   },
   words: {
     lead: 'Popatrz na obrazek i napisz słowo',
@@ -255,10 +395,14 @@ export const pl = {
   memory: {
     lead: 'Odkrywaj karty i szukaj par',
     show: 'Szukaj par!',
-    different: 'Inne!',
-    differentSay: 'Inne obrazki. Zapamiętaj, gdzie były!',
+    get different() {
+      return fresh(DIFFERENT)
+    },
+    get differentSay() {
+      return fresh(DIFFERENT_SAY)
+    },
     startSay: 'Kliknij dwie karty. Jeśli obrazki są takie same, zostają odkryte!',
-    pair: ['Para!', 'Mamy to!', 'Świetna pamięć!'],
+    pair: ['Para!', 'Mamy to!', 'Świetna pamięć!', 'Takie same!', 'Pasują!', 'Trafione!', 'Jest para!', 'Bingo!', 'Ale oko!', 'Brawo, para!', 'Zgadza się!', 'Hura!'],
     moves: (n: number) => `Ruchy: ${n}`,
     resultLine: (moves: number) => `Wszystkie pary w ${moves} ${plural(moves, 'ruchu', 'ruchach', 'ruchach')}`,
   },
@@ -267,7 +411,7 @@ export const pl = {
     howMany: 'Ile jabłek?',
     howManySum: 'Ile razem?',
     startSay: 'Policz, ile jest jabłek, i naciśnij tę cyfrę na klawiaturze. Cyfry są w górnym rzędzie.',
-    sayCount: (n: number) => `Tak! ${n}!`,
+    sayCount: (n: number) => fresh(COUNT_YES)(n),
     hint: (n: number) => `To ${n}!`,
   },
   konik: {
@@ -278,17 +422,29 @@ export const pl = {
     sayPlan: 'Najpierw ułóż strzałki, a potem naciśnij Start. Konik pójdzie dokładnie tak, jak mu każesz!',
     dirs: { up: 'w górę', down: 'w dół', left: 'w lewo', right: 'w prawo' } as Record<string, string>,
     start: 'Start',
-    go: 'Hop, hop!',
+    get go() {
+      return fresh(GO)
+    },
     clear: 'Od nowa',
-    bump: 'Ups!',
-    bumpSay: 'Ups! Tędy konik nie przejdzie.',
-    bumpPlanSay: 'Ups! Tędy konik nie przejdzie. Popraw strzałki i spróbuj jeszcze raz.',
-    notHome: 'Jeszcze nie!',
-    notHomeSay: 'Konik jeszcze nie jest w stajni. Dołóż strzałki!',
+    get bump() {
+      return fresh(BUMP)
+    },
+    get bumpSay() {
+      return fresh(BUMP_SAY)
+    },
+    get bumpPlanSay() {
+      return fresh(BUMP_PLAN_SAY)
+    },
+    get notHome() {
+      return fresh(NOT_HOME)
+    },
+    get notHomeSay() {
+      return fresh(NOT_HOME_SAY)
+    },
     empty: 'Najpierw ułóż strzałki!',
     full: 'Więcej się nie zmieści!',
-    home: ['Jest w domu!', 'Hura!', 'Brawo!'],
-    homeSay: ['Hura! Konik jest w stajni!', 'Brawo! Konik wrócił do domu!', 'Super! Konik dziękuje!'],
+    home: ['Jest w domu!', 'Hura!', 'Brawo!', 'Udało się!', 'Patataj!', 'W stajni!'],
+    homeSay: ['Hura! Konik jest w stajni!', 'Brawo! Konik wrócił do domu!', 'Super! Konik dziękuje!', 'Udało się! Konik już je sianko.', 'Patataj! Konik jest bezpieczny.', 'Ihaha! Konik mówi: dziękuję!', 'Jest w domu! Ale dobra droga!'],
     carrot: 'Mniam!',
     resultLine: (n: number, total: number) => `${n} z ${total} za pierwszym razem`,
   },
@@ -305,8 +461,8 @@ export const pl = {
     lockedSay: 'Drzwi są zamknięte. Poszukaj klucza!',
     gotKey: 'Mam klucz!',
     gotKeySay: 'Jest klucz! Teraz drzwi się otworzą. Idziemy do sera!',
-    home: ['Mniam!', 'Hura!', 'Brawo!'],
-    homeSay: ['Mniam! Myszka zjadła ser!', 'Hura! Myszka znalazła ser!', 'Brawo! Myszka dziękuje!'],
+    home: ['Mniam!', 'Hura!', 'Brawo!', 'Ser!', 'Udało się!', 'Pi-pi!'],
+    homeSay: ['Mniam! Myszka zjadła ser!', 'Hura! Myszka znalazła ser!', 'Brawo! Myszka dziękuje!', 'Pi-pi! To po mysiemu: dziękuję!', 'Udało się! Ser był pyszny.', 'Ale sprytnie! Myszka jest najedzona.', 'Mniam, mniam! Znalazłaś drogę!'],
     resultLine: (n: number, total: number) => `${n} z ${total} bez błądzenia`,
   },
   wardrobe: {

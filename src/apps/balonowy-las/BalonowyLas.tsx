@@ -1,4 +1,5 @@
 import { AnimatePresence, motion } from 'motion/react'
+import { fresh } from '../../lib/bag'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Companion } from '../../components/Companion'
 import { OnScreenKeyboard } from '../../components/OnScreenKeyboard'
@@ -141,7 +142,7 @@ function Round({ level, onDone, onBack }: { level: Level; onDone: (firstTry: num
       window.setTimeout(() => play('correct'), 90)
       const r = balloonEl.current?.getBoundingClientRect()
       if (r) burst((r.left + r.width / 2) / window.innerWidth, (r.top + r.height / 2.5) / window.innerHeight)
-      const praise = pl.game.correct[Math.floor(Math.random() * pl.game.correct.length)]
+      const praise = fresh(pl.game.correct)
       const last = idx + 1 >= letters.length
       tell(praise, last ? 'cheer' : 'happy', last || idx % 3 === 2 ? praise : '')
       window.setTimeout(() => {
